@@ -1,0 +1,49 @@
+Requirements: describe the main features of the systems 
+
+ID
+
+Character : 
+- have some general classes (Name, Class, HP, ATK, ...) to manage the character attributes
+- point system show and control character's development
+
+Class :
+- save information about each class
+- control the allowable weapons / armor for each class
+- skill systems for each class 
+- class level system for control character's development
+
+Character save :
+- save some hidden information about player / character
+
+Inventory : 
+- save the items quantity / durability that the player has
+- delete items if player throw or the items is broken
+- add items if player picks up or collect from chests / monsters
+
+Items:
+- save all the information about all items in the game
+
+Upgrade: 
+- show the list of upgradeable items / upgraded items 
+- inherit items table to control the condition of the upgrade tools
+- save the upgrade recipe
+
+
+------------------------------------------------------------------------
+NPC :	
+- given quest / reward
+- buy / sell items
+
+Monsters : 
+- have some general classes (Name, Class, HP, ATK, ...) to manage the monsters attributes
+- level systems and mechanics to control monster's actions
+- mechanic system that control monster actions
+
+Boss :
+- monster but stronger and more mechanics
+
+Map :
+- create a map sample for all maps used in game
+- save the position of character, monsters, obstacles, chest and other objects will appear on one room
+- save drop-rate of monster or chest in one room
+
