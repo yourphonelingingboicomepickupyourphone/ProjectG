@@ -79,6 +79,7 @@ public class Entity {
 		gp.cChecker.checkTile(this); //check tile collision
 		gp.cChecker.checkObject(this, false); //check object collision
 		gp.cChecker.checkEntity(this, gp.npc); //check entity 
+		gp.cChecker.checkEntity(this, gp.monster); //check monster collision
 		gp.cChecker.checkPlayer(this); //check player collision
 
 		if(collisionOn == false) {

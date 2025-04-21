@@ -15,13 +15,15 @@ public class MON_rSlime extends Entity{
         health = maxHealth;
         collision = true;
    
-        solidArea.x = 0;
-        solidArea.y = 0;
-        solidArea.width = 48;
-        solidArea.height = 48;
+        solidArea.x = 8;
+        solidArea.y = 30;
+        solidArea.width = 64;
+        solidArea.height = 50;
         solidAreaDefaultX = solidArea.x;
         solidAreaDefaultY = solidArea.y;
 
+        getImage();
+        setAction();
     }
 
     public void getImage(){
@@ -34,11 +36,10 @@ public class MON_rSlime extends Entity{
         right1 = setup("/monsters/slime_right_1");
         right2 = setup("/monsters/slime_right_2");
 
-        setAction();
+        
     }
 
     public void setAction() {
-        actionLockCounter++;
         actionLockCounter++;
             if(actionLockCounter == 240) //direction changes after 4 secs
             {
