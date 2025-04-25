@@ -14,6 +14,7 @@ public class MON_rSlime extends Entity{
         maxHealth = 10;
         health = maxHealth;
         collision = true;
+        renderLayer = 1; 
    
         solidArea.x = 8;
         solidArea.y = 30;
