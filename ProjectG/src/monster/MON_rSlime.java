@@ -13,6 +13,9 @@ public class MON_rSlime extends Entity{
         speed = 1;
         maxHealth = 10;
         health = maxHealth;
+        attack = 5;
+        defense = 0;
+
         collision = true;
         renderLayer = 1; 
    

@@ -185,7 +185,7 @@ public class Player extends Entity{
 	public void contactMonster(int i){
 		if(i != 999){
 
-			health -= 100;
+			health -= gp.monster[i].attack;
 		}
 	}
 

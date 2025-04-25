@@ -126,10 +126,13 @@ public class GamePanel extends JPanel implements Runnable{
 					monster[i].update();
 				}
 			}	//Monster update
+
+			System.out.println("Game is running");
 		}
 
-		if (gameState == pauseState) {
+		else if (gameState == pauseState) {
 			// do nothing
+			System.out.println("Game is paused");
 		}
 		
 	}
@@ -148,7 +151,6 @@ public class GamePanel extends JPanel implements Runnable{
 		else {
 			tileM.draw(g2);	//tile draw
 
-			entityList.clear();	//clear the entity list for next time
 			entityList.add(player);	//add player to entity list
 
 			for(int i = 0; i < obj.length; i++) {

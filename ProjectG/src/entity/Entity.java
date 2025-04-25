@@ -45,6 +45,8 @@ public class Entity {
 	public int maxMana;
 	public int mana;
 	public int level;
+	public int attack;
+	public int defense;
 
 	public Entity(GamePanel gp) {
 		this.gp = gp;

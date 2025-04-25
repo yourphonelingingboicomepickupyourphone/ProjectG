@@ -62,19 +62,19 @@ public class UI {
 		}
 
 		//Play State
-		if(gp.gameState == gp.playState) {
+		else if(gp.gameState == gp.playState) {
 			drawPlayerHealth();
 			drawPlayerMana();
 			drawPlayerIcon();
 		}
 
 		//Pause State
-		if (gp.gameState == gp.pauseState) {
+		else if (gp.gameState == gp.pauseState) {
 			drawPauseScreen();
 		}
 
 		//Dialogue State
-		if (gp.gameState == gp.dialogueState) {
+		else if (gp.gameState == gp.dialogueState) {
 			drawDialogueScreen();
 		}
 	}
@@ -209,7 +209,14 @@ public class UI {
 
 	public void drawPauseScreen() {
 
+		// Set the color and transparency for the overlay
+		g2.setColor(new Color(0, 0, 0, 180)); // Black with 70% opacity (alpha = 180 out of 255)
+    
+		// Draw the overlay over the entire screen
+		g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
+
 		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 80F));
+		g2.setColor(Color.WHITE);
 		String text = "PAUSED";
 		int x = getXForCenteredText(text);
 		int y = gp.screenHeight/2 - 5 * gp.tileSize / 2;
