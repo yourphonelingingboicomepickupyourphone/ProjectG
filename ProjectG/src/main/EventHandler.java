@@ -101,6 +101,7 @@ public class EventHandler {
             eventRect[col][row].eventDone = true; // Mark the event as done
             gp.keyH.enterPressed = false; // Reset the enter key press
             canTouchEvent = false; // Prevent further event triggering until the player moves
+            System.out.println("Fountain used");
         }
         
         gp.keyH.enterPressed = false;

@@ -146,6 +146,7 @@ public class GamePanel extends JPanel implements Runnable{
 		else {
 			tileM.draw(g2);	//tile draw
 
+			entityList.clear();	//clear the entity list for next time
 			entityList.add(player);	//add player to entity list
 
 			for(int i = 0; i < obj.length; i++) {
@@ -170,8 +171,7 @@ public class GamePanel extends JPanel implements Runnable{
 			Collections.sort(entityList, new Comparator<Entity>() {
 				@Override
 				public int compare(Entity e1, Entity e2) {
-					int result = Integer.compare(e1.worldY, e2.worldY);	//compare the Y coordinate of two entities
-					return result;
+					return Integer.compare(e1.worldY, e2.worldY);	//compare the Y coordinate of two entities
 				}
 			});
 
@@ -180,9 +180,11 @@ public class GamePanel extends JPanel implements Runnable{
 				entityList.get(i).draw(g2);	//draw each entity in the list
 			}
 			//clear the list for next time
-			for(int i = 0; i < entityList.size(); i++) {
-				entityList.remove(i);	//remove each entity in the list
-			}
+			// for(int i = 0; i < entityList.size(); i++) {
+			// 	entityList.remove(i);	//remove each entity in the list
+			// }
+
+			entityList.clear();	//clear the entity list for next time
 			
 			ui.draw(g2);	//ui
 			

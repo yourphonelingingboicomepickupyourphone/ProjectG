@@ -20,8 +20,8 @@ public class AssetSetter {
 	
 	public void setObject() {
 		gp.obj[0] = new OBJ_Fountain(gp);
-		gp.obj[0].worldX = gp.tileSize * 19;
-		gp.obj[0].worldY = gp.tileSize * 24;
+		gp.obj[0].worldX = gp.tileSize * 23;
+		gp.obj[0].worldY = gp.tileSize * 28;
 
 		gp.obj[1] = new OBJ_Chest(gp);
 		gp.obj[1].worldX = gp.tileSize * 23;
@@ -46,7 +46,7 @@ public class AssetSetter {
 		gp.obj[6] = new OBJ_Key(gp);
 		gp.obj[6].worldX = gp.tileSize * 43;
 		gp.obj[6].worldY = gp.tileSize * 24;
-
+		
 	}
 
 	public void setNPC() {

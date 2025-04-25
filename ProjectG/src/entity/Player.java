@@ -110,6 +110,7 @@ public class Player extends Entity{
 
 			//Check monster collision
 			int monsterIndex = gp.cChecker.checkEntity(this, gp.monster);
+			contactMonster(monsterIndex);
 			
 			//Check event
 			gp.eHandler.checkEvent();
@@ -178,6 +179,13 @@ public class Player extends Entity{
 				gp.gameState = gp.dialogueState;
 				gp.npc[i].speak();
 			}
+		}
+	}
+
+	public void contactMonster(int i){
+		if(i != 999){
+
+			health -= 100;
 		}
 	}
 
