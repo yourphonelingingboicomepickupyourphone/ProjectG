@@ -2,13 +2,13 @@ package main;
 
 import entity.NPC_Wizard;
 import monster.MON_rSlime;
-import object.OBJ_Chest;
-import object.OBJ_Chest_Locked;
-import object.OBJ_Door_Closed;
-import object.OBJ_Door_Key;
-import object.OBJ_Door_Open;
-import object.OBJ_Fountain;
-import object.OBJ_Key;
+// import object.OBJ_Chest;
+// import object.OBJ_Chest_Locked;
+// import object.OBJ_Door_Closed;
+// import object.OBJ_Door_Key;
+// import object.OBJ_Door_Open;
+// import object.OBJ_Fountain;
+// import object.OBJ_Key;
 import object.OBJ_Pillar;
 import object.OBJ_SpawnPoint;
 

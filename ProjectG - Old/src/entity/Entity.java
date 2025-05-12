@@ -16,6 +16,7 @@ public class Entity {
 	public GamePanel gp;
 
 	public int worldX, worldY;
+	public int renderLayer;
 	public int speed;
 	
 	public BufferedImage up1, up2, down1, down2, left1, left2, right1, right2, stand;	//image with  an accessible buffer of image data
@@ -44,10 +45,14 @@ public class Entity {
 	public int maxMana;
 	public int mana;
 	public int level;
+	public int attack;
+	public int defense;
 
 	public Entity(GamePanel gp) {
 		this.gp = gp;
+		this.renderLayer = 0;
 	}
+
 
 	public void setAction() {
 		

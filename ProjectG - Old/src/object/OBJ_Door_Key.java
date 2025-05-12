@@ -11,6 +11,7 @@ public class OBJ_Door_Key extends Entity{
 
 		name = "Door_Key";
 		down1 = setup("/objects/door_key");
+		renderLayer = 1;
 		
 		solidArea.x = 30;
 		solidArea.y = 25;

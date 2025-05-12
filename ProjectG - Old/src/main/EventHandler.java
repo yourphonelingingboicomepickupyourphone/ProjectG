@@ -45,15 +45,15 @@ public class EventHandler {
         }
 
         if(canTouchEvent){
-            if (hit(20, 28, "any") == true) {
-                triggerTrap(20, 18, gp.dialogueState);
+            // if (hit(20, 28, "any") == true) {
+            //     triggerTrap(20, 18, gp.dialogueState);
 
-            }
+            // }
 
-            if (hit(23, 28, "any") == true) {
-                useFountain(23, 28, gp.dialogueState);
+            // if (hit(23, 28, "any") == true) {
+            //     useFountain(23, 28, gp.dialogueState);
 
-            }
+            // }
         }
     }
 

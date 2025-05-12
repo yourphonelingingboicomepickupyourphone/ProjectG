@@ -30,6 +30,7 @@ public class Entity {
 	public int solidAreaDefaultX = 4; 
 	public int solidAreaDefaultY = 19; //to store the default position of the solid area
 	public boolean collisionOn = false;
+	public int type; //0 = player, 1 = monster, 2 = npc, 3 = object, 4 = tile
 
 	public int actionLockCounter = 0; //to control the action of the entity
 	String dialogues[] = new String[40]; //to store the dialogues of the entity

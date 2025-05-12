@@ -41,8 +41,8 @@ public class Player extends Entity{
 	}
 	
 	public void setDefaultValues() {
-		worldX = gp.tileSize * 51;
-		worldY = gp.tileSize * 84;
+		worldX = gp.tileSize * 50;
+		worldY = gp.tileSize * 50;
 		int defaultSpeed = 5;
 		speed = defaultSpeed;
 		direction = "down";
@@ -185,7 +185,7 @@ public class Player extends Entity{
 	public void contactMonster(int i){
 		if(i != 999){
 
-			health -= 100;
+			health -= gp.monster[i].attack;
 		}
 	}
 

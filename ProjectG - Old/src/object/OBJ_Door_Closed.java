@@ -11,6 +11,7 @@ public class OBJ_Door_Closed extends Entity{
 
 		name = "Door_Closed";
 		down1 = setup("/objects/door_wooden_close");
+		renderLayer = 1;
 		
 		solidArea.x = 0;
 		solidArea.y = 0;

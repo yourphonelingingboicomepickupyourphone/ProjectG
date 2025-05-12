@@ -12,6 +12,7 @@ public class OBJ_Fountain extends Entity{
 
 		name = "Fountain";
 		down1 = setup("/objects/healing_fountain");
+		renderLayer = 1;
 		
 		solidArea.x = 0;
 		solidArea.y = 0;

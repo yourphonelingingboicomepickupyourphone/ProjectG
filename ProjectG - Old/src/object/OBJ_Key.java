@@ -11,6 +11,7 @@ public class OBJ_Key extends Entity{
 
 		name = "Chest_Key";
 		down1 = setup("/objects/key");
+		renderLayer = 1;
 		
 		solidArea.x = 30;
 		solidArea.y = 25;

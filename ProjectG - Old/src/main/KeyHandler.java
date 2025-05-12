@@ -65,7 +65,7 @@ public class KeyHandler implements KeyListener{
 			}
 		}
 
-		if (gp.gameState == gp.playState) {
+		else if (gp.gameState == gp.playState) {
 		
 			if (code == KeyEvent.VK_W || code == KeyEvent.VK_UP) {
 				upPressed = true;
@@ -93,7 +93,7 @@ public class KeyHandler implements KeyListener{
 		}
 
 		//Pause State
-		if (gp.gameState == gp.pauseState) {
+		else if (gp.gameState == gp.pauseState) {
 			
 			if (code == KeyEvent.VK_ESCAPE) {
 				gp.gameState = gp.playState;
@@ -101,7 +101,7 @@ public class KeyHandler implements KeyListener{
 		}
 		
 		//Dialogue State
-		if (gp.gameState == gp.dialogueState) {
+		else if (gp.gameState == gp.dialogueState) {
 		
 			if (code == KeyEvent.VK_ENTER || code == KeyEvent.VK_SPACE) {
 				gp.gameState = gp.playState;

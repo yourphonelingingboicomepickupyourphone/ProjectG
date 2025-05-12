@@ -11,6 +11,8 @@ public class NPC_Wizard extends Entity {
         super(gp);
         
         direction = "down";
+        name = "Wizard";
+        renderLayer = 1; 
         speed = 1;
         
         // Adjust solid area to match sprite
