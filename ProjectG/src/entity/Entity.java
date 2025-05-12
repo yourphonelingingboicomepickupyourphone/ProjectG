@@ -32,12 +32,15 @@ public class Entity {
 	public boolean collisionOn = false;
 
 	public int actionLockCounter = 0; //to control the action of the entity
+	public boolean invincible = false; //to check if the entity is invincible
+	public int invincibleCounter = 0; //to check the invincibility counter
 	String dialogues[] = new String[40]; //to store the dialogues of the entity
 	int dialogIndex = 0; //to store the index of the dialogues
 
 	public BufferedImage image;
 	public String name;
 	public boolean collision = true;
+	public int type; //0 = player, 1 = monster, 2 = npc, 3 = tile
 	
 	public boolean alive = true;
 	public float maxHealth;
@@ -85,7 +88,15 @@ public class Entity {
 		gp.cChecker.checkObject(this, false); //check object collision
 		gp.cChecker.checkEntity(this, gp.npc); //check entity 
 		gp.cChecker.checkEntity(this, gp.monster); //check monster collision
-		gp.cChecker.checkPlayer(this); //check player collision
+		boolean contactPlayer = gp.cChecker.checkPlayer(this); //check player collision
+
+		if (this.type == 1 && contactPlayer == true) {
+			if (gp.player.invincible == false && gp.player.collision == true) {
+				gp.player.health -= attack - gp.player.defense;
+				gp.player.invincible = true;
+				gp.player.invincibleCounter = 0;
+			}
+		}
 
 		if(collisionOn == false) {
 			switch(direction) {

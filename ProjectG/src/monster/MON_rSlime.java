@@ -10,6 +10,8 @@ public class MON_rSlime extends Entity{
     public MON_rSlime(GamePanel gp) {
         super(gp);
         name = "Red Slime";
+        type = 1;
+        
         speed = 1;
         maxHealth = 10;
         health = maxHealth;
