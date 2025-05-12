@@ -12,6 +12,8 @@ public class NPC_Wizard extends Entity {
         
         direction = "down";
         name = "Wizard";
+        type = 2;
+        
         renderLayer = 1; 
         speed = 1;
         

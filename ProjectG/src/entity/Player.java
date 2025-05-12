@@ -1,5 +1,6 @@
 package entity;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -53,6 +54,7 @@ public class Player extends Entity{
 		this.health = maxHealth;
 		this.maxMana = 400;
 		this.mana = maxMana;
+		this.type = 0;
 
 		getPlayerImage();
 	}
@@ -157,6 +159,14 @@ public class Player extends Entity{
 			}
 
 		}
+
+		if (invincible == true) {
+			invincibleCounter++;
+			if (invincibleCounter > 20) {
+				invincible = false;
+				invincibleCounter = 0;
+			}
+		}
 		
 		if (justFinishTalking == true) {
 			justFinishTalking = false;
@@ -185,7 +195,12 @@ public class Player extends Entity{
 	public void contactMonster(int i){
 		if(i != 999){
 
-			health -= gp.monster[i].attack;
+			if (invincible == false && gp.monster[i].collision == true) {
+				gp.player.health -= gp.monster[i].attack - defense;
+				collisionRecoilCounter = RECOIL_DURATION;
+				spriteNum = 1; // Set spriteNum to 1 during recoil
+				invincible = true;
+			}
 		}
 	}
 
@@ -250,7 +265,11 @@ public class Player extends Entity{
 			y = gp.screenHeight - (gp.worldHeight - worldY);
 		}
 
+		if (invincible == true){
+			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.6f));	
+		}
 		g2.drawImage(image, x, y, null);
+		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 		g2.setColor(Color.red);
 		g2.drawRect(x + solidArea.x, y + solidArea.y, solidArea.width, solidArea.height);
 		
