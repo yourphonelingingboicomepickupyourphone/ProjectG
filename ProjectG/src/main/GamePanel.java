@@ -16,7 +16,7 @@ import entity.Player;
 import tile.TileManager;
 
 public class GamePanel extends JPanel implements Runnable{
-	private static final int FPS = 120;
+	private static final int FPS = 60;
 	//Settings
 	final int originalTileSize = 16;	//1 tile originally has size of 16x16
 	final int scale = 5;	//The scale by which a tile is enlarged
