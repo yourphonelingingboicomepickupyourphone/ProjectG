@@ -30,20 +30,20 @@ public class Player extends Entity{
 		screenY = gp.screenHeight/2 - gp.tileSize/2;
 		
 		solidArea = new Rectangle();
-		solidArea.x = 10;
-		solidArea.y = 15;
+		solidArea.x = gp.tileSize/2;
+		solidArea.y = gp.tileSize/2;
 		solidAreaDefaultX = solidArea.x;
 		solidAreaDefaultY = solidArea.y;
-		solidArea.width = 60;
-		solidArea.height= 65;
+		solidArea.width = gp.tileSize;
+		solidArea.height= gp.tileSize;
 		
 		
 		setDefaultValues();
 	}
 	
 	public void setDefaultValues() {
-		worldX = gp.tileSize * 50;
-		worldY = gp.tileSize * 50;
+		worldX = gp.tileSize * 50 - gp.tileSize/2;
+		worldY = gp.tileSize * 50 - gp.tileSize/2;
 		int defaultSpeed = 5;
 		speed = defaultSpeed;
 		direction = "down";
@@ -68,6 +68,7 @@ public class Player extends Entity{
 		left2 = setup("/player/player_left_2");
 		right1 = setup("/player/player_right_1");
 		right2 = setup("/player/player_right_2");
+		stand = setup("/player/player_stand");
 
 	}
 
@@ -94,8 +95,7 @@ public class Player extends Entity{
 			}
 			else if (keyH.rightPressed == true) {
 				direction = "right";
-			}
-			
+			}			 
 			
 			//Check tile collision
 			collisionOn = false;
@@ -208,43 +208,62 @@ public class Player extends Entity{
 		
 		BufferedImage image= null;
 		
-		switch(direction) {
-		case "up":
-			if (spriteNum == 1) {
-				image = up1;
-			}
-			if (spriteNum == 2) {
-				image = up2;
-			}
-			break;
-		case "down":
-			if (spriteNum == 1) {
-				image = down1;
-			}
-			if (spriteNum == 2) {
-				image = down2;
-			}
-			break;
-		case "left":
-			if (spriteNum == 1) {
-				image = left1;
-			}
-			if (spriteNum == 2) {
-				image = left2;
-			}
-			break;
-		case "right":
-			if (spriteNum == 1) {
-				image = right1;
-			}
-			if (spriteNum == 2) {
-				image = right2;
-			}
-			break;
-		default:
-			image = stand;
-			break;
-		} 
+		// switch(direction) {
+		// case "up":
+		// 	if (spriteNum == 1) {
+		// 		image = up1;
+		// 	}
+		// 	if (spriteNum == 2) {
+		// 		image = up2;
+		// 	}
+		// 	break;
+		// case "down":
+		// 	if (spriteNum == 1) {
+		// 		image = down1;
+		// 	}
+		// 	if (spriteNum == 2) {
+		// 		image = down2;
+		// 	}
+		// 	break;
+		// case "left":
+		// 	if (spriteNum == 1) {
+		// 		image = left1;
+		// 	}
+		// 	if (spriteNum == 2) {
+		// 		image = left2;
+		// 	}
+		// 	break;
+		// case "right":
+		// 	if (spriteNum == 1) {
+		// 		image = right1;
+		// 	}
+		// 	if (spriteNum == 2) {
+		// 		image = right2;
+		// 	}
+		// 	break;
+		// default:
+		// 	image = stand;
+		// 	break;
+		// } 
+
+		if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
+        switch (direction) {
+            case "up":
+                image = (spriteNum == 1) ? up1 : up2;
+                break;
+            case "down":
+                image = (spriteNum == 1) ? down1 : down2;
+                break;
+            case "left":
+                image = (spriteNum == 1) ? left1 : left2;
+                break;
+            case "right":
+                image = (spriteNum == 1) ? right1 : right2;
+                break;
+        }
+    } else {
+        image = stand; // Use stand sprite when idle
+    }
 
 		int x = screenX;
 		int y = screenY;
@@ -268,7 +287,7 @@ public class Player extends Entity{
 		if (invincible == true){
 			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.6f));	
 		}
-		g2.drawImage(image, x, y, null);
+		g2.drawImage(image, x, y, gp.tileSize * 2, gp.tileSize * 2, null);
 		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 		g2.setColor(Color.red);
 		g2.drawRect(x + solidArea.x, y + solidArea.y, solidArea.width, solidArea.height);

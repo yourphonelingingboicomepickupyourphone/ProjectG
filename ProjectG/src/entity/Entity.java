@@ -42,7 +42,6 @@ public class Entity {
 	public BufferedImage image;
 	public String name;
 	public boolean collision = true;
-	public int type; //0 = player, 1 = monster, 2 = npc, 3 = tile
 	
 	public boolean alive = true;
 	public float maxHealth;
