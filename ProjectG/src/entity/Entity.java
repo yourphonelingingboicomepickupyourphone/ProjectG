@@ -19,7 +19,7 @@ public class Entity {
 	public int renderLayer;
 	public int speed;
 	
-	public BufferedImage up1, up2, down1, down2, left1, left2, right1, right2, stand;	//image with  an accessible buffer of image data
+	public BufferedImage up1, up2, down1, down2, left1, left2, right1, right2, stand, standLeft, standRight, standUp;	//image with  an accessible buffer of image data
 	public BufferedImage attackUp1, attackUp2, attackDown1, attackDown2, attackLeft1, attackLeft2, attackRight1, attackRight2; //image with an accessible buffer of image data
 
 	public String direction = "down"; //to store the direction of the entity
@@ -42,6 +42,7 @@ public class Entity {
 	public BufferedImage image;
 	public String name;
 	public boolean collision = true;
+	public boolean attacking = false;
 	
 	public boolean alive = true;
 	public float maxHealth;

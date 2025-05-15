@@ -4,6 +4,7 @@ import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
 
@@ -30,12 +31,12 @@ public class Player extends Entity{
 		screenY = gp.screenHeight/2 - gp.tileSize/2;
 		
 		solidArea = new Rectangle();
-		solidArea.x = gp.tileSize/2;
-		solidArea.y = gp.tileSize/2;
+		solidArea.x = 40;
+		solidArea.y = 40;
 		solidAreaDefaultX = solidArea.x;
 		solidAreaDefaultY = solidArea.y;
-		solidArea.width = gp.tileSize;
-		solidArea.height= gp.tileSize;
+		solidArea.width = 80;
+		solidArea.height= 80;
 		
 		
 		setDefaultValues();
@@ -69,10 +70,31 @@ public class Player extends Entity{
 		right1 = setup("/player/player_right_1");
 		right2 = setup("/player/player_right_2");
 		stand = setup("/player/player_stand");
+		standLeft = setup("/player/player_stand_left");
+		standRight = setup("/player/player_stand_right");
+		standUp = setup("/player/player_stand_up");
+
 
 	}
 
+	public void getPlayerAttackImage() {
+		attackUp1 = setup("/player/player_attack_up_1");
+		attackUp2 = setup("/player/player_attack_up_2");
+		attackDown1 = setup("/player/player_attack_down_1");
+		attackDown2 = setup("/player/player_attack_down_2");
+		attackLeft1 = setup("/player/player_attack_left_1");
+		attackLeft2 = setup("/player/player_attack_left_2");
+		attackRight1 = setup("/player/player_attack_right_1");
+		attackRight2 = setup("/player/player_attack_right_2");
+		
+	}
+
 	public void update() {
+
+		if (attacking == true) {
+			// Attack logic here
+			attacking();
+		}
 		
 		if (collisionRecoilCounter > 0) {
 			collisionRecoilCounter--;
@@ -174,6 +196,22 @@ public class Player extends Entity{
 
 	}
 	
+	public void attacking(){
+
+		spriteCounter++;
+
+		if(spriteCounter <= 5){
+			spriteNum = 1;
+		}
+		if (spriteCounter > 5 && spriteCounter <= 25){
+			spriteNum = 2;
+		}
+		if (spriteCounter > 25){
+			spriteNum = 1;
+			spriteCounter = 0;
+			attacking = false;
+		}
+	}
 
 	public void pickUpObject(int i) {
 		if(i != 999) {
@@ -183,11 +221,14 @@ public class Player extends Entity{
 	}
 
 	public void interactNPC(int i) {
-		if(i != 999) {
+		
+		if (gp.keyH.enterPressed == true) {
 
-			if (gp.keyH.enterPressed == true) {
+			if(i != 999) {
 				gp.gameState = gp.dialogueState;
 				gp.npc[i].speak();
+			} else {
+				attacking = true;
 			}
 		}
 	}
@@ -206,25 +247,36 @@ public class Player extends Entity{
 
 	public void draw(Graphics2D g2) {
 		
+		g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+
 		BufferedImage image= null;
 
 		if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
         switch (direction) {
             case "up":
-                image = (spriteNum == 1) ? up1 : up2;
+                if (!attacking) image = (spriteNum == 1) ? up1 : up2;
+				if (attacking) image = (spriteNum == 1) ? attackUp1 : attackUp2;
                 break;
             case "down":
-                image = (spriteNum == 1) ? down1 : down2;
+                if (!attacking) image = (spriteNum == 1) ? down1 : down2;
+				if (attacking) image = (spriteNum == 1) ? attackDown1 : attackDown2;
                 break;
             case "left":
-                image = (spriteNum == 1) ? left1 : left2;
+				if (!attacking) image = (spriteNum == 1) ? left1 : left2;
+				if (attacking) image = (spriteNum == 1) ? attackLeft1 : attackLeft2;
                 break;
             case "right":
-                image = (spriteNum == 1) ? right1 : right2;
+                if (!attacking) image = (spriteNum == 1) ? left1 : left2;
+				if (attacking) image = (spriteNum == 1) ? attackLeft1 : attackLeft2;
                 break;
         }
     } else {
-        image = stand; // Use stand sprite when idle
+        switch (direction) {
+            case "up": image = standUp; break;
+            case "down": image = stand; break;
+            case "left": image = standLeft; break;
+            case "right": image = standRight; break;
+        }
     }
 
 		int x = screenX;
@@ -249,8 +301,14 @@ public class Player extends Entity{
 		if (invincible == true){
 			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.6f));	
 		}
-		g2.drawImage(image, x, y, gp.tileSize * 2, gp.tileSize * 2, null);
+		
+
+    	// Draw scaled buffer at position
+    	g2.drawImage(image, x, y, gp.tileSize * 2, gp.tileSize * 2, null); // 160x160 final size
+		// Restore composite
 		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+
+		// Draw solidArea rectangle for debugging
 		g2.setColor(Color.red);
 		g2.drawRect(x + solidArea.x, y + solidArea.y, solidArea.width, solidArea.height);
 		
