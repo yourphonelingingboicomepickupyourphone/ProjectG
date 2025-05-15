@@ -15,7 +15,7 @@ public class OBJ_Pillar extends Entity{
         
         name = "Pillar";
         down1 = setup("/objects/pillar");
-        renderLayer = 1;
+        renderLayer = 3;
         
         solidArea.x = 0;
         solidArea.y = gp.tileSize * 3;

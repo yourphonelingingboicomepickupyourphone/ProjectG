@@ -127,12 +127,11 @@ public class GamePanel extends JPanel implements Runnable{
 				}
 			}	//Monster update
 
-			System.out.println("Game is running");
 		}
 
 		else if (gameState == pauseState) {
 			// do nothing
-			System.out.println("Game is paused");
+
 		}
 		
 	}
