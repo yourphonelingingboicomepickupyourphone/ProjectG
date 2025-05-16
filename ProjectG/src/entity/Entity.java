@@ -30,6 +30,9 @@ public class Entity {
 	public Rectangle solidArea = new Rectangle(2, 19, 76, 61); //x, y, width, height
 	public int solidAreaDefaultX = 4; 
 	public int solidAreaDefaultY = 19; //to store the default position of the solid area
+	public Rectangle attackArea = new Rectangle(0, 0, 0, 0); //to store the attack area of the entity
+	public int attackAreaDefaultX = 0;
+	public int attackAreaDefaultY = 0;
 	public boolean collisionOn = false;
 	public int type; //0 = player, 1 = monster, 2 = npc, 3 = object, 4 = tile
 

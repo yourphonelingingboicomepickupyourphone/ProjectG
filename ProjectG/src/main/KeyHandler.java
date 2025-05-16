@@ -87,8 +87,11 @@ public class KeyHandler implements KeyListener{
 				gp.gameState = gp.pauseState;
 			}
 
-			if (code == KeyEvent.VK_ENTER || code == KeyEvent.VK_SPACE) {
+			if (code == KeyEvent.VK_ENTER) {
 				enterPressed = true;
+			}
+			if (code == KeyEvent.VK_SPACE) {
+				spacePressed = true;
 			}
 		}
 
@@ -103,7 +106,7 @@ public class KeyHandler implements KeyListener{
 		//Dialogue State
 		else if (gp.gameState == gp.dialogueState) {
 		
-			if (code == KeyEvent.VK_ENTER || code == KeyEvent.VK_SPACE) {
+			if (code == KeyEvent.VK_ENTER) {
 				gp.gameState = gp.playState;
 			}
 		}
@@ -130,8 +133,11 @@ public class KeyHandler implements KeyListener{
 			rightPressed = false;
 		}
 
-		if (code == KeyEvent.VK_ENTER || code == KeyEvent.VK_SPACE) {
+		if (code == KeyEvent.VK_ENTER) {
 			enterPressed = false;
+		}
+		if (code == KeyEvent.VK_SPACE) {
+			spacePressed = false;
 		}
 	}
 

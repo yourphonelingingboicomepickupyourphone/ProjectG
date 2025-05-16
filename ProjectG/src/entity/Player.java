@@ -58,6 +58,7 @@ public class Player extends Entity{
 		this.type = 0;
 
 		getPlayerImage();
+		getPlayerAttackImage();
 	}
 	public void getPlayerImage() {
 
@@ -92,8 +93,14 @@ public class Player extends Entity{
 	public void update() {
 
 		if (attacking == true) {
-			// Attack logic here
 			attacking();
+			return;
+		}
+
+		if (keyH.spacePressed == true) {
+			attacking = true;
+			keyH.spacePressed = false;
+			return;
 		}
 		
 		if (collisionRecoilCounter > 0) {
@@ -205,6 +212,64 @@ public class Player extends Entity{
 		}
 		if (spriteCounter > 5 && spriteCounter <= 25){
 			spriteNum = 2;
+
+			// --- Custom attack hitbox for each direction ---
+			Rectangle attackHitbox = new Rectangle();
+			int hitboxX = worldX + solidArea.x;
+			int hitboxY = worldY + solidArea.y;
+
+			// Example custom sizes for each direction
+			int upWidth = solidArea.width;
+			int upHeight = 60;
+			int downWidth = solidArea.width;
+			int downHeight = 80;
+			int leftWidth = 100;
+			int leftHeight = solidArea.height;
+			int rightWidth = 120;
+			int rightHeight = solidArea.height;
+
+			switch (direction) { 
+				case "up":
+					attackHitbox.x = hitboxX;
+					attackHitbox.y = hitboxY - upHeight;
+					attackHitbox.width = upWidth;
+					attackHitbox.height = upHeight;
+					break;
+				case "down":
+					attackHitbox.x = hitboxX;
+					attackHitbox.y = hitboxY + solidArea.height;
+					attackHitbox.width = downWidth;
+					attackHitbox.height = downHeight;
+					break;
+				case "left":
+					attackHitbox.x = hitboxX - leftWidth;
+					attackHitbox.y = hitboxY;
+					attackHitbox.width = leftWidth;
+					attackHitbox.height = leftHeight;
+					break;
+				case "right":
+					attackHitbox.x = hitboxX + solidArea.width;
+					attackHitbox.y = hitboxY;
+					attackHitbox.width = rightWidth;
+					attackHitbox.height = rightHeight;
+					break;
+			}
+
+			// Check collision with monsters using the attackHitbox
+			for (int i = 0; i < gp.monster.length; i++) {
+				Entity monster = gp.monster[i];
+				if (monster != null && monster.alive) {
+					Rectangle monsterHitbox = new Rectangle(
+						monster.worldX + monster.solidArea.x,
+						monster.worldY + monster.solidArea.y,
+						monster.solidArea.width,
+						monster.solidArea.height
+					);
+					if (attackHitbox.intersects(monsterHitbox)) {
+						damageMonster(i);
+					}
+				}
+			}
 		}
 		if (spriteCounter > 25){
 			spriteNum = 1;
@@ -245,6 +310,15 @@ public class Player extends Entity{
 		}
 	}
 
+	public void damageMonster(int i) {
+		if(i != 999) {
+			System.out.println("Player attacked " + gp.monster[i].name);
+		}
+		else {
+			System.out.println("Player attacked nothing");
+		}
+	}
+
 	public void draw(Graphics2D g2) {
 		
 		g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
@@ -266,8 +340,8 @@ public class Player extends Entity{
 				if (attacking) image = (spriteNum == 1) ? attackLeft1 : attackLeft2;
                 break;
             case "right":
-                if (!attacking) image = (spriteNum == 1) ? left1 : left2;
-				if (attacking) image = (spriteNum == 1) ? attackLeft1 : attackLeft2;
+                if (!attacking) image = (spriteNum == 1) ? right1 : right2;
+				if (attacking) image = (spriteNum == 1) ? attackRight1 : attackRight2;
                 break;
         }
     } else {
