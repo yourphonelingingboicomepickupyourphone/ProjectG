@@ -9,6 +9,7 @@ public class ITEM_Sword_Normal extends Entity{
         super(gp);
         
         name = "Normal Sword";
+        level = 1;
         down1 = setup("/items/normal_sword");
         attackBonus = 10;
     }

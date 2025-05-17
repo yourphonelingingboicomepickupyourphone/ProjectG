@@ -344,7 +344,7 @@ public class UI {
 	public void drawCharacterScreen() {
 		//Window
 		final int frameX = gp.tileSize * 14;
-		final int frameY = gp.tileSize * 2;
+		final int frameY = gp.tileSize;
 		final int frameWidth = gp.tileSize * 9;
 		final int frameHeight = gp.tileSize * 10;
 
@@ -362,6 +362,10 @@ public class UI {
 		textY += lineHeight;
 		g2.drawString("Level: " + gp.player.level, textX, textY);
 		textY += lineHeight;
+		g2.drawString("Health: " + (int)gp.player.health + "/" + (int)gp.player.maxHealth, textX, textY);
+		textY += lineHeight;
+		g2.drawString("Mana: " + gp.player.mana + "/" + gp.player.maxMana, textX, textY);
+		textY += lineHeight;
 		g2.drawString("Attack: " + gp.player.attack, textX, textY);
 		textY += lineHeight;
 		g2.drawString("Defense: " + gp.player.defense, textX, textY);
@@ -373,9 +377,15 @@ public class UI {
 		g2.drawString("Progression Points: " + gp.player.progressionPoint, textX, textY);
 		textY += lineHeight;
 		g2.drawString("Weapon: " + gp.player.currentWeapon.name, textX, textY);
+		
 
 		//Variable
 		int tailX = frameX + frameWidth - gp.tileSize / 2;
+
+		String value = "Level: " + gp.player.level;
+		textX = getXForAllignToRightText(value, tailX);
+		g2.drawString(value, textX, textY);
+
 	}
 
 
@@ -389,8 +399,8 @@ public class UI {
 		c = new Color(255, 255, 255);
 		g2.setColor(c);
 		g2.setStroke(new BasicStroke(borderInset));
-
 		g2.drawRoundRect(x + borderInset * 3, y + borderInset * 3, width - borderInset * 6, height - borderInset * 6, arc, arc);		
+		g2.setStroke(new BasicStroke(1f)); // Reset to default stroke
 	}
 	public int getXForCenteredText(String text) {
 		int length = (int)g2.getFontMetrics().getStringBounds(text, g2).getWidth();
