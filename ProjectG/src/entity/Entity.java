@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import item.ITEM_Sword_Normal;
 import main.GamePanel;
 import main.UtilityTool;
 
@@ -55,6 +56,7 @@ public class Entity {
 	public boolean dying = false;
 	public int dyingCounter = 0;
 
+	//Attributes
 	public float maxHealth;
 	public float health;
 	public int maxMana;
@@ -62,10 +64,23 @@ public class Entity {
 	public int level;
 	public int attack;
 	public int defense;
+	
+
+	//Player extra attributes
 	public int exp;
 	public int nextLevelExp;
 	public int progressionPoint;
-	public Entity currentWeapon;
+	public ITEM_Sword_Normal currentWeapon;
+
+	//Item attributes
+	public int healthBonus;
+	public int manaBonus;
+	public int attackBonus;
+	public int defenseBonus;
+	public int speedBonus;
+	public int rarity = 0; //0 = common, 1 = rare, 2 = epic, 3 = legendary
+	public int levelRequirement = 0; //level requirement to use the item
+
 
 	public Entity(GamePanel gp) {
 		this.gp = gp;

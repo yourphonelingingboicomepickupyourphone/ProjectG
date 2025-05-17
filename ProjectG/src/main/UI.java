@@ -77,6 +77,14 @@ public class UI {
 		else if (gp.gameState == gp.dialogueState) {
 			drawDialogueScreen();
 		}
+
+		//Character State
+		else if (gp.gameState == gp.characterState) {
+			drawCharacterScreen();
+			drawPlayerHealth();
+			drawPlayerMana();
+			drawPlayerIcon();
+		}
 	}
 
 	public void drawTitleScreen(){
@@ -248,22 +256,7 @@ public class UI {
 
 	}
 
-	public void drawSubWindow(int x, int y, int width, int height) {
-		
-		Color c = new Color(0, 0, 0, 200);
-		g2.setColor(c);
-		g2.fillRoundRect(x, y, width, height, 30, 30);
 
-		c = new Color(255, 255, 255);
-		g2.setStroke(new BasicStroke(5));
-
-		g2.drawRoundRect(x + 9 * gp.tileSize / 80, y + 9 * gp.tileSize / 80, width - 9 * gp.tileSize / 40, height - 9 * gp.tileSize / 80, 7 * gp.tileSize / 13, 7 * gp.tileSize / 13);		
-	}
-	public int getXForCenteredText(String text) {
-		int length = (int)g2.getFontMetrics().getStringBounds(text, g2).getWidth();
-		int x = gp.screenWidth/2 - length/2;
-		return x;
-	}
 
 	public void drawPlayerHealth() {
 		//Health Bar
@@ -347,4 +340,67 @@ public class UI {
 		g2.drawImage(image, x, y, width, height, null);
 	}
 
+	//Character Screen
+	public void drawCharacterScreen() {
+		//Window
+		final int frameX = gp.tileSize * 14;
+		final int frameY = gp.tileSize * 2;
+		final int frameWidth = gp.tileSize * 9;
+		final int frameHeight = gp.tileSize * 10;
+
+		drawSubWindow(frameX, frameY, frameWidth, frameHeight);
+
+		//Text
+		g2.setColor(Color.white);
+		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 40F));
+
+		int textX = frameX + gp.tileSize / 2;
+		int textY = frameY + gp.tileSize;
+		final int lineHeight = 5 * gp.tileSize / 8;
+
+		g2.drawString("Name: " + gp.player.name, textX, textY);
+		textY += lineHeight;
+		g2.drawString("Level: " + gp.player.level, textX, textY);
+		textY += lineHeight;
+		g2.drawString("Attack: " + gp.player.attack, textX, textY);
+		textY += lineHeight;
+		g2.drawString("Defense: " + gp.player.defense, textX, textY);
+		textY += lineHeight;
+		g2.drawString("Speed: " + gp.player.speed, textX, textY);
+		textY += lineHeight;
+		g2.drawString("EXP: " + gp.player.exp, textX, textY);
+		textY += lineHeight;
+		g2.drawString("Progression Points: " + gp.player.progressionPoint, textX, textY);
+		textY += lineHeight;
+		g2.drawString("Weapon: " + gp.player.currentWeapon.name, textX, textY);
+
+		//Variable
+		int tailX = frameX + frameWidth - gp.tileSize / 2;
+	}
+
+
+	public void drawSubWindow(int x, int y, int width, int height) {
+		int arc = 35;
+		int borderInset = 7;
+		Color c = new Color(0, 0, 0, 200);
+		g2.setColor(c);
+		g2.fillRoundRect(x, y, width, height, arc, arc);
+
+		c = new Color(255, 255, 255);
+		g2.setColor(c);
+		g2.setStroke(new BasicStroke(borderInset));
+
+		g2.drawRoundRect(x + borderInset * 3, y + borderInset * 3, width - borderInset * 6, height - borderInset * 6, arc, arc);		
+	}
+	public int getXForCenteredText(String text) {
+		int length = (int)g2.getFontMetrics().getStringBounds(text, g2).getWidth();
+		int x = gp.screenWidth/2 - length/2;
+		return x;
+	}
+
+	public int getXForAllignToRightText(String text, int tailX) {
+		int length = (int)g2.getFontMetrics().getStringBounds(text, g2).getWidth();
+		int x = tailX - length;
+		return x;
+	}
 }

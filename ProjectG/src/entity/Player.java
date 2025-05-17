@@ -6,7 +6,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
-
+import item.ITEM_Sword_Normal;
 import main.GamePanel;
 import main.KeyHandler;
 
@@ -21,6 +21,9 @@ public class Player extends Entity{
 	public boolean attackCancel = false;
 	int collisionRecoilCounter = 0;
     final int RECOIL_DURATION = 10;
+    
+    public int attackCooldown = 0;
+    public final int ATTACK_COOLDOWN_MAX = 60; // 60 frames = 1s at 60fps
 	
 	public Player(GamePanel gp, KeyHandler kH) {
 
@@ -38,13 +41,13 @@ public class Player extends Entity{
 		solidArea.width = 80;
 		solidArea.height= 80;
 		
-		
 		setDefaultValues();
 	}
 	
 	public void setDefaultValues() {
 		worldX = gp.tileSize * 50 - gp.tileSize/2;
 		worldY = gp.tileSize * 50 - gp.tileSize/2;
+
 		int defaultSpeed = 5;
 		speed = defaultSpeed;
 		direction = "down";
@@ -58,10 +61,23 @@ public class Player extends Entity{
 		this.type = 0;
 		this.level = 1;
 		this.attack = 50;
-		
+		this.defense = 10;
+		this.exp = 0;
+		this.nextLevelExp = 10;
+		currentWeapon = new ITEM_Sword_Normal(gp);
+		attack += getWeaponAttack();
+		defense += getWeaponDefense();
+
 
 		getPlayerImage();
 		getPlayerAttackImage();
+	}
+
+	public int getWeaponAttack() {
+		return currentWeapon.attackBonus;
+	}
+	public int getWeaponDefense() {
+		return currentWeapon.defenseBonus;
 	}
 	public void getPlayerImage() {
 
@@ -95,13 +111,18 @@ public class Player extends Entity{
 
 	public void update() {
 
+		if (attackCooldown > 0) {
+            attackCooldown--;
+        }
+
 		if (attacking == true) {
 			attacking();
 			return;
 		}
 
-		if (keyH.spacePressed == true) {
+		if (keyH.spacePressed == true && attackCooldown == 0) {
 			attacking = true;
+			attackCooldown = ATTACK_COOLDOWN_MAX; // Reset cooldown
 			keyH.spacePressed = false;
 			return;
 		}
