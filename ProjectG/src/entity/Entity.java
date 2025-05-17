@@ -1,5 +1,6 @@
 package entity;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -42,12 +43,18 @@ public class Entity {
 	String dialogues[] = new String[40]; //to store the dialogues of the entity
 	int dialogIndex = 0; //to store the index of the dialogues
 
+	public boolean showHpBar = false;
+	public int hpBarDisplayCounter = 0;
+
 	public BufferedImage image;
 	public String name;
 	public boolean collision = true;
 	public boolean attacking = false;
-	
+
 	public boolean alive = true;
+	public boolean dying = false;
+	public int dyingCounter = 0;
+
 	public float maxHealth;
 	public float health;
 	public int maxMana;
@@ -55,6 +62,10 @@ public class Entity {
 	public int level;
 	public int attack;
 	public int defense;
+	public int exp;
+	public int nextLevelExp;
+	public int progressionPoint;
+	public Entity currentWeapon;
 
 	public Entity(GamePanel gp) {
 		this.gp = gp;
@@ -66,6 +77,9 @@ public class Entity {
 		
 	}
 
+	public void damageReaction() {
+	
+	}
 
 	public void speak() {
 		
@@ -136,7 +150,21 @@ public class Entity {
 			}
 			spriteCounter = 0;
 		}
-		
+
+		if (invincible == true) {
+			invincibleCounter++;
+			if (invincibleCounter > 30) {
+				invincible = false;
+				invincibleCounter = 0;
+			}
+		}		
+
+		if (showHpBar == true) {
+			hpBarDisplayCounter--;
+			if (hpBarDisplayCounter <= 0) {
+				showHpBar = false;
+			}
+		}
 	}
 
 	public void draw(Graphics2D g2){
@@ -186,13 +214,53 @@ public class Entity {
 						break;
 					}
 
+					//HP Bar
+					if (this.type == 1 && (showHpBar == true || dying == true)) {
+						double oneScale = (double)gp.tileSize / maxHealth;
+						double hpBarValue = Math.max(0, (double)health * oneScale);
+						g2.setColor(new Color(35, 35, 35));
+						g2.fillRect(screenX - 1, screenY - 16, gp.tileSize + 2, 12);
+						g2.setColor(new Color(255, 0, 30));
+						g2.fillRect(screenX, screenY - 15, (int)hpBarValue, 10);
+					}
+
+					if (invincible == true) {
+						g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8f));
+					}
+
+					if (dying == true) {
+						deathAnimation(g2);
+					}
+
 			g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);		
-			g2.setColor(Color.red);
-			g2.drawRect(screenX + solidAreaDefaultX, screenY + solidAreaDefaultY, solidArea.width, solidArea.height); // debug rectangle
+			// g2.setColor(Color.red);
+			// g2.drawRect(screenX + solidAreaDefaultX, screenY + solidAreaDefaultY, solidArea.width, solidArea.height); // debug rectangle
+			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 		}
 	}
 	
 	
+	public void deathAnimation(Graphics2D g2){ 
+		int i = 5;
+		dyingCounter++;
+		if (dyingCounter <= i) changeAlpha(g2, 0f);
+		if (dyingCounter > 2*i && dyingCounter <= 3*i) changeAlpha(g2, 0f);
+		if (dyingCounter > 4*i && dyingCounter <= 5*i) changeAlpha(g2, 0f);
+		if(dyingCounter > 6*i && dyingCounter <= 7*i) changeAlpha(g2, 0f);
+		if (dyingCounter > i && dyingCounter <= 2*i)   changeAlpha(g2, 1f);
+		if (dyingCounter > 3*i && dyingCounter <= 4*i)  changeAlpha(g2, 1f);
+		if (dyingCounter > 5*i && dyingCounter <= 6*i)  changeAlpha(g2, 1f);
+		if (dyingCounter > 7*i && dyingCounter <= 8*i)  changeAlpha(g2, 1f);
+		if (dyingCounter > 8*i) {
+			dying = false;
+			alive = false;
+		}
+	}
+
+	public void changeAlpha(Graphics2D g2, float alpha) {
+		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+	}
+
 	public BufferedImage setup(String imagePath) {
 
 		UtilityTool uTool = new UtilityTool();

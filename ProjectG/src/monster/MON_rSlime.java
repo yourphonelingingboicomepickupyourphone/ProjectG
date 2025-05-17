@@ -13,9 +13,9 @@ public class MON_rSlime extends Entity{
         type = 1;
         
         speed = 1;
-        maxHealth = 10;
+        maxHealth = 70;
         health = maxHealth;
-        attack = 5;
+        attack = 20;
         defense = 0;
 
         collision = true;
@@ -69,6 +69,11 @@ public class MON_rSlime extends Entity{
                 }
                 actionLockCounter = 0; // reset
             }
+    }
+
+    public void damageReaction() {
+        direction = gp.player.direction;
+        actionLockCounter = 0;
     }
 
 }

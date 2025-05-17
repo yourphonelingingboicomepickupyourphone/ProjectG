@@ -1,7 +1,6 @@
 package entity;
 
 import java.awt.AlphaComposite;
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -19,6 +18,7 @@ public class Player extends Entity{
 	public final int screenY;
 	public boolean justFinishTalking = false;
 	int standCounter = 0;
+	public boolean attackCancel = false;
 	int collisionRecoilCounter = 0;
     final int RECOIL_DURATION = 10;
 	
@@ -56,6 +56,9 @@ public class Player extends Entity{
 		this.maxMana = 400;
 		this.mana = maxMana;
 		this.type = 0;
+		this.level = 1;
+		this.attack = 50;
+		
 
 		getPlayerImage();
 		getPlayerAttackImage();
@@ -167,6 +170,12 @@ public class Player extends Entity{
 				collisionRecoilCounter = RECOIL_DURATION;
 			}
 			
+			if (keyH.enterPressed == true &&attackCancel == false) {
+				attacking 	= true;
+				spriteCounter = 0;
+			}
+
+			attackCancel = false;
 
 			spriteCounter++;
 			if(spriteCounter > 14) {
@@ -267,6 +276,9 @@ public class Player extends Entity{
 					);
 					if (attackHitbox.intersects(monsterHitbox)) {
 						damageMonster(i);
+						// When damaging a monster
+						gp.monster[i].showHpBar = true;
+						gp.monster[i].hpBarDisplayCounter = 150; // Show for 2.5 second (150 frames)
 					}
 				}
 			}
@@ -286,12 +298,49 @@ public class Player extends Entity{
 	}
 
 	public void interactNPC(int i) {
-		
-		if (gp.keyH.enterPressed == true) {
+	
+		if (gp.keyH.enterPressed) {
+			double talkRange = gp.tileSize * 0.3; // 0.3 tiles
 
-			if(i != 999) {
+			int closestNpcIndex = -1;
+			double closestDistance = Double.MAX_VALUE;
+
+			for (int j = 0; j < gp.npc.length; j++) {
+				if (gp.npc[j] != null) {
+					// Expand NPC's solid area by talkRange in all directions
+					Rectangle npcArea = new Rectangle(
+						gp.npc[j].worldX + gp.npc[j].solidArea.x - (int)talkRange,
+						gp.npc[j].worldY + gp.npc[j].solidArea.y - (int)talkRange,
+						gp.npc[j].solidArea.width + (int)(talkRange * 2),
+						gp.npc[j].solidArea.height + (int)(talkRange * 2)
+					);
+					Rectangle playerArea = new Rectangle(
+						worldX + solidArea.x,
+						worldY + solidArea.y,
+						solidArea.width,
+						solidArea.height
+					);
+
+					if (npcArea.intersects(playerArea)) {
+						// Calculate center-to-center distance for closest NPC
+						int npcCenterX = gp.npc[j].worldX + gp.npc[j].solidArea.x + gp.npc[j].solidArea.width / 2;
+						int npcCenterY = gp.npc[j].worldY + gp.npc[j].solidArea.y + gp.npc[j].solidArea.height / 2;
+						int playerCenterX = worldX + solidArea.x + solidArea.width / 2;
+						int playerCenterY = worldY + solidArea.y + solidArea.height / 2;
+						double distance = Math.hypot(npcCenterX - playerCenterX, npcCenterY - playerCenterY);
+
+						if (distance < closestDistance) {
+							closestNpcIndex = j;
+							closestDistance = distance;
+						}
+					}
+				}
+			}
+
+			if (closestNpcIndex != -1) {
+				attackCancel = true;
 				gp.gameState = gp.dialogueState;
-				gp.npc[i].speak();
+				gp.npc[closestNpcIndex].speak();
 			} else {
 				attacking = true;
 			}
@@ -312,7 +361,16 @@ public class Player extends Entity{
 
 	public void damageMonster(int i) {
 		if(i != 999) {
-			System.out.println("Player attacked " + gp.monster[i].name);
+			if (gp.monster[i].invincible == false) {
+				gp.monster[i].health -= attack;
+				gp.monster[i].invincible = true;
+				if (gp.monster[i].health <= 0 && gp.monster[i].dying == false) {
+					gp.monster[i].dying = true;
+					gp.monster[i].dyingCounter = 0;
+					gp.monster[i].damageReaction();
+				}
+			}
+
 		}
 		else {
 			System.out.println("Player attacked nothing");
@@ -325,33 +383,33 @@ public class Player extends Entity{
 
 		BufferedImage image= null;
 
-		if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
-        switch (direction) {
-            case "up":
-                if (!attacking) image = (spriteNum == 1) ? up1 : up2;
-				if (attacking) image = (spriteNum == 1) ? attackUp1 : attackUp2;
-                break;
-            case "down":
-                if (!attacking) image = (spriteNum == 1) ? down1 : down2;
-				if (attacking) image = (spriteNum == 1) ? attackDown1 : attackDown2;
-                break;
-            case "left":
-				if (!attacking) image = (spriteNum == 1) ? left1 : left2;
-				if (attacking) image = (spriteNum == 1) ? attackLeft1 : attackLeft2;
-                break;
-            case "right":
-                if (!attacking) image = (spriteNum == 1) ? right1 : right2;
-				if (attacking) image = (spriteNum == 1) ? attackRight1 : attackRight2;
-                break;
-        }
-    } else {
-        switch (direction) {
-            case "up": image = standUp; break;
-            case "down": image = stand; break;
-            case "left": image = standLeft; break;
-            case "right": image = standRight; break;
-        }
-    }
+		if (attacking) {
+			switch (direction) {
+				case "up":    image = (spriteNum == 1) ? attackUp1 : attackUp2; break;
+				case "down":  image = (spriteNum == 1) ? attackDown1 : attackDown2; break;
+				case "left":  image = (spriteNum == 1) ? attackLeft1 : attackLeft2; break;
+				case "right": image = (spriteNum == 1) ? attackRight1 : attackRight2; break;
+			}
+		}
+		else if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
+			switch (direction) {
+				case "up":
+					image = (spriteNum == 1) ? up1 : up2; break;
+				case "down":
+					image = (spriteNum == 1) ? down1 : down2;  break;
+				case "left":
+					image = (spriteNum == 1) ? left1 : left2;  break;
+				case "right":
+					image = (spriteNum == 1) ? right1 : right2;   break;
+			}
+		} else {
+			switch (direction) {
+				case "up": image = standUp; break;
+				case "down": image = stand; break;
+				case "left": image = standLeft; break;
+				case "right": image = standRight; break;
+			}
+		}
 
 		int x = screenX;
 		int y = screenY;
@@ -381,10 +439,6 @@ public class Player extends Entity{
     	g2.drawImage(image, x, y, gp.tileSize * 2, gp.tileSize * 2, null); // 160x160 final size
 		// Restore composite
 		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
-
-		// Draw solidArea rectangle for debugging
-		g2.setColor(Color.red);
-		g2.drawRect(x + solidArea.x, y + solidArea.y, solidArea.width, solidArea.height);
 		
 	}
 }
