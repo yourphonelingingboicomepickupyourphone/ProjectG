@@ -170,37 +170,55 @@ public class KeyHandler implements KeyListener{
 			gp.gameState = gp.playState;
 		}
 		if (code == KeyEvent.VK_R) {
-			// Default stat values (adjust if your defaults change)
 			int defaultHealth = 1800;
 			int defaultMana = 400;
 			int defaultAttack = 50;
 			int defaultDefense = 10;
 
-			// Subtract equipment bonuses if equipped
-			int weaponHealthBonus = gp.player.currentWeapon != null ? gp.player.currentWeapon.healthBonus : 0;
-			int weaponManaBonus = gp.player.currentWeapon != null ? gp.player.currentWeapon.manaBonus : 0;
-			int weaponAttackBonus = gp.player.currentWeapon != null ? gp.player.currentWeapon.attackBonus : 0;
-			int weaponDefenseBonus = gp.player.currentWeapon != null ? gp.player.currentWeapon.defenseBonus : 0;
+			int healthBonus = 0, manaBonus = 0, attackBonus = 0, defenseBonus = 0;
+			if (gp.player.currentWeapon != null) {
+				healthBonus += gp.player.currentWeapon.healthBonus;
+				manaBonus += gp.player.currentWeapon.manaBonus;
+				attackBonus += gp.player.currentWeapon.attackBonus;
+				defenseBonus += gp.player.currentWeapon.defenseBonus;
+			}
+			if (gp.player.currentArmor != null) {
+				healthBonus += gp.player.currentArmor.healthBonus;
+				manaBonus += gp.player.currentArmor.manaBonus;
+				attackBonus += gp.player.currentArmor.attackBonus;
+				defenseBonus += gp.player.currentArmor.defenseBonus;
+			}
+			if (gp.player.currentHat != null) {
+				healthBonus += gp.player.currentHat.healthBonus;
+				manaBonus += gp.player.currentHat.manaBonus;
+				attackBonus += gp.player.currentHat.attackBonus;
+				defenseBonus += gp.player.currentHat.defenseBonus;
+			}
+			if (gp.player.currentBoots != null) {
+				healthBonus += gp.player.currentBoots.healthBonus;
+				manaBonus += gp.player.currentBoots.manaBonus;
+				attackBonus += gp.player.currentBoots.attackBonus;
+				defenseBonus += gp.player.currentBoots.defenseBonus;
+			}
 
-			int spentHealth = Math.max(0, ((int)gp.player.maxHealth - weaponHealthBonus - defaultHealth) / 100);
-			int spentMana = Math.max(0, ((int)gp.player.maxMana - weaponManaBonus - defaultMana) / 50);
-			int spentAttack = Math.max(0, ((int)gp.player.attack - weaponAttackBonus - defaultAttack) / 10);
-			int spentDefense = Math.max(0, ((int)gp.player.defense - weaponDefenseBonus - defaultDefense) / 10);
+			int spentHealth = Math.max(0, ((int)gp.player.maxHealth - healthBonus - defaultHealth) / 100);
+			int spentMana = Math.max(0, ((int)gp.player.maxMana - manaBonus - defaultMana) / 50);
+			int spentAttack = Math.max(0, ((int)gp.player.attack - attackBonus - defaultAttack) / 10);
+			int spentDefense = Math.max(0, ((int)gp.player.defense - defenseBonus - defaultDefense) / 10);
 			int totalSpent = spentHealth + spentMana + spentAttack + spentDefense;
 
-			// Only reset if any stat is above default (excluding equipment bonuses)
-			boolean spent = gp.player.maxHealth > defaultHealth ||
-							gp.player.maxMana > defaultMana ||
-							(gp.player.attack - weaponAttackBonus) > defaultAttack ||
-							(gp.player.defense - weaponDefenseBonus) > defaultDefense;
+			boolean spent = (gp.player.maxHealth - healthBonus) > defaultHealth ||
+							(gp.player.maxMana - manaBonus) > defaultMana ||
+							(gp.player.attack - attackBonus) > defaultAttack ||
+							(gp.player.defense - defenseBonus) > defaultDefense;
 
 			if (spent) {
-				gp.player.maxHealth = defaultHealth;
+				gp.player.maxHealth = defaultHealth + healthBonus;
 				gp.player.health = gp.player.maxHealth;
-				gp.player.maxMana = defaultMana;
+				gp.player.maxMana = defaultMana + manaBonus;
 				gp.player.mana = gp.player.maxMana;
-				gp.player.attack = defaultAttack + weaponAttackBonus;
-				gp.player.defense = defaultDefense + weaponDefenseBonus;
+				gp.player.attack = defaultAttack + attackBonus;
+				gp.player.defense = defaultDefense + defenseBonus;
 				gp.player.progressionPoints += totalSpent;
 			}
 		}

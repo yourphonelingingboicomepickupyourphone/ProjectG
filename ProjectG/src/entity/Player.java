@@ -61,7 +61,7 @@ public class Player extends Entity{
 		this.type = 0;
 		this.level = 1;
 		this.attack = 50;
-		this.defense = 30;
+		this.defense = 10;
 		this.exp = 0;
 		this.speed = 5;
 		this.nextLevelExp = 10;
