@@ -154,7 +154,6 @@ public class KeyHandler implements KeyListener{
 		if (code == KeyEvent.VK_ENTER && gp.player.progressionPoints > 0) {
 			switch (UI.progressionSelectIndex) {
 				case 0: 
-<<<<<<< HEAD
 					gp.player.maxHealth += 100;
 					gp.player.health = gp.player.maxHealth;
 					break;
@@ -164,17 +163,6 @@ public class KeyHandler implements KeyListener{
 					break;
 				case 2: gp.player.attack += 10; break;
 				case 3: gp.player.defense += 10; break;
-=======
-					gp.player.maxHealth = gp.player.maxHealth + 100;
-					gp.player.health = gp.player.maxHealth;
-					break;
-				case 1: 
-					gp.player.maxMana = gp.player.maxMana + 50; 
-					gp.player.mana = gp.player.maxMana;
-					break;
-				case 2: gp.player.attack = gp.player.attack + 10; break;
-				case 3: gp.player.defense = gp.player.defense + 10; break;
->>>>>>> e6381b321107e2ed305231ac06ac507ab9098715
 			}
 			gp.player.progressionPoints--;
 		}

@@ -455,7 +455,7 @@ public class UI {
 		//Window
 		int x = gp.tileSize * 2;
 		int y = gp.tileSize;
-		int width = gp.tileSize * 6;
+		int width = gp.tileSize * 9;
 		int height = gp.tileSize * 10;
 
 		drawSubWindow(x, y, width, height);
@@ -471,9 +471,9 @@ public class UI {
 
 	public void drawCharacterInventory() {
 		//Window
-		int x = gp.tileSize * 9;
+		int x = gp.tileSize * 13;
 		int y = gp.tileSize;
-		int width = gp.tileSize * 6;
+		int width = gp.tileSize * 9;
 		int height = gp.tileSize * 10;
 
 		drawSubWindow(x, y, width, height);
