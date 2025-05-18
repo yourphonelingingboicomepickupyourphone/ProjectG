@@ -86,9 +86,12 @@ public class UI {
 		//Character State
 		else if (gp.gameState == gp.characterState) {
 			drawCharacterScreen();
-			drawPlayerHealth();
-			drawPlayerMana();
-			drawPlayerIcon();
+		}
+
+		//Inventory State
+		else if (gp.gameState == gp.inventoryState) {
+			drawInventoryScreen();
+			drawCharacterInventory();
 		}
 	}
 
@@ -446,6 +449,42 @@ public class UI {
 		// int tailX = frameX + frameWidth - gp.tileSize / 2;
 		// textX = getXForAllignToRightText(value, tailX);
 		// g2.drawString(value, textX, textY);
+	}
+
+	public void drawInventoryScreen() {
+		//Window
+		int x = gp.tileSize * 2;
+		int y = gp.tileSize;
+		int width = gp.tileSize * 6;
+		int height = gp.tileSize * 10;
+
+		drawSubWindow(x, y, width, height);
+
+		//Title
+		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 40F));
+		String text = "INVENTORY";
+		int xText = getXForCenteredText(text);
+		int yText = gp.tileSize + gp.tileSize / 2;
+		g2.drawString(text, xText, yText);
+		
+	}
+
+	public void drawCharacterInventory() {
+		//Window
+		int x = gp.tileSize * 9;
+		int y = gp.tileSize;
+		int width = gp.tileSize * 6;
+		int height = gp.tileSize * 10;
+
+		drawSubWindow(x, y, width, height);
+
+		//Title
+		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 40F));
+		String text = "CHARACTER";
+		int xText = getXForCenteredText(text);
+		int yText = gp.tileSize + gp.tileSize / 2;
+		g2.drawString(text, xText, yText);
+		
 	}
 
 

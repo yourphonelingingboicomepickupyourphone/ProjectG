@@ -23,7 +23,7 @@ public class Player extends Entity{
     final int RECOIL_DURATION = 10;
     
     public int attackCooldown = 0;
-    public final int ATTACK_COOLDOWN_MAX = 60; // 60 frames = 1s at 60fps
+    public final int ATTACK_COOLDOWN_MAX = 120; // 120 frames = 2s at 60fps
 	
 	public Player(GamePanel gp, KeyHandler kH) {
 
@@ -61,7 +61,7 @@ public class Player extends Entity{
 		this.type = 0;
 		this.level = 1;
 		this.attack = 50;
-		this.defense = 10;
+		this.defense = 30;
 		this.exp = 0;
 		this.speed = 5;
 		this.nextLevelExp = 10;
@@ -81,6 +81,12 @@ public class Player extends Entity{
 	}
 	public int getWeaponDefense() {
 		return currentWeapon.defenseBonus;
+	}
+	public int getWeaponHealth() {
+		return currentWeapon.healthBonus;
+	}
+	public int getWeaponMana() {
+		return currentWeapon.manaBonus;
 	}
 	public void getPlayerImage() {
 
@@ -192,11 +198,6 @@ public class Player extends Entity{
 				}
 			} else {
 				collisionRecoilCounter = RECOIL_DURATION;
-			}
-			
-			if (keyH.enterPressed == true &&attackCancel == false) {
-				attacking 	= true;
-				spriteCounter = 0;
 			}
 
 			attackCancel = false;
@@ -366,8 +367,6 @@ public class Player extends Entity{
 				attackCancel = true;
 				gp.gameState = gp.dialogueState;
 				gp.npc[closestNpcIndex].speak();
-			} else {
-				attacking = true;
 			}
 		}
 	}
@@ -376,7 +375,11 @@ public class Player extends Entity{
 		if(i != 999){
 
 			if (invincible == false && gp.monster[i].collision == true) {
-				gp.player.health -= gp.monster[i].attack - defense;
+				int damage = gp.monster[i].attack - defense;
+				if (damage < 0) {
+					damage = 0;
+				}
+				health -= damage;
 				collisionRecoilCounter = RECOIL_DURATION;
 				spriteNum = 1; // Set spriteNum to 1 during recoil
 				invincible = true;

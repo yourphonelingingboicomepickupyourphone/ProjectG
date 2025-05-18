@@ -41,6 +41,13 @@ public class KeyHandler implements KeyListener{
 		else if (gp.gameState == gp.characterState) {
 			characterState(code);
 		}
+		else if (gp.gameState == gp.optionsState) {
+			optionsState(code);
+		}
+
+		else if (gp.gameState == gp.inventoryState) {
+			inventoryState(code);
+		}
 
 	}
 
@@ -116,6 +123,10 @@ public class KeyHandler implements KeyListener{
 		if (code == KeyEvent.VK_C) {
 			gp.gameState = gp.characterState;
 		}
+
+		if (code == KeyEvent.VK_I){
+			gp.gameState = gp.inventoryState;
+		}
 	}
 
 	public void pauseState(int code){
@@ -134,7 +145,7 @@ public class KeyHandler implements KeyListener{
 	public void characterState(int code){
 		if (code == KeyEvent.VK_W || code == KeyEvent.VK_UP) {
 			UI.progressionSelectIndex--;
-        	if (UI.progressionSelectIndex < 0) UI.progressionSelectIndex = 3;
+			if (UI.progressionSelectIndex < 0) UI.progressionSelectIndex = 3;
 		}
 		if (code == KeyEvent.VK_S || code == KeyEvent.VK_DOWN) {
 			UI.progressionSelectIndex++;
@@ -143,44 +154,67 @@ public class KeyHandler implements KeyListener{
 		if (code == KeyEvent.VK_ENTER && gp.player.progressionPoints > 0) {
 			switch (UI.progressionSelectIndex) {
 				case 0: 
-					gp.player.maxHealth = gp.player.maxHealth + 100;
+					gp.player.maxHealth += 100;
 					gp.player.health = gp.player.maxHealth;
 					break;
 				case 1: 
-					gp.player.maxMana = gp.player.maxMana + 50; 
+					gp.player.maxMana += 50; 
 					gp.player.mana = gp.player.maxMana;
 					break;
-				case 2: gp.player.attack = gp.player.attack + 10; break;
-				case 3: gp.player.defense = gp.player.defense + 10; break;
+				case 2: gp.player.attack += 10; break;
+				case 3: gp.player.defense += 10; break;
 			}
 			gp.player.progressionPoints--;
 		}
 		if (code == KeyEvent.VK_C) {
-				gp.gameState = gp.playState;
+			gp.gameState = gp.playState;
 		}
 		if (code == KeyEvent.VK_R) {
-            // Default stat values (adjust if your defaults change)
-            int defaultHealth = 1800;
-            int defaultMana = 400;
-            int defaultAttack = 50;
-            int defaultDefense = 10;
+			// Default stat values (adjust if your defaults change)
+			int defaultHealth = 1800;
+			int defaultMana = 400;
+			int defaultAttack = 50;
+			int defaultDefense = 10;
 
-            if (gp.player.totalProgressionPoints > 0) {
-                gp.player.maxHealth = defaultHealth;
-                gp.player.health = gp.player.maxHealth;
-                gp.player.maxMana = defaultMana;
-                gp.player.mana = gp.player.maxMana;
-                gp.player.attack = defaultAttack;
-                gp.player.defense = defaultDefense;
-                gp.player.progressionPoints += gp.player.totalProgressionPoints;
-            }
-        }
+			// Subtract equipment bonuses if equipped
+			int weaponHealthBonus = gp.player.currentWeapon != null ? gp.player.currentWeapon.healthBonus : 0;
+			int weaponManaBonus = gp.player.currentWeapon != null ? gp.player.currentWeapon.manaBonus : 0;
+			int weaponAttackBonus = gp.player.currentWeapon != null ? gp.player.currentWeapon.attackBonus : 0;
+			int weaponDefenseBonus = gp.player.currentWeapon != null ? gp.player.currentWeapon.defenseBonus : 0;
+
+			int spentHealth = Math.max(0, ((int)gp.player.maxHealth - weaponHealthBonus - defaultHealth) / 100);
+			int spentMana = Math.max(0, ((int)gp.player.maxMana - weaponManaBonus - defaultMana) / 50);
+			int spentAttack = Math.max(0, ((int)gp.player.attack - weaponAttackBonus - defaultAttack) / 10);
+			int spentDefense = Math.max(0, ((int)gp.player.defense - weaponDefenseBonus - defaultDefense) / 10);
+			int totalSpent = spentHealth + spentMana + spentAttack + spentDefense;
+
+			// Only reset if any stat is above default (excluding equipment bonuses)
+			boolean spent = gp.player.maxHealth > defaultHealth ||
+							gp.player.maxMana > defaultMana ||
+							(gp.player.attack - weaponAttackBonus) > defaultAttack ||
+							(gp.player.defense - weaponDefenseBonus) > defaultDefense;
+
+			if (spent) {
+				gp.player.maxHealth = defaultHealth;
+				gp.player.health = gp.player.maxHealth;
+				gp.player.maxMana = defaultMana;
+				gp.player.mana = gp.player.maxMana;
+				gp.player.attack = defaultAttack + weaponAttackBonus;
+				gp.player.defense = defaultDefense + weaponDefenseBonus;
+				gp.player.progressionPoints += totalSpent;
+			}
+		}
 	}
 
 	public void optionsState(int code){
 
 	}
 
+	public void inventoryState(int code){
+		if (code == KeyEvent.VK_I){
+			gp.gameState = gp.playState;
+		}
+	}
 	@Override
 	public void keyReleased(KeyEvent e) {
 		int code = e.getKeyCode();
@@ -206,6 +240,9 @@ public class KeyHandler implements KeyListener{
 		}
 		if (code == KeyEvent.VK_SPACE) {
 			spacePressed = false;
+		}
+		if (code == KeyEvent.VK_ESCAPE) {
+			escPressed = false;
 		}
 	}
 
