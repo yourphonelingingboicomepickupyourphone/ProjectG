@@ -9,7 +9,7 @@ public class OBJ_Door_Key extends Entity{
 		
 		super(gp);
 
-		name = "Door_Key";
+		name = "Door Key";
 		down1 = setup("/objects/door_key");
 		renderLayer = 1;
 		
@@ -21,6 +21,8 @@ public class OBJ_Door_Key extends Entity{
 		solidAreaDefaultY = solidArea.y;
 
 		collision = true;
+
+		description = "A key to open every door.";
 	}
 	
 }

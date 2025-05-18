@@ -560,8 +560,34 @@ public class UI {
 
 		        // Draw item description/info (wrap or trim as needed)
 		        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 24F));
-		        if (selectedItem.description != null) {
-		            g2.drawString(selectedItem.description, infoX + 24, infoY + 80);
+				int descX = infoX + 24;
+		        int descY = infoY + 80;
+		        int lineHeight = g2.getFontMetrics().getHeight();
+		        int maxDescWidth = infoWidth - 48;
+
+		        java.util.List<String> lines = wrapText(selectedItem.description, maxDescWidth, g2);
+		        for (String line : lines) {
+		            g2.drawString(line, descX, descY);
+		            descY += lineHeight;
+		        }
+
+		        // Draw basic stats if present
+		        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 22F));
+		        if (selectedItem.healthBonus != 0) {
+		            g2.drawString("Health: " + (selectedItem.healthBonus > 0 ? "+" : "") + selectedItem.healthBonus, descX, descY);
+		            descY += lineHeight;
+		        }
+		        if (selectedItem.manaBonus != 0) {
+		            g2.drawString("Mana: " + (selectedItem.manaBonus > 0 ? "+" : "") + selectedItem.manaBonus, descX, descY);
+		            descY += lineHeight;
+		        }
+		        if (selectedItem.attackBonus != 0) {
+		            g2.drawString("Attack: " + (selectedItem.attackBonus > 0 ? "+" : "") + selectedItem.attackBonus, descX, descY);
+		            descY += lineHeight;
+		        }
+		        if (selectedItem.defenseBonus != 0) {
+		            g2.drawString("Defense: " + (selectedItem.defenseBonus > 0 ? "+" : "") + selectedItem.defenseBonus, descX, descY);
+		            descY += lineHeight;
 		        }
 		    }
 		}
@@ -605,6 +631,25 @@ public class UI {
 		int length = (int)g2.getFontMetrics().getStringBounds(text, g2).getWidth();
 		int x = tailX - length;
 		return x;
+	}
+	
+	private java.util.List<String> wrapText(String text, int maxWidth, Graphics2D g2) {
+	    java.util.List<String> lines = new java.util.ArrayList<>();
+	    String[] words = text.split(" ");
+	    StringBuilder line = new StringBuilder();
+	    for (String word : words) {
+	        String testLine = line.length() == 0 ? word : line + " " + word;
+	        int lineWidth = g2.getFontMetrics().stringWidth(testLine);
+	        if (lineWidth > maxWidth && line.length() > 0) {
+	            lines.add(line.toString());
+	            line = new StringBuilder(word);
+	        } else {
+	            if (line.length() > 0) line.append(" ");
+	            line.append(word);
+	        }
+	    }
+	    if (line.length() > 0) lines.add(line.toString());
+	    return lines;
 	}
 	
 	
