@@ -5,10 +5,12 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 import item.ITEM_Sword_Normal;
 import main.GamePanel;
 import main.KeyHandler;
+import object.OBJ_Door_Key;
 
 public class Player extends Entity{
 	
@@ -19,6 +21,9 @@ public class Player extends Entity{
 	public boolean justFinishTalking = false;
 	int standCounter = 0;
 	public boolean attackCancel = false;
+	public ArrayList<Entity> inventory = new ArrayList<>();
+	public int maxInventorySize = 24;
+
 	int collisionRecoilCounter = 0;
     final int RECOIL_DURATION = 10;
     
@@ -42,6 +47,9 @@ public class Player extends Entity{
 		solidArea.height= 80;
 		
 		setDefaultValues();
+		getPlayerImage();
+		getPlayerAttackImage();
+		setItems();
 	}
 	
 	public void setDefaultValues() {
@@ -68,12 +76,29 @@ public class Player extends Entity{
 		this.totalProgressionPoints = 0;
 		this.progressionPoints = 0;
 		currentWeapon = new ITEM_Sword_Normal(gp);
+		currentArmor = null;
+		currentHat = null;
+		currentBoots = null;
 		attack += getWeaponAttack();
 		defense += getWeaponDefense();
 
 
-		getPlayerImage();
-		getPlayerAttackImage();
+
+	}
+
+	public void setItems(){
+		
+		inventory.add(currentWeapon);
+		inventory.add(currentArmor);
+		inventory.add(currentHat);
+		inventory.add(currentBoots);
+		inventory.add(new OBJ_Door_Key(gp));
+		inventory.add(new OBJ_Door_Key(gp));
+		inventory.add(new OBJ_Door_Key(gp));
+		inventory.add(new OBJ_Door_Key(gp));
+		inventory.add(new OBJ_Door_Key(gp));
+		inventory.add(new OBJ_Door_Key(gp));
+		inventory.add(new OBJ_Door_Key(gp));
 	}
 
 	public int getWeaponAttack() {

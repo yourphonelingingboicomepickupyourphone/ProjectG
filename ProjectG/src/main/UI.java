@@ -13,6 +13,8 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
+import entity.Entity;
+
 public class UI {
 	
 	GamePanel gp;
@@ -451,22 +453,118 @@ public class UI {
 		// g2.drawString(value, textX, textY);
 	}
 
+	public int slotCol = 0;
+	public int slotRow = 0;
+	public final int maxInventoryCol = 6; // Example: 6 columns
+	public final int maxInventoryRow = 4; // Example: 4 rows
+
 	public void drawInventoryScreen() {
-		//Window
-		int x = gp.tileSize * 2;
-		int y = gp.tileSize;
+		// Window
+		int frameX = gp.tileSize * 2;
+		int frameY = gp.tileSize;
 		int width = gp.tileSize * 9;
 		int height = gp.tileSize * 10;
 
-		drawSubWindow(x, y, width, height);
+		drawSubWindow(frameX, frameY, width, height);
 
-		//Title
-		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 40F));
-		String text = "INVENTORY";
-		int xText = getXForCenteredText(text);
-		int yText = gp.tileSize + gp.tileSize / 2;
-		g2.drawString(text, xText, yText);
+		// Inner frame (where slots should fit)
+		int borderInset = 7;
+		int innerX = frameX + borderInset * 3;
+		int innerY = frameY + borderInset * 3;
+		int innerWidth = width - borderInset * 6;
+		// int innerHeight = height - borderInset * 6;
+
+		// Fixed slot size
+		int slotWidth = gp.tileSize;
+		int slotHeight = gp.tileSize;
+
+		// Calculate slotGap so slots fit the inner frame width exactly
+		int sideGap = gp.tileSize / 3;
+		int usableWidth = innerWidth - 2 * sideGap;
+		int totalSlotWidth = maxInventoryCol * slotWidth;
+		int slotGap = 0;
+		if (maxInventoryCol > 1) {
+			slotGap = (usableWidth - totalSlotWidth) / (maxInventoryCol - 1);
+		}
+
+		// The grid starts at innerX + sideGap
+		int slotXStart = innerX + sideGap;
+		int slotYStart = innerY + gp.tileSize / 3; // Padding from top, adjust as needed
+
+		// Draw slots
+		g2.setStroke(new BasicStroke(2));
+		for (int row = 0; row < maxInventoryRow; row++) {
+			for (int col = 0; col < maxInventoryCol; col++) {
+				int x = slotXStart + col * (slotWidth + slotGap);
+				int y = slotYStart + row * (slotHeight + slotGap);
+				g2.setColor(new Color(80, 80, 80, 120));
+				g2.fillRoundRect(x, y, slotWidth, slotHeight, 20, 20);
+				g2.setColor(Color.WHITE);
+				g2.drawRoundRect(x, y, slotWidth, slotHeight, 20, 20);
+			}
+		}
+
+		// Draw cursor
+		int cursorX = slotXStart + slotCol * (slotWidth + slotGap);
+		int cursorY = slotYStart + slotRow * (slotHeight + slotGap);
+		int cursorArc = 20;
+		Color cursorColor = new Color(255, 255, 255, 100);
+		g2.setColor(cursorColor);
+		g2.setStroke(new BasicStroke(5));
+		g2.fillRoundRect(cursorX, cursorY, slotWidth, slotHeight, cursorArc, cursorArc);
+		g2.setStroke(new BasicStroke(1f)); // Reset stroke
+
+		// Draw items in slots (skip nulls)
+		int itemIndex = 0;
+		for (int row = 0; row < maxInventoryRow; row++) {
+			for (int col = 0; col < maxInventoryCol; col++) {
+				if (itemIndex < gp.player.inventory.size()) {
+					Entity item = gp.player.inventory.get(itemIndex);
+					if (item != null) {
+						int x = slotXStart + col * (slotWidth + slotGap);
+						int y = slotYStart + row * (slotHeight + slotGap);
+						if (item.down1 != null) {
+							g2.drawImage(
+								item.down1,
+								x + (slotWidth - gp.tileSize) / 2,
+								y + (slotHeight - gp.tileSize) / 2,
+								gp.tileSize, gp.tileSize,
+								null
+							);
+						}
+					}
+					itemIndex++;
+				}
+			}
+		}
 		
+		// Draw selected item's name and info below the grid
+		int selectedIndex = slotRow * maxInventoryCol + slotCol;
+		if (selectedIndex < gp.player.inventory.size()) {
+		    Entity selectedItem = gp.player.inventory.get(selectedIndex);
+		    if (selectedItem != null) {
+		        // Calculate info area position
+		        int infoX = innerX + gp.tileSize / 4;
+		        int infoY = slotYStart + maxInventoryRow * (slotHeight + slotGap) - gp.tileSize / 6;
+		        int infoWidth = innerWidth - gp.tileSize/2;
+		        int infoHeight = gp.tileSize * 3 + 2 * gp.tileSize / 3;
+
+		        // Draw info background
+		        g2.setColor(new Color(40, 40, 40, 220));
+		        g2.fillRoundRect(infoX, infoY, infoWidth, infoHeight, 20, 20);
+
+		        // Draw item name
+		        g2.setColor(Color.WHITE);
+		        g2.setFont(g2.getFont().deriveFont(Font.BOLD, 32F));
+		        g2.drawString(selectedItem.name, infoX + 24, infoY + 40);
+
+		        // Draw item description/info (wrap or trim as needed)
+		        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 24F));
+		        if (selectedItem.description != null) {
+		            g2.drawString(selectedItem.description, infoX + 24, infoY + 80);
+		        }
+		    }
+		}
 	}
 
 	public void drawCharacterInventory() {
@@ -479,11 +577,7 @@ public class UI {
 		drawSubWindow(x, y, width, height);
 
 		//Title
-		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 40F));
-		String text = "CHARACTER";
-		int xText = getXForCenteredText(text);
-		int yText = gp.tileSize + gp.tileSize / 2;
-		g2.drawString(text, xText, yText);
+		
 		
 	}
 

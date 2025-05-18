@@ -232,6 +232,35 @@ public class KeyHandler implements KeyListener{
 		if (code == KeyEvent.VK_I){
 			gp.gameState = gp.playState;
 		}
+		if (code == KeyEvent.VK_A || code == KeyEvent.VK_LEFT) {
+			if (gp.ui.slotCol == 0) {
+				gp.ui.slotCol = gp.ui.maxInventoryCol - 1;
+			} else {
+				gp.ui.slotCol--;
+			}
+		}
+		if (code == KeyEvent.VK_D || code == KeyEvent.VK_RIGHT) {
+			if (gp.ui.slotCol == gp.ui.maxInventoryCol - 1) {
+				gp.ui.slotCol = 0;
+			} else {
+				gp.ui.slotCol++;
+			}
+		}
+		if (code == KeyEvent.VK_W || code == KeyEvent.VK_UP) {
+			if (gp.ui.slotRow == 0) {
+				gp.ui.slotRow = gp.ui.maxInventoryRow - 1;
+			} else {
+				gp.ui.slotRow--;
+			}
+		}
+		if (code == KeyEvent.VK_S || code == KeyEvent.VK_DOWN) {
+			if (gp.ui.slotRow == gp.ui.maxInventoryRow - 1) {
+				gp.ui.slotRow = 0;
+			} else {
+				gp.ui.slotRow++;
+				
+			}
+		}
 	}
 	@Override
 	public void keyReleased(KeyEvent e) {
