@@ -354,7 +354,7 @@ public class UI {
 			if (messageCounter.get(i) < 90) {
 				//Draw the message shadow
 				g2.setColor(new Color(0, 0, 0, 80));
-				g2.drawString(messages.get(i), messageX + gp.tileSize / 13, messageY + gp.tileSize / 13);
+				g2.drawString(messages.get(i), messageX + gp.tileSize / 25, messageY + gp.tileSize / 25);
 				
 				//Draw the message
 				g2.setColor(Color.white);
@@ -366,6 +366,7 @@ public class UI {
 		}
 	}
 
+	public static int progressionSelectIndex = 0; // 0: Health, 1: Mana, 2: Attack, 3: Defense, etc.
 	//Character Screen
 	public void drawCharacterScreen() {
 		//Window
@@ -388,30 +389,63 @@ public class UI {
 		textY += lineHeight;
 		g2.drawString("Level: " + gp.player.level, textX, textY);
 		textY += lineHeight;
-		g2.drawString("Health: " + (int)gp.player.health + "/" + (int)gp.player.maxHealth, textX, textY);
+
+		// Stats array for easy iteration
+		String[] statNames = {"Health", "Mana", "Attack", "Defense"};
+		String[] statValues = {
+		    (int)gp.player.maxHealth + "",
+		    gp.player.maxMana + "",
+		    gp.player.attack + "",
+		    gp.player.defense + ""
+		};
+
+		for (int i = 0; i < statNames.length; i++) {
+		    boolean selected = (progressionSelectIndex == i);
+		    int statTextY = textY + i * lineHeight;
+
+		    // Highlight selected stat row ONLY if progression points are available
+		    if (selected && gp.player.progressionPoints > 0) {
+		        g2.setColor(new Color(255, 255, 100, 80));
+		        g2.fillRoundRect(textX - 20, statTextY - 35, frameWidth - gp.tileSize, lineHeight, 20, 20);
+		        g2.setColor(Color.white);
+		    }
+
+		    // Draw stat name and value
+		    g2.drawString(statNames[i] + ": " + statValues[i], textX, statTextY);
+
+		    // Draw "+" if player has points
+		    if (gp.player.progressionPoints > 0) {
+		        String plus = "+";
+		        int plusX = frameX + frameWidth - gp.tileSize;
+		        g2.setColor(selected ? Color.YELLOW : Color.LIGHT_GRAY);
+		        g2.drawString(plus, plusX, statTextY);
+		        g2.setColor(Color.white);
+		    }
+		}
+		textY += statNames.length * lineHeight;
+
+		// Draw progression points and instructions
+		g2.setColor(Color.white);
+		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 40F));
+		g2.drawString("Progression Points: " + gp.player.progressionPoints, textX, textY);
 		textY += lineHeight;
-		g2.drawString("Mana: " + gp.player.mana + "/" + gp.player.maxMana, textX, textY);
+		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 40F));
+		g2.drawString("[W / Up]/[S / Down]: Select", textX, textY); 
 		textY += lineHeight;
-		g2.drawString("Attack: " + gp.player.attack, textX, textY);
+		g2.drawString("[ENTER]: Add Point  [C]: Close", textX, textY);
 		textY += lineHeight;
-		g2.drawString("Defense: " + gp.player.defense, textX, textY);
+
+		// Draw Reset Points button
+		String resetText = "[R] Reset Points";
+		g2.setColor(new Color(255, 100, 100));
+		g2.drawString(resetText, textX, textY);
+		g2.setColor(Color.white);
 		textY += lineHeight;
-		g2.drawString("Speed: " + gp.player.speed, textX, textY);
-		textY += lineHeight;
-		g2.drawString("EXP: " + gp.player.exp, textX, textY);
-		textY += lineHeight;
-		g2.drawString("Progression Points: " + gp.player.progressionPoint, textX, textY);
-		textY += lineHeight;
-		g2.drawString("Weapon: " + gp.player.currentWeapon.name, textX, textY);
-		
 
 		//Variable
-		int tailX = frameX + frameWidth - gp.tileSize / 2;
-
-		String value = "Level: " + gp.player.level;
-		textX = getXForAllignToRightText(value, tailX);
-		g2.drawString(value, textX, textY);
-
+		// int tailX = frameX + frameWidth - gp.tileSize / 2;
+		// textX = getXForAllignToRightText(value, tailX);
+		// g2.drawString(value, textX, textY);
 	}
 
 
@@ -439,4 +473,6 @@ public class UI {
 		int x = tailX - length;
 		return x;
 	}
+	
+	
 }

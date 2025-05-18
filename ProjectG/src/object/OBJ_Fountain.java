@@ -23,5 +23,11 @@ public class OBJ_Fountain extends Entity{
 
 		collision = true;
 	}
-	
+
+	public void interact() {
+		gp.gameState = gp.dialogueState;
+		gp.ui.currentDialogue = "You feel refreshed!";
+		gp.player.health = gp.player.maxHealth;
+		gp.player.mana = gp.player.maxMana;
+	}
 }

@@ -12,11 +12,13 @@ public class MON_rSlime extends Entity{
         name = "Red Slime";
         type = 1;
         
+        level = 1;
         speed = 1;
         maxHealth = 70;
         health = maxHealth;
         attack = 20;
         defense = 0;
+        expReward = 10;
 
         collision = true;
         renderLayer = 1; 

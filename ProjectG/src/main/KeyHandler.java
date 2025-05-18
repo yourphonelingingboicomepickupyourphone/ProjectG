@@ -132,9 +132,49 @@ public class KeyHandler implements KeyListener{
 	}
 
 	public void characterState(int code){
+		if (code == KeyEvent.VK_W || code == KeyEvent.VK_UP) {
+			UI.progressionSelectIndex--;
+        	if (UI.progressionSelectIndex < 0) UI.progressionSelectIndex = 3;
+		}
+		if (code == KeyEvent.VK_S || code == KeyEvent.VK_DOWN) {
+			UI.progressionSelectIndex++;
+			if (UI.progressionSelectIndex > 3) UI.progressionSelectIndex = 0;
+		}
+		if (code == KeyEvent.VK_ENTER && gp.player.progressionPoints > 0) {
+			switch (UI.progressionSelectIndex) {
+				case 0: 
+					gp.player.maxHealth++;
+					gp.player.health = gp.player.maxHealth;
+					break;
+				case 1: 
+					gp.player.maxMana++; 
+					gp.player.mana = gp.player.maxMana;
+					break;
+				case 2: gp.player.attack++; break;
+				case 3: gp.player.defense++; break;
+			}
+			gp.player.progressionPoints--;
+		}
 		if (code == KeyEvent.VK_C) {
 				gp.gameState = gp.playState;
 		}
+		if (code == KeyEvent.VK_R) {
+            // Default stat values (adjust if your defaults change)
+            int defaultHealth = 1800;
+            int defaultMana = 400;
+            int defaultAttack = 50;
+            int defaultDefense = 10;
+
+            if (gp.player.totalProgressionPoints > 0) {
+                gp.player.maxHealth = defaultHealth;
+                gp.player.health = gp.player.maxHealth;
+                gp.player.maxMana = defaultMana;
+                gp.player.mana = gp.player.maxMana;
+                gp.player.attack = defaultAttack;
+                gp.player.defense = defaultDefense;
+                gp.player.progressionPoints += gp.player.totalProgressionPoints;
+            }
+        }
 	}
 
 	public void optionsState(int code){

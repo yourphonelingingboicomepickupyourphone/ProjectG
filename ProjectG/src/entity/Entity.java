@@ -9,6 +9,9 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import item.ITEM_Armor_Normal;
+import item.ITEM_Boots_Normal;
+import item.ITEM_Hat_Normal;
 import item.ITEM_Sword_Normal;
 import main.GamePanel;
 import main.UtilityTool;
@@ -69,8 +72,13 @@ public class Entity {
 	//Player extra attributes
 	public int exp;
 	public int nextLevelExp;
-	public int progressionPoint;
+	public int totalProgressionPoints;
+	public int progressionPoints;
+	public ITEM_Hat_Normal currentHat;
 	public ITEM_Sword_Normal currentWeapon;
+	public ITEM_Armor_Normal currentArmor;
+	public ITEM_Boots_Normal currentBoots;
+
 
 	//Item attributes
 	public int healthBonus;
@@ -80,6 +88,9 @@ public class Entity {
 	public int speedBonus;
 	public int rarity = 0; //0 = common, 1 = rare, 2 = epic, 3 = legendary
 	public int levelRequirement = 0; //level requirement to use the item
+
+	//Monster attributes
+	public int expReward;
 
 
 	public Entity(GamePanel gp) {

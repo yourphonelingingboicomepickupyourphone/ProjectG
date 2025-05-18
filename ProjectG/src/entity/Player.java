@@ -65,6 +65,8 @@ public class Player extends Entity{
 		this.exp = 0;
 		this.speed = 5;
 		this.nextLevelExp = 10;
+		this.totalProgressionPoints = 0;
+		this.progressionPoints = 0;
 		currentWeapon = new ITEM_Sword_Normal(gp);
 		attack += getWeaponAttack();
 		defense += getWeaponDefense();
@@ -319,6 +321,7 @@ public class Player extends Entity{
 		
 	}
 
+
 	public void interactNPC(int i) {
 	
 		if (gp.keyH.enterPressed) {
@@ -398,13 +401,25 @@ public class Player extends Entity{
 					gp.monster[i].dyingCounter = 0;
 					gp.monster[i].damageReaction();
 					gp.ui.addMessage("You defeated " + gp.monster[i].name + "!");
-					gp.player.exp += gp.monster[i].exp;
+					gp.player.exp += gp.monster[i].expReward;
+					gp.player.checkLevelUp();
 				}
 			}
 
 		}
 		else {
 			System.out.println("Player attacked nothing");
+		}
+	}
+
+	public void checkLevelUp() {
+		if (exp >= nextLevelExp) {
+			level++;
+			exp -= nextLevelExp;
+			nextLevelExp += 10; // Increase the required experience for the next level
+			totalProgressionPoints += 5;
+			progressionPoints += 5;
+			gp.ui.addMessage("Level up! You are now level " + level + "!");
 		}
 	}
 

@@ -81,6 +81,7 @@ public class AssetSetter {
 		gp.npc[1].worldY = gp.tileSize * 84;
 	}
 
+
 	public void setMonster() {
 		gp.monster[0] = new MON_rSlime(gp);
 		gp.monster[0].worldX = gp.tileSize * 50;
