@@ -63,6 +63,7 @@ public class Player extends Entity{
 		this.attack = 50;
 		this.defense = 10;
 		this.exp = 0;
+		this.speed = 5;
 		this.nextLevelExp = 10;
 		currentWeapon = new ITEM_Sword_Normal(gp);
 		attack += getWeaponAttack();
@@ -383,12 +384,21 @@ public class Player extends Entity{
 	public void damageMonster(int i) {
 		if(i != 999) {
 			if (gp.monster[i].invincible == false) {
-				gp.monster[i].health -= attack;
+				int dmg = attack - gp.monster[i].defense;
+
+				if (dmg < 0) {
+					dmg = 0;
+				}
+				
+				gp.monster[i].health -= dmg;
 				gp.monster[i].invincible = true;
+
 				if (gp.monster[i].health <= 0 && gp.monster[i].dying == false) {
 					gp.monster[i].dying = true;
 					gp.monster[i].dyingCounter = 0;
 					gp.monster[i].damageReaction();
+					gp.ui.addMessage("You defeated " + gp.monster[i].name + "!");
+					gp.player.exp += gp.monster[i].exp;
 				}
 			}
 

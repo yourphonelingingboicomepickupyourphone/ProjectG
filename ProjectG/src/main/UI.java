@@ -9,6 +9,7 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
@@ -18,8 +19,10 @@ public class UI {
 	Graphics2D g2;
 	Font pixelOperator, pixelOperatorBold;
 	public boolean messageOn = false;
-	public String message = "";
-	int messageCounter = 0;
+	// public String message = "";
+	// int messageCounter = 0;
+	ArrayList<String> messages = new ArrayList<>();
+	ArrayList<Integer> messageCounter = new ArrayList<>();
 	public boolean gameFinished = false;
 
 	public String currentDialogue = "";
@@ -44,10 +47,10 @@ public class UI {
 		}
 	}
 	
-	public void showMessage (String text) {
+	public void addMessage (String text) {
 		
-		message = text;
-		messageOn = true;
+		messages.add(text);
+		messageCounter.add(0);
 	}
 	public void draw(Graphics2D  g2) {
 		
@@ -66,6 +69,8 @@ public class UI {
 			drawPlayerHealth();
 			drawPlayerMana();
 			drawPlayerIcon();
+			//Draw messages
+			drawMessages();
 		}
 
 		//Pause State
@@ -338,6 +343,27 @@ public class UI {
 			e.printStackTrace();
 		}
 		g2.drawImage(image, x, y, width, height, null);
+	}
+
+	public void drawMessages() {
+		int messageX = gp.tileSize / 2;
+		int messageY = gp.tileSize * 5;
+		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 40F));
+		
+		for (int i = 0; i < messages.size(); i++) {
+			if (messageCounter.get(i) < 90) {
+				//Draw the message shadow
+				g2.setColor(new Color(0, 0, 0, 80));
+				g2.drawString(messages.get(i), messageX + gp.tileSize / 13, messageY + gp.tileSize / 13);
+				
+				//Draw the message
+				g2.setColor(Color.white);
+				g2.drawString(messages.get(i), messageX, messageY);
+				
+				messageCounter.set(i, messageCounter.get(i) + 1);
+				messageY += gp.tileSize / 2;
+			}
+		}
 	}
 
 	//Character Screen
