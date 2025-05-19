@@ -274,41 +274,39 @@ public class Player extends Entity{
 
 			// --- Custom attack hitbox for each direction ---
 			Rectangle attackHitbox = new Rectangle();
-			int hitboxX = worldX + solidArea.x;
-			int hitboxY = worldY + solidArea.y;
 
 			// Example custom sizes for each direction
-			int upWidth = solidArea.width;
-			int upHeight = 60;
-			int downWidth = solidArea.width;
-			int downHeight = 80;
-			int leftWidth = 100;
-			int leftHeight = solidArea.height;
-			int rightWidth = 120;
-			int rightHeight = solidArea.height;
+			int upWidth = 110;
+			int upHeight = 40;
+			int downWidth = 110;
+			int downHeight = 40;
+			int leftWidth = 50;
+			int leftHeight = 65;
+			int rightWidth = 50;
+			int rightHeight = 65;
 
 			switch (direction) { 
 				case "up":
-					attackHitbox.x = hitboxX;
-					attackHitbox.y = hitboxY - upHeight;
+					attackHitbox.x = worldX - (upWidth - gp.tileSize)/2;
+					attackHitbox.y = worldY - upHeight;
 					attackHitbox.width = upWidth;
 					attackHitbox.height = upHeight;
 					break;
 				case "down":
-					attackHitbox.x = hitboxX;
-					attackHitbox.y = hitboxY + solidArea.height;
+					attackHitbox.x = worldX + gp.tileSize + (downWidth - gp.tileSize)/2;
+					attackHitbox.y = worldY + gp.tileSize + downHeight;
 					attackHitbox.width = downWidth;
 					attackHitbox.height = downHeight;
 					break;
 				case "left":
-					attackHitbox.x = hitboxX - leftWidth;
-					attackHitbox.y = hitboxY;
+					attackHitbox.x = worldX - leftWidth;
+					attackHitbox.y = worldY + 10;
 					attackHitbox.width = leftWidth;
 					attackHitbox.height = leftHeight;
 					break;
 				case "right":
-					attackHitbox.x = hitboxX + solidArea.width;
-					attackHitbox.y = hitboxY;
+					attackHitbox.x = worldX + gp.tileSize + rightWidth;
+					attackHitbox.y = worldY + gp.tileSize + 10;
 					attackHitbox.width = rightWidth;
 					attackHitbox.height = rightHeight;
 					break;
