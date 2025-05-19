@@ -212,16 +212,49 @@ public class UI {
 			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 60F));
 			text = "Enter your name: ";
 			x = getXForCenteredText(text);
-			y = gp.screenHeight/2 + gp.tileSize * 2 / 3;
+			int lineGap = gp.tileSize;
+			y += 3 * lineGap / 2;
 			g2.drawString(text, x, y);
-
-			g2.drawString(gp.player.name, x, y + 3 * gp.tileSize / 2);
+			g2.drawString(gp.player.name, x, y + lineGap);
 
 			x2 = getXForCenteredText(gp.player.name);
-			text = "Enter";
-			g2.drawString(text, x2, y + 3 * gp.tileSize);
-			g2.drawString(">", x2 - gp.tileSize, y + 3 * gp.tileSize);
-			g2.drawString("<", gp.screenWidth - x2 + 2 * gp.tileSize / 3, y + 3 * gp.tileSize);	
+			
+			// Draw keyboard
+			int kbStartX = gp.screenWidth/2 - gp.tileSize * 5;
+			int kbStartY = y + 3 * gp.tileSize / 2;
+			int keyW = gp.tileSize;
+			int keyH = gp.tileSize;
+			for (int row = 0; row < keyboard.length; row++) {
+			    int rowY = kbStartY + row * (keyH + gp.tileSize/8);
+			    int rowLen = keyboard[row].length;
+				// Calculate total width for this row, accounting for SPACE being double width
+			    int totalRowWidth = 0;
+			    for (int col = 0; col < rowLen; col++) {
+			        if (keyboard[row][col].equals("SPACE")) {
+			            totalRowWidth += keyW * 2;
+			        } else {
+			            totalRowWidth += keyW;
+			        }
+			    }
+			    int rowX = gp.screenWidth/2 - (totalRowWidth)/2;
+			    int currentX = rowX;
+			    for (int col = 0; col < rowLen; col++) {
+			        int buttonW = keyboard[row][col].equals("SPACE") ? keyW * 2 : keyW;
+			        // Highlight selected key
+			        if (kbRow == row && kbCol == col && typingName) {
+			            g2.setColor(new Color(255, 255, 100));
+			            g2.fillRoundRect(currentX, rowY, buttonW, keyH, 20, 20);
+			        }
+			        g2.setColor(Color.DARK_GRAY);
+			        g2.drawRoundRect(currentX, rowY, buttonW, keyH, 20, 20);
+			        g2.setColor(Color.BLACK);
+			        String key = keyboard[row][col];
+			        int tx = currentX + (buttonW - g2.getFontMetrics().stringWidth(key))/2;
+			        int ty = rowY + keyH/2 + g2.getFontMetrics().getAscent()/2;
+			        g2.drawString(key, tx, ty);
+			        currentX += buttonW;
+			    }
+			}
 		}
 	}
 
@@ -271,7 +304,7 @@ public class UI {
 	public void drawPlayerHealth() {
 		//Health Bar
 		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 40F));
-		g2.setColor(new Color(255, 255, 255));
+		g2.setColor(new Color(0, 0, 0));
 		int x = 5 * gp.tileSize / 2;
 		int y = gp.tileSize / 2;
 		int width = gp.tileSize * 6;
@@ -398,7 +431,9 @@ public class UI {
 		// Stats array for easy iteration
 		String[] statNames = {"Health", "Mana", "Attack", "Defense"};
 		String[] statValues = {
-		    (int)gp.player.maxHealth + "",
+			(int)gp.player.health + "",
+			gp.player.mana + "",
+			(int)gp.player.maxHealth + "",
 		    gp.player.maxMana + "",
 		    gp.player.attack + "",
 		    gp.player.defense + ""
@@ -416,7 +451,11 @@ public class UI {
 		    }
 
 		    // Draw stat name and value
-		    g2.drawString(statNames[i] + ": " + statValues[i], textX, statTextY);
+			if (i < 2) {
+				g2.drawString(statNames[i] + ": " + statValues[i] + "/" + statValues[i + 2], textX, statTextY);
+			} else {
+				g2.drawString(statNames[i] + ": " + statValues[i], textX, statTextY);
+			}
 
 		    // Draw "+" if player has points
 		    if (gp.player.progressionPoints > 0) {
@@ -652,5 +691,13 @@ public class UI {
 	    return lines;
 	}
 	
-	
+	final String[][] keyboard = {
+		{"1","2","3","4","5","6","7","8","9","0"},
+		{"Q","W","E","R","T","Y","U","I","O","P"},
+		{"A","S","D","F","G","H","J","K","L","<-"},
+		{"Z","X","C","V","B","N","M", "SPACE","OK"},
+	};
+	int kbRow = 0;
+	int kbCol = 0;
+	boolean typingName = true; // true while on name input screen
 }

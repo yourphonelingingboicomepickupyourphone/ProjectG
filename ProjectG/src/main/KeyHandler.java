@@ -86,9 +86,34 @@ public class KeyHandler implements KeyListener{
 		}
 			
 		else if (gp.ui.titleScreenState == 1) {
-			if (code == KeyEvent.VK_ENTER) {
-				gp.gameState = gp.playState;
+			if (code == KeyEvent.VK_UP) {
+				gp.ui.kbRow = Math.max(0, gp.ui.kbRow - 1);
+				gp.ui.kbCol = Math.min(gp.ui.kbCol, gp.ui.keyboard[gp.ui.kbRow].length - 1);
+			} else if (code == KeyEvent.VK_DOWN) {
+				gp.ui.kbRow = Math.min(gp.ui.keyboard.length - 1, gp.ui.kbRow + 1);
+				gp.ui.kbCol = Math.min(gp.ui.kbCol, gp.ui.keyboard[gp.ui.kbRow].length - 1);
+			} else if (code == KeyEvent.VK_LEFT) {
+				gp.ui.kbCol = Math.max(0, gp.ui.kbCol - 1);
+			} else if (code == KeyEvent.VK_RIGHT) {
+				gp.ui.kbCol = Math.min(gp.ui.keyboard[gp.ui.kbRow].length - 1, gp.ui.kbCol + 1);
+			} else if (code == KeyEvent.VK_ENTER) {
+				String key = gp.ui.keyboard[gp.ui.kbRow][gp.ui.kbCol];
+				if (key.equals("<-")) {
+					if (!gp.player.name.isEmpty()) {
+						gp.player.name = gp.player.name.substring(0, gp.player.name.length() - 1);
+					}
+				} else if (key.equals("SPACE")) {
+					gp.player.name += " ";
+				} else if (key.equals("OK")) {
+					gp.ui.typingName = false;
+					gp.gameState = gp.playState;
+					gp.player.name = gp.player.name.trim();
+					// Proceed to next screen or save name
+				} else if (gp.player.name.length() < 12) { // Limit name length
+					gp.player.name += key;
+				}
 			}
+			return; // Prevent further processing if on name input
 		}
 
 	}
@@ -155,11 +180,11 @@ public class KeyHandler implements KeyListener{
 			switch (UI.progressionSelectIndex) {
 				case 0: 
 					gp.player.maxHealth += 100;
-					gp.player.health = gp.player.maxHealth;
+					gp.player.health += 100;
 					break;
 				case 1: 
 					gp.player.maxMana += 50; 
-					gp.player.mana = gp.player.maxMana;
+					gp.player.mana += 50;
 					break;
 				case 2: gp.player.attack += 10; break;
 				case 3: gp.player.defense += 10; break;
@@ -205,7 +230,6 @@ public class KeyHandler implements KeyListener{
 			int spentMana = Math.max(0, ((int)gp.player.maxMana - manaBonus - defaultMana) / 50);
 			int spentAttack = Math.max(0, ((int)gp.player.attack - attackBonus - defaultAttack) / 10);
 			int spentDefense = Math.max(0, ((int)gp.player.defense - defenseBonus - defaultDefense) / 10);
-			int totalSpent = spentHealth + spentMana + spentAttack + spentDefense;
 
 			boolean spent = (gp.player.maxHealth - healthBonus) > defaultHealth ||
 							(gp.player.maxMana - manaBonus) > defaultMana ||
@@ -213,11 +237,20 @@ public class KeyHandler implements KeyListener{
 							(gp.player.defense - defenseBonus) > defaultDefense;
 
 			if (spent) {
-				gp.player.maxHealth = defaultHealth + healthBonus;
-				gp.player.health = gp.player.maxHealth;
-				gp.player.maxMana = defaultMana + manaBonus;
-				gp.player.mana = gp.player.maxMana;
+				int totalSpent = 0;
+				if (gp.player.health - spentHealth * 100 > 0) {
+					totalSpent += (gp.player.maxHealth - defaultHealth - healthBonus) / 100;
+					gp.player.maxHealth = defaultHealth + healthBonus;
+					gp.player.health -= spentHealth * 100;
+				}
+				if (gp.player.mana - spentMana * 50 > 0) {
+					totalSpent += (gp.player.maxMana - defaultMana - manaBonus) / 50;
+					gp.player.maxMana = defaultMana + manaBonus;
+					gp.player.mana -= spentMana * 50;
+				}
+				totalSpent += (gp.player.attack - defaultAttack - attackBonus) / 10;
 				gp.player.attack = defaultAttack + attackBonus;
+				totalSpent += (gp.player.defense - defaultDefense - defenseBonus) / 10;
 				gp.player.defense = defaultDefense + defenseBonus;
 				gp.player.progressionPoints += totalSpent;
 			}

@@ -61,7 +61,7 @@ public class Player extends Entity{
 		direction = "down";
 
 		//Status
-		this.name = "Player";
+		this.name = "";
 		this.maxHealth = 1800;
 		this.health = maxHealth;
 		this.maxMana = 400;
