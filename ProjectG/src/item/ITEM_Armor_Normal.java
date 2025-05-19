@@ -8,10 +8,14 @@ public class ITEM_Armor_Normal extends Entity{
         super(gp);
         
         name = "Normal Armor";
+        type = 2;
         level = 1;
         down1 = setup("/items/normal_armor");
         healthBonus = 20;
         defenseBonus = 10;
+
+        pickable = true;
+        stackable = false;
     }
 
 }

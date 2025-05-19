@@ -9,10 +9,6 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import item.ITEM_Armor_Normal;
-import item.ITEM_Boots_Normal;
-import item.ITEM_Hat_Normal;
-import item.ITEM_Sword_Normal;
 import main.GamePanel;
 import main.UtilityTool;
 
@@ -24,7 +20,7 @@ public class Entity {
 	public int renderLayer;
 	public int speed;
 	
-	public BufferedImage up1, up2, down1, down2, left1, left2, right1, right2, stand, standLeft, standRight, standUp;	//image with  an accessible buffer of image data
+	public BufferedImage up1, up2, down1, down2, left1, left2, right1, right2, stand, standLeft, standRight, standUp, fullBody;	//image with  an accessible buffer of image data
 	public BufferedImage attackUp1, attackUp2, attackDown1, attackDown2, attackLeft1, attackLeft2, attackRight1, attackRight2; //image with an accessible buffer of image data
 
 	public String direction = "down"; //to store the direction of the entity
@@ -74,13 +70,14 @@ public class Entity {
 	public int nextLevelExp;
 	public int totalProgressionPoints;
 	public int progressionPoints;
-	public ITEM_Hat_Normal currentHat;
-	public ITEM_Sword_Normal currentWeapon;
-	public ITEM_Armor_Normal currentArmor;
-	public ITEM_Boots_Normal currentBoots;
+	public Entity currentHat;
+	public Entity currentWeapon;
+	public Entity currentArmor;
+	public Entity currentBoots;
 
 
 	//Item attributes
+	public int itemType; //0 = weapon, 1 = hat, 2 = armor, 3 = boots, 4 = interactable, 5 = potion, 6 = food
 	public int healthBonus;
 	public int manaBonus;
 	public int attackBonus;
@@ -89,6 +86,13 @@ public class Entity {
 	public int rarity = 0; //0 = common, 1 = rare, 2 = epic, 3 = legendary
 	public int levelRequirement = 0; //level requirement to use the item
 	public String description = "";
+	public int cooldownBonus;
+	public boolean stackable = false; //to check if the item is stackable
+	public boolean pickable = false;
+
+	public int quantity = 1; //quantity of the item
+	public int healthHeal = 0; //health heal of the item
+	public int manaHeal = 0; //mana heal of the item
 
 	//Monster attributes
 	public int expReward;
@@ -106,6 +110,10 @@ public class Entity {
 
 	public void damageReaction() {
 	
+	}
+
+	public void use(Entity entity) {
+
 	}
 
 	public void speak() {
@@ -138,7 +146,7 @@ public class Entity {
 
 		if (this.type == 1 && contactPlayer == true) {
 			if (gp.player.invincible == false && gp.player.collision == true) {
-				int damage = attack - gp.player.defense;
+				int damage = attack - gp.player.getTotalDefense();
 				if (damage < 0) {
 					damage = 0;
 				}

@@ -1,17 +1,20 @@
-package object;
+package item;
 
 import entity.Entity;
 import main.GamePanel;
 
-public class OBJ_Door_Key extends Entity{
+public class ITEM_Door_Key extends Entity{
 
-	public OBJ_Door_Key(GamePanel gp) {
+	public ITEM_Door_Key(GamePanel gp) {
 		
 		super(gp);
 
 		name = "Door Key";
 		down1 = setup("/objects/door_key");
 		renderLayer = 1;
+		pickable = true;
+		stackable = true;
+		type = 4;
 		
 		solidArea.x = 30;
 		solidArea.y = 25;

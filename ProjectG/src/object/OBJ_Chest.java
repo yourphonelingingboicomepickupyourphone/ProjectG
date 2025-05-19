@@ -12,6 +12,7 @@ public class OBJ_Chest extends Entity{
 		name = "Chest";
 		down1 = setup("/objects/chest_1");
 		renderLayer = 1;
+		pickable = false;
 		
 		solidArea.x = 0;
 		solidArea.y = 15;

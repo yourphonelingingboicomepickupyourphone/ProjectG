@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import item.ITEM_Sword_Normal;
 import main.GamePanel;
 import main.KeyHandler;
-import object.OBJ_Door_Key;
 
 public class Player extends Entity{
 	
@@ -24,12 +23,15 @@ public class Player extends Entity{
 	public ArrayList<Entity> inventory = new ArrayList<>();
 	public int maxInventorySize = 24;
 
+	public int totalAttack;
+	public int totalDefense;
+	public float totalMaxHealth;
+	public float totalMaxMana;
 	int collisionRecoilCounter = 0;
     final int RECOIL_DURATION = 10;
-    
     public int attackCooldown = 0;
-    public final int ATTACK_COOLDOWN_MAX = 120; // 120 frames = 2s at 60fps
-	
+    public int ATTACK_COOLDOWN_MAX; 
+
 	public Player(GamePanel gp, KeyHandler kH) {
 
 		super(gp);
@@ -75,44 +77,21 @@ public class Player extends Entity{
 		this.nextLevelExp = 10;
 		this.totalProgressionPoints = 0;
 		this.progressionPoints = 0;
+		this.ATTACK_COOLDOWN_MAX = 30; // 30 frames = 0.5s at 60fps
 		currentWeapon = new ITEM_Sword_Normal(gp);
 		currentArmor = null;
 		currentHat = null;
 		currentBoots = null;
-		attack += getWeaponAttack();
-		defense += getWeaponDefense();
+		ATTACK_COOLDOWN_MAX += currentWeapon.cooldownBonus;
 
 
 
 	}
 
 	public void setItems(){
-		
-		inventory.add(currentWeapon);
-		inventory.add(currentArmor);
-		inventory.add(currentHat);
-		inventory.add(currentBoots);
-		inventory.add(new OBJ_Door_Key(gp));
-		inventory.add(new OBJ_Door_Key(gp));
-		inventory.add(new OBJ_Door_Key(gp));
-		inventory.add(new OBJ_Door_Key(gp));
-		inventory.add(new OBJ_Door_Key(gp));
-		inventory.add(new OBJ_Door_Key(gp));
-		inventory.add(new OBJ_Door_Key(gp));
+		stackInventory(); 
 	}
 
-	public int getWeaponAttack() {
-		return currentWeapon.attackBonus;
-	}
-	public int getWeaponDefense() {
-		return currentWeapon.defenseBonus;
-	}
-	public int getWeaponHealth() {
-		return currentWeapon.healthBonus;
-	}
-	public int getWeaponMana() {
-		return currentWeapon.manaBonus;
-	}
 	public void getPlayerImage() {
 
 		up1 = setup("/player/player_up_1");
@@ -127,6 +106,7 @@ public class Player extends Entity{
 		standLeft = setup("/player/player_stand_left");
 		standRight = setup("/player/player_stand_right");
 		standUp = setup("/player/player_stand_up");
+		fullBody = setup("/player/player_full_body");
 
 
 	}
@@ -339,10 +319,26 @@ public class Player extends Entity{
 	}
 
 	public void pickUpObject(int i) {
-		if(i != 999) {
-
+	    if (i != 999 && gp.obj[i].pickable) {
+			if (inventory.size() != maxInventorySize) {
+				Entity picked = gp.obj[i];
+				boolean stacked = false;
+				// Try to stack if same item exists
+				for (Entity item : inventory) {
+					if (item != null && item.getClass() == picked.getClass() && item.stackable) {
+						item.quantity++;
+						stacked = true;
+						break;
+					}
+				}
+				// If not stacked, add as new item
+				if (!stacked) {
+					inventory.add(picked);
+				}
+				gp.obj[i] = null; // Remove from world
 			}
-		
+	    }
+	    stackInventory(); // <-- Add this line
 	}
 
 
@@ -394,11 +390,17 @@ public class Player extends Entity{
 		}
 	}
 
+	public void interactChest(int i) {
+		if (i != 999) {
+			
+		}
+	}
+
 	public void contactMonster(int i){
 		if(i != 999){
 
 			if (invincible == false && gp.monster[i].collision == true) {
-				int damage = gp.monster[i].attack - defense;
+				int damage = gp.monster[i].attack - getTotalDefense();
 				if (damage < 0) {
 					damage = 0;
 				}
@@ -413,7 +415,7 @@ public class Player extends Entity{
 	public void damageMonster(int i) {
 		if(i != 999) {
 			if (gp.monster[i].invincible == false) {
-				int dmg = attack - gp.monster[i].defense;
+				int dmg = getTotalAttack() - gp.monster[i].defense;
 
 				if (dmg < 0) {
 					dmg = 0;
@@ -505,12 +507,128 @@ public class Player extends Entity{
 		if (invincible == true){
 			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.6f));	
 		}
-		
-
-    	// Draw scaled buffer at position
+		// Draw image with scaling
     	g2.drawImage(image, x, y, gp.tileSize * 2, gp.tileSize * 2, null); // 160x160 final size
 		// Restore composite
 		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
-		
+
+	}
+
+	public void stackInventory() {
+	    ArrayList<Entity> newInventory = new ArrayList<>();
+	    for (Entity item : inventory) {
+	        if (item == null) continue;
+	        boolean stacked = false;
+	        for (Entity stackedItem : newInventory) {
+	            // Stack if same class and (optionally) same name
+	            if (stackedItem != null && item.getClass() == stackedItem.getClass() && 
+	                (item.name == null || item.name.equals(stackedItem.name))) {
+	                stackedItem.quantity += item.quantity;
+	                stacked = true;
+	                break;
+	            }
+	        }
+	        if (!stacked) {
+	            newInventory.add(item);
+	        }
+	    }
+	    inventory = newInventory;
+	}
+
+	
+	public void selectItem(int index) {
+		int itemIndex = gp.ui.getItemIndexOnSlot();
+		if (itemIndex < inventory.size()) {
+			Entity selectedItem = inventory.get(itemIndex);
+
+			if (selectedItem.type == 0) { // Weapon
+				Entity previousWeapon = currentWeapon;
+				currentWeapon = selectedItem;
+				inventory.set(itemIndex, previousWeapon);
+			}
+			else if (selectedItem.type == 1) { // Armor
+				Entity previousArmor = currentArmor;
+				currentArmor = selectedItem;
+				inventory.set(itemIndex, previousArmor);
+			}
+			else if (selectedItem.type == 2) { // Boots
+				Entity previousBoots = currentBoots;
+				currentBoots = selectedItem;
+				inventory.set(itemIndex, previousBoots);
+			}
+			else if (selectedItem.type == 3) { // Hat
+				Entity previousHat = currentHat;
+				currentHat = selectedItem;
+				inventory.set(itemIndex, previousHat);
+			}
+			// For consumables or other types, you can call use() or similar here
+			else if (selectedItem.type == 4 || selectedItem.type == 5 || selectedItem.type == 6) {
+    // Consumable types (e.g., 4 = interactable, 5 = potion, 6 = food)
+    selectedItem.use(this);
+
+    // If stackable, decrease quantity; remove if quantity is 0
+    if (selectedItem.stackable) {
+        selectedItem.quantity--;
+        if (selectedItem.quantity <= 0) {
+            inventory.remove(itemIndex);
+        }
+    } else {
+        // Not stackable, just remove from inventory
+        inventory.remove(itemIndex);
+    }
+			}
+		}
+	}
+
+	public int getEquipmentHealthBonus() {
+	    int bonus = 0;
+	    if (currentWeapon != null) bonus += currentWeapon.healthBonus;
+	    if (currentArmor != null) bonus += currentArmor.healthBonus;
+	    if (currentBoots != null) bonus += currentBoots.healthBonus;
+	    if (currentHat != null) bonus += currentHat.healthBonus;
+	    return bonus;
+	}
+
+	public int getEquipmentManaBonus() {
+	    int bonus = 0;
+	    if (currentWeapon != null) bonus += currentWeapon.manaBonus;
+	    if (currentArmor != null) bonus += currentArmor.manaBonus;
+	    if (currentBoots != null) bonus += currentBoots.manaBonus;
+	    if (currentHat != null) bonus += currentHat.manaBonus;
+	    return bonus;
+	}
+
+	public int getEquipmentAttackBonus() {
+	    int bonus = 0;
+	    if (currentWeapon != null) bonus += currentWeapon.attackBonus;
+	    if (currentArmor != null) bonus += currentArmor.attackBonus;
+	    if (currentBoots != null) bonus += currentBoots.attackBonus;
+	    if (currentHat != null) bonus += currentHat.attackBonus;
+	    return bonus;
+	}
+
+	public int getEquipmentDefenseBonus() {
+	    int bonus = 0;
+	    if (currentWeapon != null) bonus += currentWeapon.defenseBonus;
+	    if (currentArmor != null) bonus += currentArmor.defenseBonus;
+	    if (currentBoots != null) bonus += currentBoots.defenseBonus;
+	    if (currentHat != null) bonus += currentHat.defenseBonus;
+	    return bonus;
+	}
+	
+	public int getTotalAttack() {
+	    return attack + getEquipmentAttackBonus();
+	}
+
+	public int getTotalDefense() {
+	    return defense + getEquipmentDefenseBonus();
+	}
+
+	public float getTotalMaxHealth() {
+	    return maxHealth + getEquipmentHealthBonus();
+	}
+
+	public int getTotalMaxMana() {
+	    return maxMana + getEquipmentManaBonus();
 	}
 }

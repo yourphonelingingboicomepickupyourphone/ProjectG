@@ -12,6 +12,7 @@ public class OBJ_Chest_Locked extends Entity{
 		name = "Chest_Locked";
 		down1 = setup("/objects/chest_1_locked");
 		renderLayer = 1;
+		pickable = false;
 
 		
 		solidArea.x = 0;

@@ -12,6 +12,10 @@ public class ITEM_Hat_Normal extends Entity{
         down1 = setup("/items/normal_hat");
         healthBonus = 10;
         defenseBonus = 5;
+        type = 1;
+
+        pickable = true;
+        stackable = false;
     }
 
 }

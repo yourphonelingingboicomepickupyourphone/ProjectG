@@ -1,17 +1,20 @@
-package object;
+package item;
 
 import entity.Entity;
 import main.GamePanel;
 
-public class OBJ_Key extends Entity{
+public class ITEM_Chest_Key extends Entity{
 	
-	public OBJ_Key(GamePanel gp) {
+	public ITEM_Chest_Key(GamePanel gp) {
 		
 		super(gp);
 
 		name = "Chest_Key";
 		down1 = setup("/objects/key");
 		renderLayer = 1;
+		pickable = true;
+		stackable = true;
+		type = 4;
 		
 		solidArea.x = 30;
 		solidArea.y = 25;

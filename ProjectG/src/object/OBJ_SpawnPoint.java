@@ -15,6 +15,7 @@ public class OBJ_SpawnPoint extends Entity{
 		name = "Spawn Point";
         down1 = setup("/objects/spawn_point");
 		renderLayer = 1;
+		pickable = false;
 		
 		solidArea.x = 0;
 		solidArea.y = 0;

@@ -109,10 +109,9 @@ public class KeyHandler implements KeyListener{
 					gp.gameState = gp.playState;
 					gp.player.name = gp.player.name.trim();
 					// Proceed to next screen or save name
-				} else if (gp.player.name.length() < 12) { // Limit name length
+				} else if (gp.player.name.length() < 12) // Limit name length
 					gp.player.name += key;
 				}
-			}
 			return; // Prevent further processing if on name input
 		}
 
@@ -186,8 +185,8 @@ public class KeyHandler implements KeyListener{
 					gp.player.maxMana += 50; 
 					gp.player.mana += 50;
 					break;
-				case 2: gp.player.attack += 10; break;
-				case 3: gp.player.defense += 10; break;
+				case 2: gp.player.totalAttack += 10; break;
+				case 3: gp.player.totalDefense += 10; break;
 			}
 			gp.player.progressionPoints--;
 		}
@@ -250,8 +249,11 @@ public class KeyHandler implements KeyListener{
 				gp.player.attack = defaultAttack + attackBonus;
 				totalSpent += (gp.player.defense - defaultDefense - defenseBonus) / 10;
 				gp.player.defense = defaultDefense + defenseBonus;
-				gp.player.progressionPoints += totalSpent;
+				gp.player.progressionPoints  += totalSpent;
 			}
+		}
+		if (code == KeyEvent.VK_I) {
+			gp.gameState = gp.inventoryState;
 		}
 	}
 
@@ -262,6 +264,9 @@ public class KeyHandler implements KeyListener{
 	public void inventoryState(int code){
 		if (code == KeyEvent.VK_I){
 			gp.gameState = gp.playState;
+		}
+		if (code == KeyEvent.VK_C) {
+			gp.gameState = gp.characterState;
 		}
 		if (code == KeyEvent.VK_A || code == KeyEvent.VK_LEFT) {
 			if (gp.ui.slotCol == 0) {
@@ -291,6 +296,9 @@ public class KeyHandler implements KeyListener{
 				gp.ui.slotRow++;
 				
 			}
+		}
+		if (code == KeyEvent.VK_ENTER) {
+			gp.player.selectItem(0); // The argument is not used, so 0 is fine
 		}
 	}
 	@Override

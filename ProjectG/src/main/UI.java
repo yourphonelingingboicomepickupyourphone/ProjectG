@@ -93,7 +93,13 @@ public class UI {
 		//Inventory State
 		else if (gp.gameState == gp.inventoryState) {
 			drawInventoryScreen();
-			drawCharacterInventory();
+			drawCharacterScreen();		
+		}
+
+		//Chest State
+		else if (gp.gameState == gp.chestState) {
+			drawInventoryScreen();
+			drawChestScreen();
 		}
 	}
 
@@ -318,7 +324,7 @@ public class UI {
 		int xHealth = x + 3 * gp.tileSize / 80;
 		int yHealth = y + 3 * gp.tileSize / 80;
 		if (gp.player.health > 0){
-			width = (int) ((gp.player.health / gp.player.maxHealth) * width) - 3 * gp.tileSize / 40;
+			width = (int) ((gp.player.health / gp.player.getTotalMaxHealth()) * width) - 3 * gp.tileSize / 40;
 		} else {
 			width = 0;
 		}
@@ -328,7 +334,7 @@ public class UI {
 		//Current Health Text
 		g2.setColor(new Color(255, 255, 255));
 		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 60F));
-		String text = (int)gp.player.health + "/" + (int)gp.player.maxHealth;
+		String text = (int)gp.player.health + "/" + (int)gp.player.getTotalMaxHealth();
 		int xText = x + 3 * gp.tileSize / 40;
 		int yText = y + height - gp.tileSize / 20;
 		g2.drawString(text, xText, yText);
@@ -351,7 +357,7 @@ public class UI {
 		int xMana = x + 3 * gp.tileSize / 80;
 		int yMana = y + 3 * gp.tileSize / 80;
 		if (gp.player.mana > 0){
-			width = (int) ((gp.player.mana / gp.player.maxMana) * width) - 6;
+			width = (int) ((gp.player.mana / gp.player.getTotalMaxMana()) * width) - 6;
 		} else {
 			width = 0;
 		}
@@ -360,7 +366,7 @@ public class UI {
 		//Current Mana Text
 		g2.setColor(new Color(255, 255, 255));
 		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 27F));
-		String text = gp.player.mana + "/" + gp.player.maxMana;
+		String text = gp.player.mana + "/" + gp.player.getTotalMaxMana();
 		int xText = x + 3 * gp.tileSize / 40;
 		int yText = y + height;
 		g2.drawString(text, xText, yText);
@@ -408,7 +414,7 @@ public class UI {
 	//Character Screen
 	public void drawCharacterScreen() {
 		//Window
-		final int frameX = gp.tileSize * 14;
+		final int frameX = gp.tileSize * 13;
 		final int frameY = gp.tileSize;
 		final int frameWidth = gp.tileSize * 9;
 		final int frameHeight = gp.tileSize * 10;
@@ -417,11 +423,11 @@ public class UI {
 
 		//Text
 		g2.setColor(Color.white);
-		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 40F));
+		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 35F));
 
 		int textX = frameX + gp.tileSize / 2;
 		int textY = frameY + gp.tileSize;
-		final int lineHeight = 5 * gp.tileSize / 8;
+		final int lineHeight = 4 * gp.tileSize / 7;
 
 		g2.drawString("Name: " + gp.player.name, textX, textY);
 		textY += lineHeight;
@@ -431,10 +437,10 @@ public class UI {
 		// Stats array for easy iteration
 		String[] statNames = {"Health", "Mana", "Attack", "Defense"};
 		String[] statValues = {
-			(int)gp.player.health + "/" + (int)gp.player.maxHealth, // Health: current/max
-			gp.player.mana + "/" + gp.player.maxMana,               // Mana: current/max
-			gp.player.attack + "",
-			gp.player.defense + ""
+			(int)gp.player.health + "/" + (int)gp.player.getTotalMaxHealth(),
+			gp.player.mana + "/" + gp.player.getTotalMaxMana(),
+			gp.player.getTotalAttack() + "",
+			gp.player.getTotalDefense() + ""
 		};
 
 		for (int i = 0; i < statNames.length; i++) {
@@ -443,8 +449,10 @@ public class UI {
 
 			// Highlight selected stat row ONLY if progression points are available
 			if (selected && gp.player.progressionPoints > 0) {
+				// Only highlight 2/5 of the frame width on the left
+				int highlightWidth = (frameWidth * 2) / 5;
 				g2.setColor(new Color(255, 255, 100, 80));
-				g2.fillRoundRect(textX - 20, statTextY - 35, frameWidth - gp.tileSize, lineHeight, 20, 20);
+				g2.fillRoundRect(textX - 20, statTextY - 35, highlightWidth, lineHeight, 20, 20);
 				g2.setColor(Color.white);
 			}
 
@@ -452,10 +460,10 @@ public class UI {
 			g2.drawString(statNames[i] + ": " + statValues[i], textX, statTextY);
 
 
-			// Draw "+" if player has points
+			// Draw "+" if player has points, only in the highlighted area (right edge of the 2/5 area)
 			if (gp.player.progressionPoints > 0) {
 				String plus = "+";
-				int plusX = frameX + frameWidth - gp.tileSize;
+				int plusX = textX - 20 + ((frameWidth * 2) / 5) - g2.getFontMetrics().stringWidth(plus) - 10;
 				g2.setColor(selected ? Color.YELLOW : Color.LIGHT_GRAY);
 				g2.drawString(plus, plusX, statTextY);
 				g2.setColor(Color.white);
@@ -465,13 +473,15 @@ public class UI {
 
 		// Draw progression points and instructions
 		g2.setColor(Color.white);
-		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 40F));
+		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 35F));
 		g2.drawString("Progression Points: " + gp.player.progressionPoints, textX, textY);
 		textY += lineHeight;
-		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 40F));
-		g2.drawString("[W / Up]/[S / Down]: Select", textX, textY); 
+		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 35F));
+		g2.drawString("[W/Up]/[S/Down]:Select", textX, textY); 
 		textY += lineHeight;
-		g2.drawString("[ENTER]: Add Point  [C]: Close", textX, textY);
+		g2.drawString("[ENTER]: Add Point", textX, textY);
+		textY += lineHeight;
+		g2.drawString("[C]: Close Window", textX, textY);
 		textY += lineHeight;
 
 		// Draw Reset Points button
@@ -480,6 +490,84 @@ public class UI {
 		g2.drawString(resetText, textX, textY);
 		g2.setColor(Color.white);
 		textY += lineHeight;
+
+				// Draw player image size 4x4
+		int playerImageX = frameX + (frameWidth - gp.tileSize * 3) / 2 - gp.tileSize / 2;
+		int playerImageY = frameY + gp.tileSize;
+		g2.drawImage(gp.player.fullBody, playerImageX, playerImageY - gp.tileSize / 2, gp.tileSize * 6 + gp.tileSize / 2, gp.tileSize * 6 + gp.tileSize / 2, null);
+		// Draw 3 slots for hat, armor, boots (vertical, right side)
+		int slotSize = gp.tileSize;
+		int slotGap = gp.tileSize / 2;
+		int slotsStartY = playerImageY;
+		int slotsX = frameX + frameWidth - slotSize - gp.tileSize / 2;
+
+		// Hat slot
+		g2.setColor(new Color(200, 200, 200, 180));
+		g2.fillRoundRect(slotsX, slotsStartY, slotSize, slotSize, 20, 20);
+		g2.setColor(Color.WHITE);
+		g2.drawRoundRect(slotsX, slotsStartY, slotSize, slotSize, 20, 20);
+		if (gp.player.currentHat == null) {
+			// Draw the hat image in the slot
+			g2.setColor(Color.BLACK);
+			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 20F));
+			g2.drawString("Hat", slotsX + 8, slotsStartY + slotSize - 8);
+		}
+		if (gp.player.currentHat != null) {
+			// Draw the hat image in the slot
+			g2.drawImage(gp.player.currentHat.down1, slotsX + 2, slotsStartY + 2, slotSize - 4, slotSize - 4, null);
+		}
+
+		// Armor slot
+		int armorY = slotsStartY + slotSize + slotGap;
+		g2.setColor(new Color(200, 200, 200, 180));
+		g2.fillRoundRect(slotsX, armorY, slotSize, slotSize, 20, 20);
+		g2.setColor(Color.WHITE);
+		g2.drawRoundRect(slotsX, armorY, slotSize, slotSize, 20, 20);
+		if (gp.player.currentArmor == null) {
+			// Draw the armor image in the slot
+			g2.setColor(Color.BLACK);
+			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 20F));
+			g2.drawString("Armor", slotsX + 8, armorY + slotSize - 8);
+		}
+		if (gp.player.currentArmor != null) {
+			// Draw the armor image in the slot
+			g2.drawImage(gp.player.currentArmor.down1, slotsX + 2, armorY + 2, slotSize - 4, slotSize - 4, null);
+		}
+
+		// Boots slot
+		int bootsY = armorY + slotSize + slotGap;
+		g2.setColor(new Color(200, 200, 200, 180));
+		g2.fillRoundRect(slotsX, bootsY, slotSize, slotSize, 20, 20);
+		g2.setColor(Color.WHITE);
+		g2.drawRoundRect(slotsX, bootsY, slotSize, slotSize, 20, 20);
+		if (gp.player.currentBoots == null) {
+			// Draw the boots image in the slot
+			g2.setColor(Color.BLACK);
+			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 20F));
+			g2.drawString("Boots", slotsX + 2, bootsY + slotSize - 8);
+		}
+		if (gp.player.currentBoots != null) {
+			// Draw the boots image in the slot
+			g2.drawImage(gp.player.currentBoots.down1, slotsX + 2, bootsY + 2, slotSize - 4, slotSize - 4, null);
+		}
+
+		// Weapon slot (to the right of the player image, below the 3 slots)
+		int weaponSlotY = bootsY + slotSize + slotGap;
+		g2.setColor(new Color(200, 200, 200, 180));
+		g2.fillRoundRect(slotsX, weaponSlotY, slotSize, slotSize, 20, 20);
+		g2.setColor(Color.WHITE);
+		g2.drawRoundRect(slotsX, weaponSlotY, slotSize, slotSize, 20, 20);
+		if (gp.player.currentWeapon == null) {
+			// Draw the weapon image in the slot
+			g2.setColor(Color.BLACK);
+			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 20F));
+			g2.drawString("Weapon", slotsX + 2, weaponSlotY + slotSize - 8);		
+		}
+		
+		if (gp.player.currentWeapon != null) {
+			// Draw the weapon image in the slot
+			g2.drawImage(gp.player.currentWeapon.down1, slotsX + 2, weaponSlotY + 2, slotSize - 4, slotSize - 4, null);
+		}
 
 		//Variable
 		// int tailX = frameX + frameWidth - gp.tileSize / 2;
@@ -552,11 +640,12 @@ public class UI {
 		int itemIndex = 0;
 		for (int row = 0; row < maxInventoryRow; row++) {
 			for (int col = 0; col < maxInventoryCol; col++) {
+				int x = slotXStart + col * (slotWidth + slotGap);
+				int y = slotYStart + row * (slotHeight + slotGap);
+
 				if (itemIndex < gp.player.inventory.size()) {
 					Entity item = gp.player.inventory.get(itemIndex);
 					if (item != null) {
-						int x = slotXStart + col * (slotWidth + slotGap);
-						int y = slotYStart + row * (slotHeight + slotGap);
 						if (item.down1 != null) {
 							g2.drawImage(
 								item.down1,
@@ -566,9 +655,31 @@ public class UI {
 								null
 							);
 						}
+						// Display quantity for stackable items
+						if (item != null && item.quantity > 1) {
+						    g2.setFont(g2.getFont().deriveFont(Font.BOLD, 18F));
+						    g2.setColor(Color.WHITE);
+						    String qtyText = "x" + item.quantity;
+						    int qtyWidth = g2.getFontMetrics().stringWidth(qtyText);
+						    g2.drawString(qtyText, x + slotWidth - qtyWidth - 4, y + slotHeight - 6);
+						}
+					} else {
+						// Draw placeholder text or icon for empty slot in inventory
+						g2.setColor(new Color(200, 200, 200, 120));
+						g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 20F));
+						String emptyText = "Empty";
+						int textWidth = g2.getFontMetrics().stringWidth(emptyText);
+						g2.drawString(emptyText, x + (slotWidth - textWidth) / 2, y + slotHeight / 2 + 6);
 					}
-					itemIndex++;
+				} else {
+					// Draw placeholder for slots beyond inventory size
+					g2.setColor(new Color(200, 200, 200, 120));
+					g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 20F));
+					String emptyText = "Empty";
+					int textWidth = g2.getFontMetrics().stringWidth(emptyText);
+					g2.drawString(emptyText, x + (slotWidth - textWidth) / 2, y + slotHeight / 2 + 6);
 				}
+				itemIndex++;
 			}
 		}
 		
@@ -627,19 +738,69 @@ public class UI {
 		}
 	}
 
-	public void drawCharacterInventory() {
-		//Window
-		int x = gp.tileSize * 13;
-		int y = gp.tileSize;
+	public int chestCol = 0;
+	public int chestRow = 0;
+	public final int maxChestCol = 6; // Example: 6 columns
+	public final int maxChestRow = 4; // Example: 4 rows
+
+
+	public void drawChestScreen() {
+		// Window
+		int frameX = gp.tileSize * 13;
+		int frameY = gp.tileSize;
 		int width = gp.tileSize * 9;
 		int height = gp.tileSize * 10;
 
-		drawSubWindow(x, y, width, height);
+		drawSubWindow(frameX, frameY, width, height);
 
-		//Title
-		
-		
+		// Inner frame (where slots should fit)
+		int borderInset = 7;
+		int innerX = frameX + borderInset * 3;
+		int innerY = frameY + borderInset * 3;
+		int innerWidth = width - borderInset * 6;
+		// int innerHeight = height - borderInset * 6;
+
+		// Fixed slot size
+		int chestWidth = gp.tileSize;
+		int chestHeight = gp.tileSize;
+
+		// Calculate slotGap so slots fit the inner frame width exactly
+		int sideGap = gp.tileSize / 3;
+		int usableWidth = innerWidth - 2 * sideGap;
+		int totalChestWidth = maxChestCol * chestWidth;
+		int chestGap = 0;
+		if (maxChestCol > 1) {
+			chestGap = (usableWidth - totalChestWidth) / (maxChestCol - 1);
+		}
+
+		// The grid starts at innerX + sideGap
+		int chestXStart = innerX + sideGap;
+		int chestYStart = innerY + gp.tileSize / 3; // Padding from top, adjust as needed
+
+		// Draw slots
+		g2.setStroke(new BasicStroke(2));
+		for (int row = 0; row < maxChestRow; row++) {
+			for (int col = 0; col < maxChestCol; col++) {
+				int x = chestXStart + col * (chestWidth + chestGap);
+				int y = chestYStart + row * (chestHeight + chestGap);
+				g2.setColor(new Color(80, 80, 80, 120));
+				g2.fillRoundRect(x, y, chestWidth, chestHeight, 20, 20);
+				g2.setColor(Color.WHITE);
+				g2.drawRoundRect(x, y, chestWidth, chestHeight, 20, 20);
+			}
+		}
+
+		// Draw cursor
+		int cursorX = chestXStart + chestCol * (chestWidth + chestGap);
+		int cursorY = chestYStart + chestRow * (chestHeight + chestGap);
+		int cursorArc = 20;
+		Color cursorColor = new Color(255, 255, 255, 100);
+		g2.setColor(cursorColor);
+		g2.setStroke(new BasicStroke(5));
+		g2.fillRoundRect(cursorX, cursorY, chestWidth, chestHeight, cursorArc, cursorArc);
+		g2.setStroke(new BasicStroke(1f)); // Reset stroke
 	}
+
 
 
 	public void drawSubWindow(int x, int y, int width, int height) {
@@ -695,4 +856,8 @@ public class UI {
 	int kbRow = 0;
 	int kbCol = 0;
 	boolean typingName = true; // true while on name input screen
+
+	public int getItemIndexOnSlot() {
+		return slotRow * maxInventoryCol + slotCol;
+	}
 }
