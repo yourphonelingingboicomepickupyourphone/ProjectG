@@ -220,7 +220,7 @@ public class UI {
 			x2 = getXForCenteredText(gp.player.name);
 			
 			// Draw keyboard
-			int kbStartX = gp.screenWidth/2 - gp.tileSize * 5;
+			// int kbStartX = gp.screenWidth/2 - gp.tileSize * 5;
 			int kbStartY = y + 3 * gp.tileSize / 2;
 			int keyW = gp.tileSize;
 			int keyH = gp.tileSize;
@@ -431,40 +431,35 @@ public class UI {
 		// Stats array for easy iteration
 		String[] statNames = {"Health", "Mana", "Attack", "Defense"};
 		String[] statValues = {
-			(int)gp.player.health + "",
-			gp.player.mana + "",
-			(int)gp.player.maxHealth + "",
-		    gp.player.maxMana + "",
-		    gp.player.attack + "",
-		    gp.player.defense + ""
+			(int)gp.player.health + "/" + (int)gp.player.maxHealth, // Health: current/max
+			gp.player.mana + "/" + gp.player.maxMana,               // Mana: current/max
+			gp.player.attack + "",
+			gp.player.defense + ""
 		};
 
 		for (int i = 0; i < statNames.length; i++) {
-		    boolean selected = (progressionSelectIndex == i);
-		    int statTextY = textY + i * lineHeight;
+			boolean selected = (progressionSelectIndex == i);
+			int statTextY = textY + i * lineHeight;
 
-		    // Highlight selected stat row ONLY if progression points are available
-		    if (selected && gp.player.progressionPoints > 0) {
-		        g2.setColor(new Color(255, 255, 100, 80));
-		        g2.fillRoundRect(textX - 20, statTextY - 35, frameWidth - gp.tileSize, lineHeight, 20, 20);
-		        g2.setColor(Color.white);
-		    }
-
-		    // Draw stat name and value
-			if (i < 2) {
-				g2.drawString(statNames[i] + ": " + statValues[i] + "/" + statValues[i + 2], textX, statTextY);
-			} else {
-				g2.drawString(statNames[i] + ": " + statValues[i], textX, statTextY);
+			// Highlight selected stat row ONLY if progression points are available
+			if (selected && gp.player.progressionPoints > 0) {
+				g2.setColor(new Color(255, 255, 100, 80));
+				g2.fillRoundRect(textX - 20, statTextY - 35, frameWidth - gp.tileSize, lineHeight, 20, 20);
+				g2.setColor(Color.white);
 			}
 
-		    // Draw "+" if player has points
-		    if (gp.player.progressionPoints > 0) {
-		        String plus = "+";
-		        int plusX = frameX + frameWidth - gp.tileSize;
-		        g2.setColor(selected ? Color.YELLOW : Color.LIGHT_GRAY);
-		        g2.drawString(plus, plusX, statTextY);
-		        g2.setColor(Color.white);
-		    }
+			// Draw stat name and value
+			g2.drawString(statNames[i] + ": " + statValues[i], textX, statTextY);
+
+
+			// Draw "+" if player has points
+			if (gp.player.progressionPoints > 0) {
+				String plus = "+";
+				int plusX = frameX + frameWidth - gp.tileSize;
+				g2.setColor(selected ? Color.YELLOW : Color.LIGHT_GRAY);
+				g2.drawString(plus, plusX, statTextY);
+				g2.setColor(Color.white);
+			}
 		}
 		textY += statNames.length * lineHeight;
 

@@ -228,8 +228,6 @@ public class KeyHandler implements KeyListener{
 
 			int spentHealth = Math.max(0, ((int)gp.player.maxHealth - healthBonus - defaultHealth) / 100);
 			int spentMana = Math.max(0, ((int)gp.player.maxMana - manaBonus - defaultMana) / 50);
-			int spentAttack = Math.max(0, ((int)gp.player.attack - attackBonus - defaultAttack) / 10);
-			int spentDefense = Math.max(0, ((int)gp.player.defense - defenseBonus - defaultDefense) / 10);
 
 			boolean spent = (gp.player.maxHealth - healthBonus) > defaultHealth ||
 							(gp.player.maxMana - manaBonus) > defaultMana ||
