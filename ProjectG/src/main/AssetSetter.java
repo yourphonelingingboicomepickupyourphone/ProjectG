@@ -60,6 +60,10 @@ public class AssetSetter {
 		gp.obj[8].worldX = gp.tileSize * 54;
 		gp.obj[8].worldY = gp.tileSize * 62;
 
+		gp.obj[9] = new ITEM_Mini_Health_Potion(gp);
+		gp.obj[9].worldX = gp.tileSize * 54;
+		gp.obj[9].worldY = gp.tileSize * 65;
+
 	}
 
 	public void setNPC() {

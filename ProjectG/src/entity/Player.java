@@ -23,10 +23,6 @@ public class Player extends Entity{
 	public ArrayList<Entity> inventory = new ArrayList<>();
 	public int maxInventorySize = 24;
 
-	public int totalAttack;
-	public int totalDefense;
-	public float totalMaxHealth;
-	public float totalMaxMana;
 	int collisionRecoilCounter = 0;
     final int RECOIL_DURATION = 10;
     public int attackCooldown = 0;
@@ -47,6 +43,7 @@ public class Player extends Entity{
 		solidAreaDefaultY = solidArea.y;
 		solidArea.width = 80;
 		solidArea.height= 80;
+		
 		
 		setDefaultValues();
 		getPlayerImage();
@@ -77,6 +74,10 @@ public class Player extends Entity{
 		this.nextLevelExp = 10;
 		this.totalProgressionPoints = 0;
 		this.progressionPoints = 0;
+		this.progressionHealthUpgrades = 0;
+		this.progressionManaUpgrades = 0;
+		this.progressionAttackUpgrades = 0;
+		this.progressionDefenseUpgrades = 0;
 		this.ATTACK_COOLDOWN_MAX = 30; // 30 frames = 0.5s at 60fps
 		currentWeapon = new ITEM_Sword_Normal(gp);
 		currentArmor = null;

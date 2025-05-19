@@ -63,6 +63,10 @@ public class Entity {
 	public int level;
 	public int attack;
 	public int defense;
+	public int progressionHealthUpgrades;
+	public int progressionManaUpgrades;
+	public int progressionAttackUpgrades;
+	public int progressionDefenseUpgrades;
 	
 
 	//Player extra attributes

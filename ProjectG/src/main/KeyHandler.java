@@ -165,7 +165,7 @@ public class KeyHandler implements KeyListener{
 			gp.gameState = gp.playState;
 		}
 	}
-
+	
 	public void characterState(int code){
 		if (code == KeyEvent.VK_W || code == KeyEvent.VK_UP) {
 			UI.progressionSelectIndex--;
@@ -180,13 +180,21 @@ public class KeyHandler implements KeyListener{
 				case 0: 
 					gp.player.maxHealth += 100;
 					gp.player.health += 100;
+					gp.player.progressionHealthUpgrades++;
 					break;
 				case 1: 
 					gp.player.maxMana += 50; 
 					gp.player.mana += 50;
+					gp.player.progressionManaUpgrades++;
 					break;
-				case 2: gp.player.totalAttack += 10; break;
-				case 3: gp.player.totalDefense += 10; break;
+				case 2: 
+					gp.player.attack += 10; 
+					gp.player.progressionAttackUpgrades++;
+					break;
+				case 3: 
+					gp.player.defense += 10; 
+					gp.player.progressionDefenseUpgrades++;
+					break;
 			}
 			gp.player.progressionPoints--;
 		}
@@ -194,63 +202,37 @@ public class KeyHandler implements KeyListener{
 			gp.gameState = gp.playState;
 		}
 		if (code == KeyEvent.VK_R) {
-			int defaultHealth = 1800;
-			int defaultMana = 400;
-			int defaultAttack = 50;
-			int defaultDefense = 10;
+			int totalSpent = 0;
 
-			int healthBonus = 0, manaBonus = 0, attackBonus = 0, defenseBonus = 0;
-			if (gp.player.currentWeapon != null) {
-				healthBonus += gp.player.currentWeapon.healthBonus;
-				manaBonus += gp.player.currentWeapon.manaBonus;
-				attackBonus += gp.player.currentWeapon.attackBonus;
-				defenseBonus += gp.player.currentWeapon.defenseBonus;
-			}
-			if (gp.player.currentArmor != null) {
-				healthBonus += gp.player.currentArmor.healthBonus;
-				manaBonus += gp.player.currentArmor.manaBonus;
-				attackBonus += gp.player.currentArmor.attackBonus;
-				defenseBonus += gp.player.currentArmor.defenseBonus;
-			}
-			if (gp.player.currentHat != null) {
-				healthBonus += gp.player.currentHat.healthBonus;
-				manaBonus += gp.player.currentHat.manaBonus;
-				attackBonus += gp.player.currentHat.attackBonus;
-				defenseBonus += gp.player.currentHat.defenseBonus;
-			}
-			if (gp.player.currentBoots != null) {
-				healthBonus += gp.player.currentBoots.healthBonus;
-				manaBonus += gp.player.currentBoots.manaBonus;
-				attackBonus += gp.player.currentBoots.attackBonus;
-				defenseBonus += gp.player.currentBoots.defenseBonus;
+			// Health
+			int healthReduction = gp.player.progressionHealthUpgrades * 100;
+			if (gp.player.maxHealth - healthReduction > 0 && gp.player.health - healthReduction > 0) {
+				gp.player.maxHealth -= healthReduction;
+				gp.player.health -= healthReduction;
+				totalSpent += gp.player.progressionHealthUpgrades;
+				gp.player.progressionHealthUpgrades = 0;
 			}
 
-			int spentHealth = Math.max(0, ((int)gp.player.maxHealth - healthBonus - defaultHealth) / 100);
-			int spentMana = Math.max(0, ((int)gp.player.maxMana - manaBonus - defaultMana) / 50);
-
-			boolean spent = (gp.player.maxHealth - healthBonus) > defaultHealth ||
-							(gp.player.maxMana - manaBonus) > defaultMana ||
-							(gp.player.attack - attackBonus) > defaultAttack ||
-							(gp.player.defense - defenseBonus) > defaultDefense;
-
-			if (spent) {
-				int totalSpent = 0;
-				if (gp.player.health - spentHealth * 100 > 0) {
-					totalSpent += (gp.player.maxHealth - defaultHealth - healthBonus) / 100;
-					gp.player.maxHealth = defaultHealth + healthBonus;
-					gp.player.health -= spentHealth * 100;
-				}
-				if (gp.player.mana - spentMana * 50 > 0) {
-					totalSpent += (gp.player.maxMana - defaultMana - manaBonus) / 50;
-					gp.player.maxMana = defaultMana + manaBonus;
-					gp.player.mana -= spentMana * 50;
-				}
-				totalSpent += (gp.player.attack - defaultAttack - attackBonus) / 10;
-				gp.player.attack = defaultAttack + attackBonus;
-				totalSpent += (gp.player.defense - defaultDefense - defenseBonus) / 10;
-				gp.player.defense = defaultDefense + defenseBonus;
-				gp.player.progressionPoints  += totalSpent;
+			// Mana
+			int manaReduction = gp.player.progressionManaUpgrades * 50;
+			if (gp.player.maxMana - manaReduction > 0 && gp.player.mana - manaReduction > 0) {
+				gp.player.maxMana -= manaReduction;
+				gp.player.mana -= manaReduction;
+				totalSpent += gp.player.progressionManaUpgrades;
+				gp.player.progressionManaUpgrades = 0;
 			}
+
+			// Attack
+			gp.player.attack -= gp.player.progressionAttackUpgrades * 10;
+			totalSpent += gp.player.progressionAttackUpgrades;
+			gp.player.progressionAttackUpgrades = 0;
+
+			// Defense
+			gp.player.defense -= gp.player.progressionDefenseUpgrades * 10;
+			totalSpent += gp.player.progressionDefenseUpgrades;
+			gp.player.progressionDefenseUpgrades = 0;
+
+			gp.player.progressionPoints += totalSpent;
 		}
 		if (code == KeyEvent.VK_I) {
 			gp.gameState = gp.inventoryState;
