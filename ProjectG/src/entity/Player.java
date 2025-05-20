@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import item.ITEM_Sword_Normal;
 import main.GamePanel;
 import main.KeyHandler;
+import projectile.PROJECTILE_Fire_Ball;
 
 public class Player extends Entity{
 	
@@ -84,7 +85,7 @@ public class Player extends Entity{
 		currentHat = null;
 		currentBoots = null;
 		ATTACK_COOLDOWN_MAX += currentWeapon.cooldownBonus;
-
+		Projectile projectileList = new PROJECTILE_Fire_Ball(gp);
 
 
 	}
@@ -230,6 +231,12 @@ public class Player extends Entity{
 				spriteNum = 1;
 			}
 
+		}
+
+		if (currentWeapon != null && currentWeapon.weaponType == 4 && keyH.enterPressed == true) {
+			// Fireball attack
+			projectile.set(worldX, worldY, direction, true, this);
+			gp.projectileList.add(projectile);
 		}
 
 		if (invincible == true) {
