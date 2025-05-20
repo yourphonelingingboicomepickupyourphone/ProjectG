@@ -89,6 +89,8 @@ public class Entity {
 	public int attackBonus;
 	public int defenseBonus;
 	public int speedBonus;
+	public int attackRange;
+	public int weaponType; //0 = sword, 1 = axe, 2 = spear, 3 = bow, 4 = wand
 	public int rarity = 0; //0 = common, 1 = rare, 2 = epic, 3 = legendary
 	public int levelRequirement = 0; //level requirement to use the item
 	public String description = "";

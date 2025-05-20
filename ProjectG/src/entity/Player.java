@@ -113,15 +113,15 @@ public class Player extends Entity{
 	}
 
 	public void getPlayerAttackImage() {
-		attackUp1 = setup("/player/player_attack_up_1");
-		attackUp2 = setup("/player/player_attack_up_2");
-		attackDown1 = setup("/player/player_attack_down_1");
-		attackDown2 = setup("/player/player_attack_down_2");
-		attackLeft1 = setup("/player/player_attack_left_1");
-		attackLeft2 = setup("/player/player_attack_left_2");
-		attackRight1 = setup("/player/player_attack_right_1");
-		attackRight2 = setup("/player/player_attack_right_2");
-		
+		attackUp1 = currentWeapon.attackUp1;
+		attackUp2 = currentWeapon.attackUp2;
+		attackDown1 = currentWeapon.attackDown1;
+		attackDown2 = currentWeapon.attackDown2;
+		attackLeft1 = currentWeapon.attackLeft1;
+		attackLeft2 = currentWeapon.attackLeft2;
+		attackRight1 = currentWeapon.attackRight1;
+		attackRight2 = currentWeapon.attackRight2;
+
 	}
 
 	public void update() {
@@ -171,7 +171,10 @@ public class Player extends Entity{
 
 			//Check object collision
 			int objIndex = gp.cChecker.checkObject(this, true);
-			pickUpObject(objIndex);
+			if (keyH.enterPressed == true) {
+				pickUpObject(objIndex);
+				keyH.enterPressed = false; // Reset enterPressed after picking up
+			}
 
 			//Check NPC collision
 
@@ -253,64 +256,177 @@ public class Player extends Entity{
 		if (spriteCounter > 5 && spriteCounter <= 25){
 			spriteNum = 2;
 
-			// --- Custom attack hitbox for each direction ---
-			Rectangle attackHitbox = new Rectangle();
-
-			// Example custom sizes for each direction
-			int upWidth = 110;
-			int upHeight = 40;
-			int downWidth = 110;
-			int downHeight = 40;
-			int leftWidth = 50;
-			int leftHeight = 65;
-			int rightWidth = 50;
-			int rightHeight = 65;
-
-			switch (direction) { 
-				case "up":
-					attackHitbox.x = worldX - (upWidth - gp.tileSize)/2;
-					attackHitbox.y = worldY - upHeight;
-					attackHitbox.width = upWidth;
-					attackHitbox.height = upHeight;
-					break;
-				case "down":
-					attackHitbox.x = worldX + gp.tileSize + (downWidth - gp.tileSize)/2;
-					attackHitbox.y = worldY + gp.tileSize + downHeight;
-					attackHitbox.width = downWidth;
-					attackHitbox.height = downHeight;
-					break;
-				case "left":
-					attackHitbox.x = worldX - leftWidth;
-					attackHitbox.y = worldY + 10;
-					attackHitbox.width = leftWidth;
-					attackHitbox.height = leftHeight;
-					break;
-				case "right":
-					attackHitbox.x = worldX + gp.tileSize + rightWidth;
-					attackHitbox.y = worldY + gp.tileSize + 10;
-					attackHitbox.width = rightWidth;
-					attackHitbox.height = rightHeight;
-					break;
+			int range = 1;
+			int hitboxType = 0;
+			if (currentWeapon != null) {
+				range = currentWeapon.attackRange;
+				hitboxType = currentWeapon.weaponType;
 			}
 
-			// Check collision with monsters using the attackHitbox
-			for (int i = 0; i < gp.monster.length; i++) {
-				Entity monster = gp.monster[i];
-				if (monster != null && monster.alive) {
-					Rectangle monsterHitbox = new Rectangle(
-						monster.worldX + monster.solidArea.x,
-						monster.worldY + monster.solidArea.y,
-						monster.solidArea.width,
-						monster.solidArea.height
-					);
-					if (attackHitbox.intersects(monsterHitbox)) {
-						damageMonster(i);
-						// When damaging a monster
-						gp.monster[i].showHpBar = true;
-						gp.monster[i].hpBarDisplayCounter = 150; // Show for 2.5 second (150 frames)
+			// --- Custom attack hitbox for each direction ---
+			if (hitboxType == 0){
+				Rectangle attackHitbox = new Rectangle();
+
+				// Example custom sizes for each direction
+				int upWidth = 110;
+				int upHeight = 40;
+				int downWidth = 110;
+				int downHeight = 40;
+				int leftWidth = 50;
+				int leftHeight = 65;
+				int rightWidth = 50;
+				int rightHeight = 65;
+
+				switch (direction) { 
+					case "up":
+						attackHitbox.x = worldX - (upWidth - gp.tileSize)/2;
+						attackHitbox.y = worldY - upHeight;
+						attackHitbox.width = upWidth;
+						attackHitbox.height = upHeight;
+						break;
+					case "down":
+						attackHitbox.x = worldX + gp.tileSize + (downWidth - gp.tileSize)/2;
+						attackHitbox.y = worldY + gp.tileSize + downHeight;
+						attackHitbox.width = downWidth;
+						attackHitbox.height = downHeight;
+						break;
+					case "left":
+						attackHitbox.x = worldX - leftWidth;
+						attackHitbox.y = worldY + 10;
+						attackHitbox.width = leftWidth;
+						attackHitbox.height = leftHeight;
+						break;
+					case "right":
+						attackHitbox.x = worldX + gp.tileSize + rightWidth;
+						attackHitbox.y = worldY + gp.tileSize + 10;
+						attackHitbox.width = rightWidth;
+						attackHitbox.height = rightHeight;
+						break;
+				}
+				// Check collision with monsters using the attackHitbox
+				for (int i = 0; i < gp.monster.length; i++) {
+					Entity monster = gp.monster[i];
+					if (monster != null && monster.alive) {
+						Rectangle monsterHitbox = new Rectangle(
+							monster.worldX + monster.solidArea.x,
+							monster.worldY + monster.solidArea.y,
+							monster.solidArea.width,
+							monster.solidArea.height
+						);
+						if (attackHitbox.intersects(monsterHitbox)) {
+							damageMonster(i);
+							// When damaging a monster
+							gp.monster[i].showHpBar = true;
+							gp.monster[i].hpBarDisplayCounter = 150; // Show for 2.5 second (150 frames)
+						}
+					}
+				}
+			} 
+			if (hitboxType == 1){
+				Rectangle attackHitbox = new Rectangle();
+
+				// Example custom sizes for each direction
+				int upWidth = 110;
+				int upHeight = 40;
+				int downWidth = 110;
+				int downHeight = 40;
+				int leftWidth = 50;
+				int leftHeight = 65;
+				int rightWidth = 50;
+				int rightHeight = 65;
+
+				switch (direction) { 
+					case "up":
+						attackHitbox.x = worldX - (upWidth - gp.tileSize)/2;
+						attackHitbox.y = worldY - upHeight;
+						attackHitbox.width = upWidth;
+						attackHitbox.height = upHeight;
+						break;
+					case "down":
+						attackHitbox.x = worldX + gp.tileSize + (downWidth - gp.tileSize)/2;
+						attackHitbox.y = worldY + gp.tileSize + downHeight;
+						attackHitbox.width = downWidth;
+						attackHitbox.height = downHeight;
+						break;
+					case "left":
+						attackHitbox.x = worldX - leftWidth;
+						attackHitbox.y = worldY + 10;
+						attackHitbox.width = leftWidth;
+						attackHitbox.height = leftHeight;
+						break;
+					case "right":
+						attackHitbox.x = worldX + gp.tileSize + rightWidth;
+						attackHitbox.y = worldY + gp.tileSize + 10;
+						attackHitbox.width = rightWidth;
+						attackHitbox.height = rightHeight;
+						break;
+				}
+				for (int i = 0; i < gp.monster.length; i++) {
+					Entity monster = gp.monster[i];
+					if (monster != null && monster.alive) {
+						Rectangle monsterHitbox = new Rectangle(
+							monster.worldX + monster.solidArea.x,
+							monster.worldY + monster.solidArea.y,
+							monster.solidArea.width,
+							monster.solidArea.height
+						);
+						if (attackHitbox.intersects(monsterHitbox)) {
+							damageMonster(i);
+							gp.monster[i].showHpBar = true; // Show HP bar
+							gp.monster[i].hpBarDisplayCounter = 150; // Show for 2.5 seconds
+						}
 					}
 				}
 			}
+
+			if (hitboxType == 2){
+				Rectangle attackHitbox = new Rectangle();
+
+				switch (direction) { 
+					case "up":
+						attackHitbox.x = worldX;
+						attackHitbox.y = worldY;
+						attackHitbox.width = gp.tileSize;
+						attackHitbox.height = gp.tileSize * 2;
+						break;
+					case "down":
+						attackHitbox.x = worldX + gp.tileSize;
+						attackHitbox.y = worldY + gp.tileSize;
+						attackHitbox.width = gp.tileSize;
+						attackHitbox.height = gp.tileSize * 2;
+						break;
+					case "left":
+						attackHitbox.x = worldX - gp.tileSize * 2;
+						attackHitbox.y = worldY;
+						attackHitbox.width = gp.tileSize * 2;
+						attackHitbox.height = gp.tileSize;
+						break;
+					case "right":
+						attackHitbox.x = worldX + gp.tileSize;
+						attackHitbox.y = worldY;
+						attackHitbox.width = gp.tileSize * 2;
+						attackHitbox.height = gp.tileSize;
+						break;
+				}
+				for (int i = 0; i < gp.monster.length; i++) {
+					Entity monster = gp.monster[i];
+					if (monster != null && monster.alive) {
+						Rectangle monsterHitbox = new Rectangle(
+							monster.worldX + monster.solidArea.x,
+							monster.worldY + monster.solidArea.y,
+							monster.solidArea.width,
+							monster.solidArea.height
+						);
+						if (attackHitbox.intersects(monsterHitbox)) {
+							damageMonster(i);
+							gp.monster[i].showHpBar = true; // Show HP bar
+							gp.monster[i].hpBarDisplayCounter = 150; // Show for 2.5 seconds
+						}
+					}
+				}
+			}
+
+			
 		}
 		if (spriteCounter > 25){
 			spriteNum = 1;
@@ -458,7 +574,7 @@ public class Player extends Entity{
 
 		BufferedImage image= null;
 
-		if (attacking) {
+		if (attacking && currentWeapon != null) {
 			switch (direction) {
 				case "up":    image = (spriteNum == 1) ? attackUp1 : attackUp2; break;
 				case "down":  image = (spriteNum == 1) ? attackDown1 : attackDown2; break;
