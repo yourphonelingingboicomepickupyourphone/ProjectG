@@ -400,7 +400,7 @@ public class Player extends Entity{
 	public void contactMonster(int i){
 		if(i != 999){
 
-			if (invincible == false && gp.monster[i].collision == true) {
+			if (invincible == false && gp.monster[i].collision == true && gp.monster[i].dying == false) {
 				int damage = gp.monster[i].attack - getTotalDefense();
 				if (damage < 0) {
 					damage = 0;

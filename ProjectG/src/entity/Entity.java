@@ -67,6 +67,7 @@ public class Entity {
 	public int progressionManaUpgrades;
 	public int progressionAttackUpgrades;
 	public int progressionDefenseUpgrades;
+
 	
 
 	//Player extra attributes
@@ -78,6 +79,7 @@ public class Entity {
 	public Entity currentWeapon;
 	public Entity currentArmor;
 	public Entity currentBoots;
+	public Projectile projectile;
 
 
 	//Item attributes
@@ -97,6 +99,9 @@ public class Entity {
 	public int quantity = 1; //quantity of the item
 	public int healthHeal = 0; //health heal of the item
 	public int manaHeal = 0; //mana heal of the item
+
+	public float healthCost = 0; //health cost of the item
+	public int manaCost = 0; //mana cost of the item
 
 	//Monster attributes
 	public int expReward;
@@ -295,7 +300,6 @@ public class Entity {
 		if (dyingCounter > 5*i && dyingCounter <= 6*i)  changeAlpha(g2, 1f);
 		if (dyingCounter > 7*i && dyingCounter <= 8*i)  changeAlpha(g2, 1f);
 		if (dyingCounter > 8*i) {
-			dying = false;
 			alive = false;
 		}
 	}
