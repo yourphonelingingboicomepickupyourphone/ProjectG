@@ -13,14 +13,14 @@ public class ITEM_Axe_Normal extends Entity {
         down1 = setup("/items/normal_axe");
 
         //Attack animation
-        attackUp1 = setup("/items/normal_axe_up");
-        attackUp2 = setup("/items/normal_axe_up_2");
-        attackDown1 = setup("/items/normal_axe_down");
-        attackDown2 = setup("/items/normal_axe_down_2");
-        attackLeft1 = setup("/items/normal_axe_left");
-        attackLeft2 = setup("/items/normal_axe_left_2");
-        attackRight1 = setup("/items/normal_axe_right");
-        attackRight2 = setup("/items/normal_axe_right_2");
+        attackUp1 = setup("/player/attack_axe_up_1");
+        attackUp2 = setup("/player/attack_axe_up_2");
+        attackDown1 = setup("/player/attack_axe_down_1");
+        attackDown2 = setup("/player/attack_axe_down_2");
+        attackLeft1 = setup("/player/attack_axe_left_1");
+        attackLeft2 = setup("/player/attack_axe_left_2");
+        attackRight1 = setup("/player/attack_axe_right_1");
+        attackRight2 = setup("/player/attack_axe_right_2");
 
         attackBonus = 10;
         cooldownBonus = 10; //time in ms to wait before the

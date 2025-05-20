@@ -574,14 +574,24 @@ public class Player extends Entity{
 
 		BufferedImage image= null;
 
-		if (attacking && currentWeapon != null) {
-			switch (direction) {
-				case "up":    image = (spriteNum == 1) ? attackUp1 : attackUp2; break;
-				case "down":  image = (spriteNum == 1) ? attackDown1 : attackDown2; break;
-				case "left":  image = (spriteNum == 1) ? attackLeft1 : attackLeft2; break;
-				case "right": image = (spriteNum == 1) ? attackRight1 : attackRight2; break;
-			}
-		}
+		if (attacking) {
+            if (currentWeapon != null) {
+                switch (direction) {
+                    case "up":
+                        image = (spriteNum == 1) ? currentWeapon.attackUp1 : currentWeapon.attackUp2;
+                        break;
+                    case "down":
+                        image = (spriteNum == 1) ? currentWeapon.attackDown1 : currentWeapon.attackDown2;
+                        break;
+                    case "left":
+                        image = (spriteNum == 1) ? currentWeapon.attackLeft1 : currentWeapon.attackLeft2;
+                        break;
+                    case "right":
+                        image = (spriteNum == 1) ? currentWeapon.attackRight1 : currentWeapon.attackRight2;
+                        break;
+                }
+            }
+        }
 		else if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
 			switch (direction) {
 				case "up":
