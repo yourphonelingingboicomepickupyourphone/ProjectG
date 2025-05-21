@@ -1,6 +1,7 @@
 package entity;
 
 import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -172,15 +173,18 @@ public class Player extends Entity{
 
 			//Check object collision
 			int objIndex = gp.cChecker.checkObject(this, true);
+			int npcIndex = gp.cChecker.checkEntity(this, gp.npc);
+
 			if (keyH.enterPressed == true) {
-				pickUpObject(objIndex);
-				keyH.enterPressed = false; // Reset enterPressed after picking up
+				if (objIndex != 999) {
+					pickUpObject(objIndex);
+				} else if (npcIndex != 999) {
+					interactNPC(npcIndex);
+				}
+				keyH.enterPressed = false;
 			}
 
 			//Check NPC collision
-
-			int npcIndex = gp.cChecker.checkEntity(this, gp.npc);
-			interactNPC(npcIndex);
 
 			//Check monster collision
 			int monsterIndex = gp.cChecker.checkEntity(this, gp.monster);
@@ -643,6 +647,8 @@ public class Player extends Entity{
 		}
 		// Draw image with scaling
     	g2.drawImage(image, x, y, gp.tileSize * 2, gp.tileSize * 2, null); // 160x160 final size
+		g2.setColor(Color.RED);
+		g2.drawRect(x + solidArea.x, y + solidArea.y, solidArea.width, solidArea.height);
 		// Restore composite
 		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 

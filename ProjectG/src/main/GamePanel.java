@@ -4,7 +4,11 @@ import java.awt.Color;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
+// import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -26,6 +30,11 @@ public class GamePanel extends JPanel implements Runnable{
 	public final int maxScreenRow = 13;
 	public final int screenWidth = tileSize * maxScreenCol;
 	public final int screenHeight = tileSize * maxScreenRow;	//1920x1040
+
+	public int screenWidth2 = screenWidth;
+	public int screenHeight2 = screenHeight;
+	BufferedImage tempScreen;
+	Graphics2D g2;
 	
 	//World Settings
 	public final int maxWorldCol = 100;
@@ -81,7 +90,22 @@ public class GamePanel extends JPanel implements Runnable{
 		player.renderLayer = 2; // Player in the middle layer
 
 		gameState = titleState;	//start with title screen
+
+		tempScreen = new BufferedImage(screenWidth, screenHeight, BufferedImage.TYPE_INT_RGB);	//create a buffered image
+		g2 = (Graphics2D)tempScreen.getGraphics();	//create a graphics context for the buffered image
+
+		setFullScreen();	//set the window to full screen
 		
+	}
+
+	public void setFullScreen(){
+		GraphicsEnvironment gEnv = GraphicsEnvironment.getLocalGraphicsEnvironment();	//get the local graphics environment
+		GraphicsDevice gDevice = gEnv.getDefaultScreenDevice();	//get the default screen device
+		gDevice.setFullScreenWindow(Main.window);	//set the window to full screen
+		Main.window.setResizable(false);	//set the window to be not resizable
+
+		screenWidth2 = Main.window.getWidth();	//get the width of the window
+		screenHeight2 = Main.window.getHeight();	//get the height of the window
 	}
 
 	public void startGameThread() {
@@ -106,7 +130,9 @@ public class GamePanel extends JPanel implements Runnable{
 			
 			if (delta >= 1) {
 				update();
+				drawToTempScreen();
 				repaint();
+				
 				delta--;
 			}
 			
@@ -133,6 +159,7 @@ public class GamePanel extends JPanel implements Runnable{
 						monster[i].update();
 					}
 					if (monster[i].alive == false) {
+						monster[i].checkDrop();
 						monster[i] = null;
 					}
 				}
@@ -157,13 +184,7 @@ public class GamePanel extends JPanel implements Runnable{
 		}
 		
 	}
-	
-	public void paintComponent(Graphics g) {	//draw objects onscreen
-		super.paintComponent(g);
-		
-		Graphics2D g2 = (Graphics2D)g;	//extend Graphics to provide more sophisticated control over geometry
-		
-
+	public void drawToTempScreen() {
 		//title screen
 		if (gameState == titleState) {
 			ui.draw(g2);	//title screen
@@ -217,10 +238,44 @@ public class GamePanel extends JPanel implements Runnable{
 			entityList.clear();	//clear the entity list for next time
 			
 			ui.draw(g2);	//ui
-			
-			g2.dispose();	//dispose of graphic context & free system resource
 		}
 		
-		
 	}
+
+	@Override
+	protected void paintComponent(Graphics g) {
+	    super.paintComponent(g);
+	    if (tempScreen != null) {
+	        // Calculate scale to fit while preserving aspect ratio
+	        double panelAspect = (double) getWidth() / getHeight();
+	        double gameAspect = (double) screenWidth / screenHeight;
+	        int drawWidth, drawHeight, drawX, drawY;
+
+	        if (panelAspect > gameAspect) {
+	            // Panel is wider than game: fit height
+	            drawHeight = getHeight();
+	            drawWidth = (int) (drawHeight * gameAspect);
+	        } else {
+	            // Panel is taller than game: fit width
+	            drawWidth = getWidth();
+	            drawHeight = (int) (drawWidth / gameAspect);
+	        }
+	        drawX = (getWidth() - drawWidth) / 2;
+	        drawY = (getHeight() - drawHeight) / 2;
+
+	        // Fill background black to hide borders
+	        g.setColor(Color.BLACK);
+	        g.fillRect(0, 0, getWidth(), getHeight());
+
+	        // Draw the game buffer scaled, centered
+	        g.drawImage(tempScreen, drawX, drawY, drawWidth, drawHeight, null);
+	    }
+	}
+	
+	public void drawToScreen() {
+		Graphics g = getGraphics();	//get the graphics context of the screen
+		g.drawImage(tempScreen, 0, 0, screenWidth2, screenHeight2, null);	//draw the buffered image to the screen
+		g.dispose();	//dispose the graphics context
+	}
+		
 }

@@ -153,10 +153,28 @@ public class KeyHandler implements KeyListener{
 		}
 	}
 
+
 	public void pauseState(int code){
 			
 		if (code == KeyEvent.VK_ESCAPE) {
 			gp.gameState = gp.playState;
+		}
+		
+		if (KeyEvent.VK_W == code || KeyEvent.VK_UP == code) {
+			gp.ui.pauseCommandNum--;
+			if (gp.ui.pauseCommandNum < 0) gp.ui.pauseCommandNum = 3;
+		}
+		if (code == KeyEvent.VK_S || code == KeyEvent.VK_DOWN) {
+			gp.ui.pauseCommandNum++;
+			if (gp.ui.pauseCommandNum > 3) gp.ui.pauseCommandNum = 0;
+		}
+		if (code == KeyEvent.VK_ENTER) {
+			switch (gp.ui.pauseCommandNum) {
+				case 0: gp.gameState = gp.playState; break; // Continue
+				case 1: gp.gameState = gp.optionsState; break; // Settings
+				// case 2: saveGame(); break; // Save
+				case 3: System.exit(0); break; // Exit
+			}
 		}
 	}
 

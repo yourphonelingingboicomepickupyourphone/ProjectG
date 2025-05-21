@@ -264,22 +264,39 @@ public class UI {
 		}
 	}
 
+	int pauseCommandNum = 0; // to store the command number of the pause menu
 	public void drawPauseScreen() {
+	    // Overlay
+	    g2.setColor(new Color(0, 0, 0, 180));
+	    g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
 
-		// Set the color and transparency for the overlay
-		g2.setColor(new Color(0, 0, 0, 180)); // Black with 70% opacity (alpha = 180 out of 255)
-    
-		// Draw the overlay over the entire screen
-		g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
+	    // Title
+	    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 80F));
+	    g2.setColor(Color.WHITE);
+	    String text = "PAUSED";
+	    int x = getXForCenteredText(text);
+	    int y = gp.screenHeight/2 - 3 * gp.tileSize;
+	    g2.drawString(text, x, y);
 
-		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 80F));
-		g2.setColor(Color.WHITE);
-		String text = "PAUSED";
-		int x = getXForCenteredText(text);
-		int y = gp.screenHeight/2 - 5 * gp.tileSize / 2;
+	    // Menu options
+	    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 50F));
+	    String[] options = {"Continue", "Settings", "Save", "Exit"};
+	    int menuStartY = y + gp.tileSize * 2;
+	    int lineHeight = gp.tileSize + 10;
 
-		g2.drawString(text, x, y);
+	    for (int i = 0; i < options.length; i++) {
+	        String option = options[i];
+	        int optionX = getXForCenteredText(option);
+	        int optionY = menuStartY + i * lineHeight;
 
+	        // Highlight selected option
+	        if (pauseCommandNum == i) {
+	            g2.setColor(new Color(255, 255, 100));
+	            g2.drawString(">", optionX - gp.tileSize, optionY);
+	            g2.setColor(Color.WHITE);
+	        }
+	        g2.drawString(option, optionX, optionY);
+	    }
 	}
 
 	public void drawDialogueScreen() {
@@ -381,12 +398,19 @@ public class UI {
 
 		UtilityTool uTool = new UtilityTool();
 		try {
-			image = ImageIO.read(getClass().getResourceAsStream("/player/player_icon.png"));
-			image = uTool.scaleImage(image, width, height);
-		}catch(IOException e) {
+			InputStream is = getClass().getResourceAsStream("/player/player_icon.png");
+			if (is == null) {
+				System.err.println("ERROR: /player/player_icon.png not found in resources!");
+			} else {
+				image = ImageIO.read(is);
+				image = uTool.scaleImage(image, width, height);
+			}
+		} catch(IOException e) {
 			e.printStackTrace();
 		}
-		g2.drawImage(image, x, y, width, height, null);
+		if (image != null) {
+			g2.drawImage(image, x, y, width, height, null);
+		}
 	}
 
 	public void drawMessages() {
@@ -689,10 +713,30 @@ public class UI {
 		    Entity selectedItem = gp.player.inventory.get(selectedIndex);
 		    if (selectedItem != null) {
 		        // Calculate info area position
-		        int infoX = innerX + gp.tileSize / 4;
-		        int infoY = slotYStart + maxInventoryRow * (slotHeight + slotGap) - gp.tileSize / 6;
-		        int infoWidth = innerWidth - gp.tileSize/2;
+		        int infoX = frameX + gp.tileSize / 2;
+		        int infoWidth = width - gp.tileSize;
 		        int infoHeight = gp.tileSize * 3 + 2 * gp.tileSize / 3;
+
+		        // Clamp info box to not go beyond the inventory window
+		        if (infoX + infoWidth > frameX + width - 8) {
+		            infoWidth = frameX + width - 8 - infoX;
+		        }
+
+		        // Don't let info box overlap character window
+		        int characterWindowX = gp.tileSize * 13;
+		        if (infoX + infoWidth > characterWindowX - 8) {
+		            infoWidth = characterWindowX - 8 - infoX;
+		        }
+
+		        // Default: draw below the grid
+		        int infoY = slotYStart + maxInventoryRow * (slotHeight + slotGap) + gp.tileSize / 6;
+
+		        // If it would go off the bottom, draw above the grid instead
+		        if (infoY + infoHeight > gp.screenHeight - gp.tileSize / 2) {
+		            infoY = slotYStart - infoHeight - gp.tileSize / 6;
+		            // If still off the top, clamp to at least frameY
+		            if (infoY < frameY + 8) infoY = frameY + 8;
+		        }
 
 		        // Draw info background
 		        g2.setColor(new Color(40, 40, 40, 220));

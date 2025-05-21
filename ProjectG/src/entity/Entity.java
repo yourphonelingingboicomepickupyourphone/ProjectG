@@ -138,6 +138,24 @@ public class Entity {
 		facePlayer();
 	}
 
+	public void checkDrop() {
+
+
+	}
+
+	public void dropItem(Entity droppedItem) {
+		for (int i = 0; i < gp.obj.length; i++) {
+			if (gp.obj[i] == null) {
+
+				gp.obj[i] = droppedItem;
+				gp.obj[i].worldX = worldX;
+				gp.obj[i].worldY = worldY;
+				break;
+				
+			}
+		}
+	}
+
 	public void update() {
 
 		if (gp.gameState == gp.dialogueState) {
@@ -283,8 +301,8 @@ public class Entity {
 					}
 
 			g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);		
-			// g2.setColor(Color.red);
-			// g2.drawRect(screenX + solidAreaDefaultX, screenY + solidAreaDefaultY, solidArea.width, solidArea.height); // debug rectangle
+			g2.setColor(Color.red);
+			g2.drawRect(screenX + solidAreaDefaultX, screenY + solidAreaDefaultY, solidArea.width, solidArea.height); // debug rectangle
 			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 		}
 	}

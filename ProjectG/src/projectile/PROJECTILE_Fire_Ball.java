@@ -18,13 +18,13 @@ public class PROJECTILE_Fire_Ball extends Projectile {
     }
 
     public void getImage() {
-        up1 = setup("/projectiles/fire_ball_up_1");
-        up2 = setup("/projectiles/fire_ball_up_2");
-        down1 = setup("/projectiles/fire_ball_down_1");
-        down2 = setup("/projectiles/fire_ball_down_2");
-        left1 = setup("/projectiles/fire_ball_left_1");
-        left2 = setup("/projectiles/fire_ball_left_2");
-        right1 = setup("/projectiles/fire_ball_right_1");
-        right2 = setup("/projectiles/fire_ball_right_2");
+        up1 = setup("/projectiles/fireball_up_1");
+        up2 = setup("/projectiles/fireball_up_2");
+        down1 = setup("/projectiles/fireball_down_1");
+        down2 = setup("/projectiles/fireball_down_2");
+        left1 = setup("/projectiles/fireball_left_1");
+        left2 = setup("/projectiles/fireball_left_2");
+        right1 = setup("/projectiles/fireball_right_1");
+        right2 = setup("/projectiles/fireball_right_2");
     }
 }

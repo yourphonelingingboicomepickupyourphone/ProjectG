@@ -3,6 +3,13 @@ package monster;
 import java.util.Random;
 
 import entity.Entity;
+import item.ITEM_Axe_Normal;
+import item.ITEM_Bow_Normal;
+import item.ITEM_Mini_Health_Potion;
+import item.ITEM_Mini_Mana_Potion;
+import item.ITEM_Spear_Normal;
+import item.ITEM_Staff_Normal;
+import item.ITEM_Sword_Normal;
 import main.GamePanel;
 
 public class MON_rSlime extends Entity{
@@ -77,5 +84,49 @@ public class MON_rSlime extends Entity{
         direction = gp.player.direction;
         actionLockCounter = 0;
     }
+
+public void checkDrop() {
+    class DropEntry {
+        Entity item;
+        int weight; // Higher = more common
+
+        DropEntry(Entity item, int weight) {
+            this.item = item;
+            this.weight = weight;
+        }
+    }
+
+    DropEntry[] drops = new DropEntry[] {
+        new DropEntry(null, 80),                            // Percentage chance of no drop
+        new DropEntry(new ITEM_Mini_Health_Potion(gp), 60),      // Very common
+        new DropEntry(new ITEM_Mini_Mana_Potion(gp), 60),        // Very common
+        new DropEntry(new ITEM_Sword_Normal(gp), 20),            // Rare
+        new DropEntry(new ITEM_Axe_Normal(gp), 20),              // Rare
+        new DropEntry(new ITEM_Staff_Normal(gp), 20),            // Rare
+        new DropEntry(new ITEM_Spear_Normal(gp),20),             // Rare
+        new DropEntry(new ITEM_Bow_Normal(gp), 20)               // Rare
+        // Add more items and adjust weights as needed
+    };
+
+    // Calculate total weight
+    int totalWeight = 0;
+    for (DropEntry entry : drops) {
+        totalWeight += entry.weight;
+    }
+
+    // Pick a random number in the total weight range
+    int r = new Random().nextInt(totalWeight);
+    int sum = 0;
+    for (DropEntry entry : drops) {
+        sum += entry.weight;
+        if (r < sum) {
+            if (entry.item != null) {
+                dropItem(entry.item);
+            }
+            break; // Exit the loop once we find the right drop
+            
+        }
+    }
+}
 
 }
