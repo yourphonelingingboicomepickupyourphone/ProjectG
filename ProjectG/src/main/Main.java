@@ -6,17 +6,18 @@ package main;
 import javax.swing.JFrame;
 
 public class Main {
-
-	public static JFrame window;
 	public static void main(String[] args) {
-		Main.window = new JFrame();
+		JFrame window = new JFrame();
 		GamePanel gamePanel = new GamePanel();
 		
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setResizable(true);
-	
+		
+//		for ( Window w : Window.getWindows() ) {
+//		    GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow( w );
+//		}
+
 		window.setTitle("Test Game");
-		window.setUndecorated(true);
 		
 		
 		window.add(gamePanel);
