@@ -14,7 +14,8 @@ public class ITEM_Chest_Key extends Entity{
 		renderLayer = 1;
 		pickable = true;
 		stackable = true;
-		type = 4;
+		type = 3;
+		itemType = 4;
 		
 		solidArea.x = 30;
 		solidArea.y = 25;

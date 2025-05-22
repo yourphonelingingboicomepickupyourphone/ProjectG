@@ -32,6 +32,8 @@ public class UI {
 	public int commandNum = 0;	//to store the command number of the menu
 	
 	public int titleScreenState = 0; 
+
+	public int subState = 0; 
 	public UI(GamePanel gp) {
 		this.gp = gp;
 		
@@ -167,7 +169,7 @@ public class UI {
 			}
 
 			text = "SETTINGS";
-			x = getXForCenteredText(text);
+		 	x = getXForCenteredText(text);
 			y += 3 * gp.tileSize / 2;
 			g2.drawString(text, x, y);
 			if (commandNum == 2) {
@@ -268,39 +270,45 @@ public class UI {
 			    }
 			}
 			
-		} else if (titleScreenState == 3){
+		} else if (titleScreenState == 3) {
 			g2.setColor(new Color(243, 193, 8));
 			g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
 
-			//Title Name
-			g2.setFont(pixelOperatorBold.deriveFont(Font.PLAIN, 120F));
-		
-			String text = "Legends of the Red Wheels";
+			// Title Name
+			g2.setFont(pixelOperatorBold.deriveFont(Font.PLAIN, 100F));
+			String text = "Options";
 			int x = getXForCenteredText(text);
-			int y = gp.tileSize * 5;
-
-			//Shadow
+			int y = gp.tileSize * 3;
 			g2.setColor(new Color(0, 0, 0, 80));
 			g2.drawString(text, x + gp.tileSize / 13, y + gp.tileSize / 13);
-
-			//Main text
 			g2.setColor(new Color(206, 22, 40));
 			g2.drawString(text, x, y);
 
-			//Logo
-			BufferedImage logo = null;
-			BufferedImage groupLogo = null;
-			try {
-				logo = ImageIO.read(getClass().getResourceAsStream("/logo/logo.png"));
-				groupLogo = ImageIO.read(getClass().getResourceAsStream("/logo/group_logo.png"));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			int x2 = gp.screenWidth/2 - (gp.tileSize * 9)/2;	
-			int y2 = gp.tileSize * 1 - gp.tileSize/2;
-			g2.drawImage(logo, x2, y2, gp.tileSize *3, gp.tileSize * 3, null);
-			g2.drawImage(groupLogo, x2 + gp.tileSize * 6, y2 - gp.tileSize / 8, gp.tileSize * 3, gp.tileSize * 3, null);
+			// Menu options
+			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 60F));
+			String[] options = {"Music Volume", "SFX Volume", "Fullscreen", "Language", "Controls","Back"};
+			int menuStartY = y + gp.tileSize * 2;
+			int lineHeight = gp.tileSize + 10;
 
+			for (int i = 0; i < options.length; i++) {
+				String option = options[i];
+				int optionX = getXForCenteredText(option);
+				int optionY = menuStartY + i * lineHeight;
+
+				// Highlight selected option
+				if (commandNum == i) {
+					g2.setColor(new Color(255, 255, 100));
+					g2.drawString(">", optionX - gp.tileSize, optionY);
+					
+				}
+				g2.setColor(Color.WHITE);
+				g2.drawString(option, optionX, optionY);
+			}
+
+			// Instructions
+			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 32F));
+			g2.setColor(Color.YELLOW);
+			g2.drawString("Use W/S or Up/Down to move, Enter to select", getXForCenteredText("Use W/S or Up/Down to move, Enter to select"), menuStartY + options.length * lineHeight + gp.tileSize / 2);
 		}
 	}
 
@@ -474,14 +482,20 @@ public class UI {
 		}
 	}
 
-	public static int progressionSelectIndex = 0; // 0: Health, 1: Mana, 2: Attack, 3: Defense, etc.
+
+	public int slotCol = 0;
+	public int slotRow = 0;
+	public final int maxInventoryCol = 6; // Example: 6 columns
+	public final int maxInventoryRow = 4; // Example: 4 rows
+
+			public static int progressionSelectIndex = 0; // 0: Health, 1: Mana, 2: Attack, 3: Defense, etc.
 	//Character Screen
 	public void drawCharacterScreen() {
 		//Window
 		final int frameX = gp.tileSize * 13;
 		final int frameY = gp.tileSize;
 		final int frameWidth = gp.tileSize * 9;
-		final int frameHeight = gp.tileSize * 10;
+		final int frameHeight = gp.tileSize * 7 + gp.tileSize / 2;
 
 		drawSubWindow(frameX, frameY, frameWidth, frameHeight);
 
@@ -515,7 +529,7 @@ public class UI {
 			if (selected && gp.player.progressionPoints > 0) {
 				// Only highlight 2/5 of the frame width on the left
 				int highlightWidth = (frameWidth * 2) / 5;
-				g2.setColor(new Color(255, 255, 100, 80));
+				g2.setColor(new Color(255, 255, 100, 200)); // More opaque
 				g2.fillRoundRect(textX - 20, statTextY - 35, highlightWidth, lineHeight, 20, 20);
 				g2.setColor(Color.white);
 			}
@@ -638,12 +652,7 @@ public class UI {
 		// textX = getXForAllignToRightText(value, tailX);
 		// g2.drawString(value, textX, textY);
 	}
-
-	public int slotCol = 0;
-	public int slotRow = 0;
-	public final int maxInventoryCol = 6; // Example: 6 columns
-	public final int maxInventoryRow = 4; // Example: 4 rows
-
+	
 	public void drawInventoryScreen() {
 		// Window
 		int frameX = gp.tileSize * 2;
@@ -749,78 +758,208 @@ public class UI {
 		
 		// Draw selected item's name and info below the grid
 		int selectedIndex = slotRow * maxInventoryCol + slotCol;
+		Entity selectedItem = null;
 		if (selectedIndex < gp.player.inventory.size()) {
-		    Entity selectedItem = gp.player.inventory.get(selectedIndex);
+		    selectedItem = gp.player.inventory.get(selectedIndex);
+		}
+
+		// Draw selected item's name and info below the grid
+		// Calculate info area position (always, so variables are in scope)
+		int infoX = frameX + gp.tileSize / 2;
+		int infoWidth = width - gp.tileSize;
+		int infoHeight = gp.tileSize * 3 + gp.tileSize / 2;
+
+		// Clamp info box to not go beyond the inventory window
+		if (infoX + infoWidth > frameX + width - 8) {
+		    infoWidth = frameX + width - 8 - infoX;
+		}
+
+		// Don't let info box overlap character window
+		int characterWindowX = gp.tileSize * 13;
+		if (infoX + infoWidth > characterWindowX - 8) {
+		    infoWidth = characterWindowX - 8 - infoX;
+		}
+
+		// Default: draw below the grid
+		int infoY = slotYStart + maxInventoryRow * (slotHeight + slotGap);
+
+		// If it would go off the bottom, draw above the grid instead
+		if (infoY + infoHeight > gp.screenHeight - gp.tileSize / 2) {
+		    infoY = slotYStart - infoHeight - gp.tileSize / 6;
+		    // If still off the top, clamp to at least frameY
+		    if (infoY < frameY + 8) infoY = frameY + 8;
+		}
+
+		// Draw info background
+		g2.setColor(new Color(40, 40, 40, 220));
+		g2.fillRoundRect(infoX, infoY, infoWidth, infoHeight, 20, 20);
+
+		if (selectedItem != null) {
+		    // Draw selected item's name and info below the grid
+		    g2.setColor(Color.WHITE);
+		    g2.setFont(g2.getFont().deriveFont(Font.BOLD, 32F));
+		    g2.drawString(selectedItem.name, infoX + 24, infoY + 40);
+
+		    // Draw item description/info (wrap or trim as needed)
+		    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 24F));
+		    int descX = infoX + 24;
+		    int descY = infoY + 80;
+		    int lineHeight = g2.getFontMetrics().getHeight();
+		    int maxDescWidth = infoWidth - 48;
+
+		    java.util.List<String> lines = wrapText(selectedItem.description, maxDescWidth, g2);
+		    for (String line : lines) {
+		        g2.drawString(line, descX, descY);
+		        descY += lineHeight;
+		    }
+
+		    // Draw basic stats if present
+		    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 22F));
+		    if (selectedItem.healthBonus != 0) {
+		        g2.drawString("Health: " + (selectedItem.healthBonus > 0 ? "+" : "") + selectedItem.healthBonus, descX, descY);
+		        descY += lineHeight;
+		    }
+		    if (selectedItem.manaBonus != 0) {
+		        g2.drawString("Mana: " + (selectedItem.manaBonus > 0 ? "+" : "") + selectedItem.manaBonus, descX, descY);
+		        descY += lineHeight;
+		    }
+		    if (selectedItem.attackBonus != 0) {
+		        g2.drawString("Attack: " + (selectedItem.attackBonus > 0 ? "+" : "") + selectedItem.attackBonus, descX, descY);
+		        descY += lineHeight;
+		    }
+		    if (selectedItem.defenseBonus != 0) {
+		        g2.drawString("Defense: " + (selectedItem.defenseBonus > 0 ? "+" : "") + selectedItem.defenseBonus, descX, descY);
+		        descY += lineHeight;
+		    }
+
+		    if (selectedItem.type == 3 && selectedItem.itemType == 0 || selectedItem.itemType == 1 || selectedItem.itemType == 2 || selectedItem.itemType == 3) {
+		        g2.drawString("Level Required: " + selectedItem.levelRequirement, descX, descY);
+		        descY += lineHeight;
+		    }
+
+		    // Draw comparison box if selected item is equipment and not the equipped one
+		    Entity equippedItem = null;
+		    String equippedLabel = "";
+
 		    if (selectedItem != null) {
-		        // Calculate info area position
-		        int infoX = frameX + gp.tileSize / 2;
-		        int infoWidth = width - gp.tileSize;
-		        int infoHeight = gp.tileSize * 3 + 2 * gp.tileSize / 3;
-
-		        // Clamp info box to not go beyond the inventory window
-		        if (infoX + infoWidth > frameX + width - 8) {
-		            infoWidth = frameX + width - 8 - infoX;
+		        // Determine which equipment slot to compare
+		        if (selectedItem.itemType == 0) { // Weapon
+		            equippedItem = gp.player.currentWeapon;
+		            equippedLabel = "Equipped Weapon";
+		        } else if (selectedItem.itemType == 1) { // Hat
+		            equippedItem = gp.player.currentHat;
+		            equippedLabel = "Equipped Hat";
+		        } else if (selectedItem.itemType == 2) { // Armor
+		            equippedItem = gp.player.currentArmor;
+		            equippedLabel = "Equipped Armor";
+		        } else if (selectedItem.itemType == 3) { // Boots
+		            equippedItem = gp.player.currentBoots;
+		            equippedLabel = "Equipped Boots";
 		        }
+		    }
 
-		        // Don't let info box overlap character window
-		        int characterWindowX = gp.tileSize * 13;
-		        if (infoX + infoWidth > characterWindowX - 8) {
-		            infoWidth = characterWindowX - 8 - infoX;
-		        }
+		    // Only show if equipped item exists, is not the selected item, and is the same type
+		    if (
+		        selectedItem != null &&
+		        equippedItem != null &&
+		        selectedItem != equippedItem &&
+				selectedItem.type == equippedItem.type &&
+		        selectedItem.itemType == equippedItem.itemType // <--- THIS IS CRUCIAL
+		    ) {
+		        int charFrameX = gp.tileSize * 13;
+		        int charFrameY = gp.tileSize * 11 + gp.tileSize / 2;
+		        int charFrameWidth = gp.tileSize * 10 ;
+		        int charFrameHeight = gp.tileSize * 10 ;
 
-		        // Default: draw below the grid
-		        int infoY = slotYStart + maxInventoryRow * (slotHeight + slotGap) + gp.tileSize / 6;
+		        int compareWidth = charFrameWidth - gp.tileSize;
+		        int compareHeight = gp.tileSize * 2 + gp.tileSize / 2;
+		        int compareX = charFrameX;
+		        // Move above the character box:
+		        int compareY = charFrameY - compareHeight - gp.tileSize / 2;
+		        if (compareY < 0) compareY = 0; // Prevent going off the top of the screen
 
-		        // If it would go off the bottom, draw above the grid instead
-		        if (infoY + infoHeight > gp.screenHeight - gp.tileSize / 2) {
-		            infoY = slotYStart - infoHeight - gp.tileSize / 6;
-		            // If still off the top, clamp to at least frameY
-		            if (infoY < frameY + 8) infoY = frameY + 8;
-		        }
+		        g2.setColor(new Color(60, 60, 60, 240));
+		        g2.fillRoundRect(compareX, compareY, compareWidth, compareHeight, 20, 20);
 
-		        // Draw info background
-		        g2.setColor(new Color(40, 40, 40, 220));
-		        g2.fillRoundRect(infoX, infoY, infoWidth, infoHeight, 20, 20);
-
-		        // Draw item name
 		        g2.setColor(Color.WHITE);
-		        g2.setFont(g2.getFont().deriveFont(Font.BOLD, 32F));
-		        g2.drawString(selectedItem.name, infoX + 24, infoY + 40);
+		        g2.setFont(g2.getFont().deriveFont(Font.BOLD, 28F));
+		        g2.drawString(equippedLabel + ": " + equippedItem.name, compareX + 24, compareY + 40);
 
-		        // Draw item description/info (wrap or trim as needed)
-		        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 24F));
-				int descX = infoX + 24;
-		        int descY = infoY + 80;
-		        int lineHeight = g2.getFontMetrics().getHeight();
-		        int maxDescWidth = infoWidth - 48;
-
-		        java.util.List<String> lines = wrapText(selectedItem.description, maxDescWidth, g2);
-		        for (String line : lines) {
-		            g2.drawString(line, descX, descY);
-		            descY += lineHeight;
-		        }
-
-		        // Draw basic stats if present
 		        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 22F));
-		        if (selectedItem.healthBonus != 0) {
-		            g2.drawString("Health: " + (selectedItem.healthBonus > 0 ? "+" : "") + selectedItem.healthBonus, descX, descY);
-		            descY += lineHeight;
+		        int statY = compareY + 80;
+		        int statLine = g2.getFontMetrics().getHeight();
+
+		        // Only show stats that are relevant for the item type
+		        if (selectedItem.itemType == 0 || selectedItem.itemType == 2) { // Weapon or Armor
+		            // Attack
+		            int selAtk = selectedItem.attackBonus;
+		            int eqAtk = equippedItem.attackBonus;
+		            int diffAtk = selAtk - eqAtk;
+		            g2.setColor(Color.WHITE);
+		            g2.drawString("Attack: " + eqAtk, compareX + 24, statY);
+		            if (diffAtk != 0) {
+		                g2.setColor(diffAtk > 0 ? Color.GREEN : Color.RED);
+		                g2.drawString((diffAtk > 0 ? "+" : "") + diffAtk, compareX + 180, statY);
+		            }
+		            statY += statLine;
+
+		            // Defense
+		            int selDef = selectedItem.defenseBonus;
+		            int eqDef = equippedItem.defenseBonus;
+		            int diffDef = selDef - eqDef;
+		            g2.setColor(Color.WHITE);
+		            g2.drawString("Defense: " + eqDef, compareX + 24, statY);
+		            if (diffDef != 0) {
+		                g2.setColor(diffDef > 0 ? Color.GREEN : Color.RED);
+		                g2.drawString((diffDef > 0 ? "+" : "") + diffDef, compareX + 180, statY);
+		            }
+		            statY += statLine;
 		        }
-		        if (selectedItem.manaBonus != 0) {
-		            g2.drawString("Mana: " + (selectedItem.manaBonus > 0 ? "+" : "") + selectedItem.manaBonus, descX, descY);
-		            descY += lineHeight;
+
+		        // Health
+		        int selHealth = selectedItem.healthBonus;
+		        int eqHealth = equippedItem.healthBonus;
+		        int diffHealth = selHealth - eqHealth;
+		        g2.setColor(Color.WHITE);
+		        g2.drawString("Health: " + eqHealth, compareX + 24, statY);
+		        if (diffHealth != 0) {
+		            g2.setColor(diffHealth > 0 ? Color.GREEN : Color.RED);
+		            g2.drawString((diffHealth > 0 ? "+" : "") + diffHealth, compareX + 180, statY);
 		        }
-		        if (selectedItem.attackBonus != 0) {
-		            g2.drawString("Attack: " + (selectedItem.attackBonus > 0 ? "+" : "") + selectedItem.attackBonus, descX, descY);
-		            descY += lineHeight;
+		        statY += statLine;
+
+		        // Mana
+		        int selMana = selectedItem.manaBonus;
+		        int eqMana = equippedItem.manaBonus;
+		        int diffMana = selMana - eqMana;
+		        g2.setColor(Color.WHITE);
+		        g2.drawString("Mana: " + eqMana, compareX + 24, statY);
+		        if (diffMana != 0) {
+		            g2.setColor(diffMana > 0 ? Color.GREEN : Color.RED);
+		            g2.drawString((diffMana > 0 ? "+" : "") + diffMana, compareX + 180, statY);
 		        }
-		        if (selectedItem.defenseBonus != 0) {
-		            g2.drawString("Defense: " + (selectedItem.defenseBonus > 0 ? "+" : "") + selectedItem.defenseBonus, descX, descY);
-		            descY += lineHeight;
+		        statY += statLine;
+
+		        // Speed (for boots, if you have this stat)
+		        if (selectedItem.itemType == 3) { // Boots
+		            int selSpeed = selectedItem.speedBonus;
+		            int eqSpeed = equippedItem.speedBonus;
+		            int diffSpeed = selSpeed - eqSpeed;
+		            g2.setColor(Color.WHITE);
+		            g2.drawString("Speed: " + eqSpeed, compareX + 24, statY);
+		            if (diffSpeed != 0) {
+		                g2.setColor(diffSpeed > 0 ? Color.GREEN : Color.RED);
+		                g2.drawString((diffSpeed > 0 ? "+" : "") + diffSpeed, compareX + 180, statY);
+		            }
+		            statY += statLine;
 		        }
+		        g2.setColor(Color.WHITE);
 		    }
 		}
 	}
+
+
+
 
 	public int chestCol = 0;
 	public int chestRow = 0;
@@ -893,31 +1032,47 @@ public class UI {
 
 		drawSubWindow(frameX, frameY, width, height);
 
-		int textX = frameX + gp.tileSize;
-		int textY = frameY + gp.tileSize * 2;
-		int lineHeight = gp.tileSize + 10;
+		switch (subState) {
+			case 0: // Options
+				options_Top(frameX, frameY);
+				break;
+			case 1: // Controls
+				break;
+		}
 
-		g2.setFont(g2.getFont().deriveFont(Font.BOLD, 48F));
-		g2.setColor(Color.WHITE);
-		g2.drawString("Settings", textX, textY);
-
-		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 32F));
-		textY += lineHeight * 2;
-
-		// Example settings options
-		g2.drawString("Music Volume: [  ]", textX, textY);
-		textY += lineHeight;
-		g2.drawString("SFX Volume:   [  ]", textX, textY);
-		textY += lineHeight;
-		g2.drawString("Fullscreen:   [  ]", textX, textY);
-		textY += lineHeight * 2;
-
-		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 28F));
-		g2.setColor(Color.YELLOW);
-		g2.drawString("Press ESC to return", textX, textY);
 	}
 
+	public void options_Top(int frameX, int frameY){
+		int textX;
+		int textY;
 
+		String text = "Options";
+		textX = getXForCenteredText(text);
+		textY = frameY + gp.tileSize * 1;
+		g2.setColor(Color.WHITE);
+		g2.setFont(pixelOperatorBold.deriveFont(Font.PLAIN, 48F));
+		g2.drawString(text, textX, textY);
+
+		//BGM
+		textY += gp.tileSize * 2;
+		text = "BGM";
+		g2.drawString(text, textX, textY);
+
+		//SE
+		textY += gp.tileSize;
+		text = "SE";
+		g2.drawString(text, textX, textY);
+
+		//Controls
+		textY += gp.tileSize;
+		text = "Controls";
+		g2.drawString(text, textX, textY);		
+
+		//Back 
+		textY += gp.tileSize;
+		text = "Back";
+		g2.drawString(text, textX, textY);
+	}
 
 	public void drawSubWindow(int x, int y, int width, int height) {
 		int arc = 35;

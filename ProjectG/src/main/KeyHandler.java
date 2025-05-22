@@ -77,6 +77,7 @@ public class KeyHandler implements KeyListener{
 
 				}
 				if (gp.ui.commandNum == 2) {
+					gp.ui.commandNum = 0; // Reset cursor to first option
 					gp.ui.titleScreenState = 3; // Show settings menu
 				}	
 				if (gp.ui.commandNum == 3) {
@@ -129,12 +130,21 @@ public class KeyHandler implements KeyListener{
 			return; // Prevent further processing if on name input
 		}
 		else if (gp.ui.titleScreenState == 3) {
-			if (code == KeyEvent.VK_ENTER) {
-				
+			if (code == KeyEvent.VK_W || code == KeyEvent.VK_UP) {
+				gp.ui.commandNum--;
+				if (gp.ui.commandNum < 0) gp.ui.commandNum = 5; // 6 options: 0-5
 			}
-
-			if (code == KeyEvent.VK_ESCAPE) {
-				gp.ui.titleScreenState = 0; // Go back to main menu
+			if (code == KeyEvent.VK_S || code == KeyEvent.VK_DOWN) {
+				gp.ui.commandNum++;
+				if (gp.ui.commandNum > 5) gp.ui.commandNum = 0;
+			}
+			if (code == KeyEvent.VK_ENTER) {
+				// Handle selection based on gp.ui.commandNum
+				// 0: Music Volume, 1: SFX Volume, 2: Fullscreen, 3: Back
+				if (gp.ui.commandNum == 5) {
+					gp.ui.titleScreenState = 0; // Go back to main menu
+				}
+				// Add your logic for other options here
 			}
 		}
 		
@@ -303,6 +313,31 @@ public class KeyHandler implements KeyListener{
 	}
 
 	public void optionsState(int code){
+		if (code == KeyEvent.VK_ESCAPE) {
+			gp.gameState = gp.pauseState;
+		}
+		
+		if (code == KeyEvent.VK_W || code == KeyEvent.VK_UP) {
+			gp.ui.commandNum--;
+			if (gp.ui.commandNum < 0) gp.ui.commandNum = 3; // 4 options: 0-3
+		}
+		if (code == KeyEvent.VK_S || code == KeyEvent.VK_DOWN) {
+			gp.ui.commandNum++;
+			if (gp.ui.commandNum > 3) gp.ui.commandNum = 0;
+		}
+		if (code == KeyEvent.VK_ENTER) {
+			switch (gp.ui.commandNum) {
+				case 0: // BGM
+					break;
+				case 1: // SFX
+					break;
+				case 2: // Controls
+					break;
+				case 3: // Back
+					gp.gameState = gp.pauseState; 
+					break;
+			}
+		}
 
 	}
 
@@ -344,6 +379,9 @@ public class KeyHandler implements KeyListener{
 		}
 		if (code == KeyEvent.VK_ENTER) {
 			gp.player.selectItem(0); // The argument is not used, so 0 is fine
+		}
+		if (code == KeyEvent.VK_R){
+			gp.player.disposeSelectedItem();
 		}
 	}
 	@Override

@@ -13,6 +13,7 @@ public class OBJ_Chest extends Entity{
 		down1 = setup("/objects/chest_1");
 		renderLayer = 1;
 		pickable = false;
+		type = 3; // 0 = player, 1 = npc, 2 = monster, 3 = object, 4 = projectile, 5 = effect, 6 = ui
 		
 		solidArea.x = 0;
 		solidArea.y = 15;

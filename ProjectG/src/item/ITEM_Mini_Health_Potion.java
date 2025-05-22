@@ -17,7 +17,8 @@ public class ITEM_Mini_Health_Potion  extends Entity {
         description = "A potion that restores health. It is not very powerful, but it is better than nothing.";
         healthHeal = 100; //health heal of the item
         
-        type = 6; //6 = potion
+        type = 3; 
+        itemType = 6; //6 = potion
         pickable = true;
         stackable = true;
     }

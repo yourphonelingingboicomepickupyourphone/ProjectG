@@ -9,6 +9,7 @@ public class ITEM_Boots_Normal extends Entity{
         
         name = "Normal Boots";
         type = 3;
+        itemType = 3;
         level = 1;
         down1 = setup("/items/normal_boots");
         speedBonus = 2;

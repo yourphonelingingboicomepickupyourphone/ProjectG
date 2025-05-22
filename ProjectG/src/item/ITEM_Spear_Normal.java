@@ -8,7 +8,8 @@ public class ITEM_Spear_Normal extends Entity {
         super(gp);
         
         name = "Normal Spear";
-        type = 0;
+        type = 3;
+        itemType = 0;
         level = 1;
         down1 = setup("/items/normal_spear");
 

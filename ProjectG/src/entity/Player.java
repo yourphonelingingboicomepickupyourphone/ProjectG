@@ -681,43 +681,55 @@ public class Player extends Entity{
 		if (itemIndex < inventory.size()) {
 			Entity selectedItem = inventory.get(itemIndex);
 
-			if (selectedItem.type == 0) { // Weapon
+			if (selectedItem.itemType == 0) { // Weapon
 				Entity previousWeapon = currentWeapon;
 				currentWeapon = selectedItem;
 				inventory.set(itemIndex, previousWeapon);
 			}
-			else if (selectedItem.type == 1) { // Armor
-				Entity previousArmor = currentArmor;
-				currentArmor = selectedItem;
-				inventory.set(itemIndex, previousArmor);
-			}
-			else if (selectedItem.type == 2) { // Boots
-				Entity previousBoots = currentBoots;
-				currentBoots = selectedItem;
-				inventory.set(itemIndex, previousBoots);
-			}
-			else if (selectedItem.type == 3) { // Hat
+			else if (selectedItem.itemType == 1) { // Hat
 				Entity previousHat = currentHat;
 				currentHat = selectedItem;
 				inventory.set(itemIndex, previousHat);
 			}
-			// For consumables or other types, you can call use() or similar here
-			else if (selectedItem.type == 4 || selectedItem.type == 5 || selectedItem.type == 6) {
-    // Consumable types (e.g., 4 = interactable, 5 = potion, 6 = food)
-    selectedItem.use(this);
-
-    // If stackable, decrease quantity; remove if quantity is 0
-    if (selectedItem.stackable) {
-        selectedItem.quantity--;
-        if (selectedItem.quantity <= 0) {
-            inventory.remove(itemIndex);
-        }
-    } else {
-        // Not stackable, just remove from inventory
-        inventory.remove(itemIndex);
-    }
+			else if (selectedItem.itemType == 2) { // Armor
+				Entity previousArmor = currentArmor;
+				currentArmor = selectedItem;
+				inventory.set(itemIndex, previousArmor);
 			}
+			else if (selectedItem.itemType == 3) { // Boots
+				Entity previousBoots = currentBoots;
+				currentBoots = selectedItem;
+				inventory.set(itemIndex, previousBoots);
+			}
+			// ...other item types...
 		}
+	}
+
+	public void disposeSelectedItem() {
+	    int itemIndex = gp.ui.getItemIndexOnSlot();
+	    if (itemIndex >= 0 && itemIndex < inventory.size()) {
+	        inventory.remove(itemIndex);
+
+	        // After removal, adjust cursor if needed
+	        int totalItems = inventory.size();
+	        int maxIndex = totalItems - 1;
+	        int currentIndex = gp.ui.slotRow * gp.ui.maxInventoryCol + gp.ui.slotCol;
+
+	        // If the cursor is now out of bounds, move it left or up
+	        if (currentIndex > maxIndex) {
+	            if (gp.ui.slotCol > 0) {
+	                gp.ui.slotCol--;
+	            } else if (gp.ui.slotRow > 0) {
+	                gp.ui.slotRow--;
+	                gp.ui.slotCol = gp.ui.maxInventoryCol - 1;
+	                // Clamp to last item if still out of bounds
+	                currentIndex = gp.ui.slotRow * gp.ui.maxInventoryCol + gp.ui.slotCol;
+	                if (currentIndex > maxIndex) {
+	                    gp.ui.slotCol = maxIndex % gp.ui.maxInventoryCol;
+	                }
+	            }
+	        }
+	    }
 	}
 
 	public int getEquipmentHealthBonus() {

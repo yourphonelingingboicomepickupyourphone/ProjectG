@@ -19,7 +19,8 @@ public class ITEM_Mini_Mana_Potion extends Entity{
         description = "A potion that restores mana. It is not very powerful, but it is better than nothing.";
         manaHeal = 100; //mana heal of the item
         
-        type = 6; //6 = potion
+        type = 3;
+        itemType = 6; //6 = potion
         pickable = true;
         stackable = true;
     }

@@ -8,11 +8,15 @@ public class ITEM_Armor_Normal extends Entity{
         super(gp);
         
         name = "Normal Armor";
-        type = 2;
+        type = 3;
+        itemType = 2;
         level = 1;
         down1 = setup("/items/normal_armor");
         healthBonus = 20;
         defenseBonus = 10;
+        rarity = 0; //0 = common, 1 = rare, 2 = epic, 3 = legendary
+        levelRequirement = 1; //level requirement to use the item
+        description = "Normal armor. It is not very powerful, but it is better than nothing.";
 
         pickable = true;
         stackable = false;

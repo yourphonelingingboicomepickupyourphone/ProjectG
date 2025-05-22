@@ -3,6 +3,8 @@ package main;
 import entity.NPC_Wizard;
 import item.ITEM_Dual_Blade_Axe;
 import item.ITEM_Mini_Health_Potion;
+import item.ITEM_Armor_Normal;
+import item.ITEM_Better_Armor;
 import item.ITEM_Door_Key;
 import monster.MON_rSlime;
 // import object.OBJ_Chest;
@@ -63,6 +65,14 @@ public class AssetSetter {
 		gp.obj[9] = new ITEM_Mini_Health_Potion(gp);
 		gp.obj[9].worldX = gp.tileSize * 54;
 		gp.obj[9].worldY = gp.tileSize * 65;
+
+		gp.obj[10] = new ITEM_Armor_Normal(gp);
+		gp.obj[10].worldX = gp.tileSize * 50;
+		gp.obj[10].worldY = gp.tileSize * 65;
+
+		gp.obj[11] = new ITEM_Better_Armor(gp);
+		gp.obj[11].worldX = gp.tileSize * 54;
+		gp.obj[11].worldY = gp.tileSize * 65;
 
 	}
 

@@ -13,6 +13,7 @@ public class OBJ_Chest_Locked extends Entity{
 		down1 = setup("/objects/chest_1_locked");
 		renderLayer = 1;
 		pickable = false;
+		type = 3;
 
 		
 		solidArea.x = 0;
