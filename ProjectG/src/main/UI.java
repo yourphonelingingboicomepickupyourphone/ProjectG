@@ -54,7 +54,7 @@ public class UI {
 		messages.add(text);
 		messageCounter.add(0);
 	}
-	public void draw(Graphics2D  g2) {
+	public void draw(Graphics2D g2) {
 		
 		this.g2 = g2;
 		g2.setFont(pixelOperator);
@@ -101,6 +101,12 @@ public class UI {
 			drawInventoryScreen();
 			drawChestScreen();
 		}
+
+		else if (gp.gameState == gp.optionsState) {
+			drawOptionsScreen();
+		}
+
+
 	}
 
 	public void drawTitleScreen(){
@@ -261,6 +267,40 @@ public class UI {
 			        currentX += buttonW;
 			    }
 			}
+			
+		} else if (titleScreenState == 3){
+			g2.setColor(new Color(243, 193, 8));
+			g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
+
+			//Title Name
+			g2.setFont(pixelOperatorBold.deriveFont(Font.PLAIN, 120F));
+		
+			String text = "Legends of the Red Wheels";
+			int x = getXForCenteredText(text);
+			int y = gp.tileSize * 5;
+
+			//Shadow
+			g2.setColor(new Color(0, 0, 0, 80));
+			g2.drawString(text, x + gp.tileSize / 13, y + gp.tileSize / 13);
+
+			//Main text
+			g2.setColor(new Color(206, 22, 40));
+			g2.drawString(text, x, y);
+
+			//Logo
+			BufferedImage logo = null;
+			BufferedImage groupLogo = null;
+			try {
+				logo = ImageIO.read(getClass().getResourceAsStream("/logo/logo.png"));
+				groupLogo = ImageIO.read(getClass().getResourceAsStream("/logo/group_logo.png"));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			int x2 = gp.screenWidth/2 - (gp.tileSize * 9)/2;	
+			int y2 = gp.tileSize * 1 - gp.tileSize/2;
+			g2.drawImage(logo, x2, y2, gp.tileSize *3, gp.tileSize * 3, null);
+			g2.drawImage(groupLogo, x2 + gp.tileSize * 6, y2 - gp.tileSize / 8, gp.tileSize * 3, gp.tileSize * 3, null);
+
 		}
 	}
 
@@ -845,6 +885,38 @@ public class UI {
 		g2.setStroke(new BasicStroke(1f)); // Reset stroke
 	}
 
+	public void drawOptionsScreen(){
+		int frameX = gp.tileSize * 6;
+		int frameY = gp.tileSize * 2;
+		int width = gp.tileSize * 12;
+		int height = gp.tileSize * 8;
+
+		drawSubWindow(frameX, frameY, width, height);
+
+		int textX = frameX + gp.tileSize;
+		int textY = frameY + gp.tileSize * 2;
+		int lineHeight = gp.tileSize + 10;
+
+		g2.setFont(g2.getFont().deriveFont(Font.BOLD, 48F));
+		g2.setColor(Color.WHITE);
+		g2.drawString("Settings", textX, textY);
+
+		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 32F));
+		textY += lineHeight * 2;
+
+		// Example settings options
+		g2.drawString("Music Volume: [  ]", textX, textY);
+		textY += lineHeight;
+		g2.drawString("SFX Volume:   [  ]", textX, textY);
+		textY += lineHeight;
+		g2.drawString("Fullscreen:   [  ]", textX, textY);
+		textY += lineHeight * 2;
+
+		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 28F));
+		g2.setColor(Color.YELLOW);
+		g2.drawString("Press ESC to return", textX, textY);
+	}
+
 
 
 	public void drawSubWindow(int x, int y, int width, int height) {
@@ -904,4 +976,5 @@ public class UI {
 	public int getItemIndexOnSlot() {
 		return slotRow * maxInventoryCol + slotCol;
 	}
+
 }

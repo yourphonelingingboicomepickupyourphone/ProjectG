@@ -49,6 +49,7 @@ public class KeyHandler implements KeyListener{
 			inventoryState(code);
 		}
 
+
 	}
 
 	public void titleState(int code){
@@ -76,7 +77,7 @@ public class KeyHandler implements KeyListener{
 
 				}
 				if (gp.ui.commandNum == 2) {
-					//options
+					gp.ui.titleScreenState = 3; // Show settings menu
 				}	
 				if (gp.ui.commandNum == 3) {
 					System.exit(0);
@@ -104,15 +105,59 @@ public class KeyHandler implements KeyListener{
 					}
 				} else if (key.equals("SPACE")) {
 					gp.player.name += " ";
-				} else if (key.equals("OK")) {
+				} else if (key.equals("OK") && !gp.player.name.isEmpty()) {
 					gp.ui.typingName = false;
 					gp.gameState = gp.playState;
 					gp.player.name = gp.player.name.trim();
 					// Proceed to next screen or save name
+				} else if (key.equals("OK")) {
+					if (gp.player.name.isEmpty()) {
+						gp.player.name = generateRandomName();
+						// Stay on the name input screen so the player can see and edit the name
+					} else {
+						gp.ui.typingName = false;
+						gp.gameState = gp.playState;
+						gp.player.name = gp.player.name.trim();
+						// Proceed to next screen or save name
+					}
 				} else if (gp.player.name.length() < 12) // Limit name length
 					gp.player.name += key;
-				}
+			} else if (code == KeyEvent.VK_ESCAPE) {
+				gp.ui.typingName = false;
+				gp.ui.titleScreenState = 0; // Go back to main menu
+			}
 			return; // Prevent further processing if on name input
+		}
+		else if (gp.ui.titleScreenState == 3) {
+			if (code == KeyEvent.VK_ENTER) {
+				
+			}
+
+			if (code == KeyEvent.VK_ESCAPE) {
+				gp.ui.titleScreenState = 0; // Go back to main menu
+			}
+		}
+		
+		
+		else if (gp.ui.titleScreenState == 4) {
+			if (code == KeyEvent.VK_ENTER) {
+				gp.gameState = gp.playState;
+				gp.ui.titleScreenState = 0; // Go back to main menu
+			}
+		}
+		
+		else if (gp.ui.titleScreenState == 5) {
+			if (code == KeyEvent.VK_ENTER) {
+				gp.gameState = gp.playState;
+				gp.ui.titleScreenState = 0; // Go back to main menu
+			}
+		}
+		
+		else if (gp.ui.titleScreenState == 6) {
+			if (code == KeyEvent.VK_ENTER) {
+				gp.gameState = gp.playState;
+				gp.ui.titleScreenState = 0; // Go back to main menu
+			}
 		}
 
 	}
@@ -332,4 +377,8 @@ public class KeyHandler implements KeyListener{
 		}
 	}
 
+	private String generateRandomName() {
+	    String[] names = {"Alex", "Riley", "Morgan", "Casey", "Jordan", "Taylor", "Skyler", "Jamie", "Avery", "Quinn"};
+	    return names[(int)(Math.random() * names.length)];
+	}
 }
