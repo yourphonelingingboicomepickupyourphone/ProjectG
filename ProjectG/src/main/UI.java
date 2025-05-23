@@ -34,6 +34,17 @@ public class UI {
 	public int titleScreenState = 0; 
 
 	public int subState = 0; 
+
+	public int controlsCommandNum = 0;
+	public boolean waitingForKey = false;
+	public String waitingAction = null;
+	public final String[] controlActions = {
+		KeyConfig.UP, KeyConfig.DOWN, KeyConfig.LEFT, KeyConfig.RIGHT,
+		KeyConfig.ATTACK, KeyConfig.CHOOSE, KeyConfig.ESCAPE, KeyConfig.INVENTORY, KeyConfig.CHARACTER, KeyConfig.RESET
+	};
+	public boolean keyBindWarning = false;
+	public long keyBindWarningTime = 0;
+
 	public UI(GamePanel gp) {
 		this.gp = gp;
 		
@@ -153,9 +164,7 @@ public class UI {
 			y = gp.screenHeight/2 + gp.tileSize * 2 / 3;
 			g2.drawString(text, x, y);
 			if (commandNum == 0) {
-				g2.drawString(">", x - gp.tileSize, y);
-				g2.drawString("<", gp.screenWidth - x + 2 * gp.tileSize / 3, y);
-				
+				g2.drawString(">", x - gp.tileSize, y);				
 			}
 
 			text = "LOAD GAME";
@@ -163,9 +172,7 @@ public class UI {
 			y += 3 * gp.tileSize / 2;
 			g2.drawString(text, x, y);
 			if (commandNum == 1) {
-				g2.drawString(">", x - gp.tileSize, y);
-				g2.drawString("<", gp.screenWidth - x + 2 * gp.tileSize / 3, y);
-				
+				g2.drawString(">", x - gp.tileSize, y);				
 			}
 
 			text = "SETTINGS";
@@ -173,9 +180,7 @@ public class UI {
 			y += 3 * gp.tileSize / 2;
 			g2.drawString(text, x, y);
 			if (commandNum == 2) {
-				g2.drawString(">", x - gp.tileSize, y);
-				g2.drawString("<", gp.screenWidth - x + 2 * gp.tileSize / 3, y); // the opposite side of the screen
-				
+				g2.drawString(">", x - gp.tileSize, y);				
 			}
 
 			text = "QUIT";
@@ -183,9 +188,7 @@ public class UI {
 			y += 3 * gp.tileSize / 2;
 			g2.drawString(text, x, y);
 			if (commandNum == 3) {
-				g2.drawString(">", x - gp.tileSize, y);
-				g2.drawString("<", gp.screenWidth - x + 2 * gp.tileSize / 3, y);
-				
+				g2.drawString(">", x - gp.tileSize, y);				
 			}
 		} else if (titleScreenState == 1) {
 
@@ -1025,10 +1028,10 @@ public class UI {
 	}
 
 	public void drawOptionsScreen(){
-		int frameX = gp.tileSize * 6;
+		int frameX = gp.tileSize * 3;
 		int frameY = gp.tileSize * 2;
-		int width = gp.tileSize * 12;
-		int height = gp.tileSize * 8;
+		int width = gp.tileSize * 18;
+		int height = gp.tileSize * 10;
 
 		drawSubWindow(frameX, frameY, width, height);
 
@@ -1037,6 +1040,7 @@ public class UI {
 				options_Top(frameX, frameY);
 				break;
 			case 1: // Controls
+				drawControlsScreen(frameX, frameY);
 				break;
 		}
 
@@ -1057,21 +1061,102 @@ public class UI {
 		textY += gp.tileSize * 2;
 		text = "BGM";
 		g2.drawString(text, textX, textY);
+		if (commandNum == 0){
+			g2.drawString(">", textX - gp.tileSize /2, textY);
+		} 
 
 		//SE
 		textY += gp.tileSize;
 		text = "SE";
 		g2.drawString(text, textX, textY);
+		if (commandNum == 1){
+			g2.drawString(">", textX - gp.tileSize /2, textY);
+		} 
 
 		//Controls
 		textY += gp.tileSize;
 		text = "Controls";
-		g2.drawString(text, textX, textY);		
+		g2.drawString(text, textX, textY);	
+		if (commandNum == 2){
+			g2.drawString(">", textX - gp.tileSize /2, textY);
+		} 
 
 		//Back 
 		textY += gp.tileSize;
 		text = "Back";
 		g2.drawString(text, textX, textY);
+		if (commandNum == 3){
+			g2.drawString(">", textX - gp.tileSize /2, textY);
+		} 
+	}
+
+	public void drawControlsScreen(int frameX, int frameY) {
+	    int total = controlActions.length;
+	    int half = (total + 1) / 2; // left column gets the extra if odd
+
+	    int textX1 = frameX + gp.tileSize;
+	    int textX2 = frameX + gp.tileSize * 9; // adjust as needed for your box width
+	    int textYStart = frameY + gp.tileSize * 2;
+	    int lineHeight = gp.tileSize;
+
+	    g2.setFont(pixelOperatorBold.deriveFont(Font.PLAIN, 48F));
+	    g2.setColor(Color.WHITE);
+		String cText = "Customize Controls";
+	    g2.drawString(cText, getXForCenteredText(cText), textYStart - gp.tileSize / 2);
+	    int textY1 = textYStart + lineHeight;
+	    int textY2 = textY1;
+
+		g2.setFont(pixelOperator.deriveFont(Font.PLAIN, 36F));
+	    // Draw left column
+	    for (int i = 0; i < total; i += 2) {
+	        String action = controlActions[i];
+	        String keyName = gp.keyConfig.getKeyName(action);
+	        if (controlsCommandNum == i && !waitingForKey) {
+	            g2.setColor(Color.YELLOW);
+	            g2.drawString(">", textX1 - gp.tileSize / 2, textY1);
+	        }
+	        g2.setColor(Color.WHITE);
+	        g2.drawString(action + ": " + keyName, textX1, textY1);
+	        textY1 += lineHeight;
+	    }
+
+	    // Draw right column
+	    for (int i = 1; i < total; i += 2) {
+	        String action = controlActions[i];
+	        String keyName = gp.keyConfig.getKeyName(action);
+	        if (controlsCommandNum == i && !waitingForKey) {
+	            g2.setColor(Color.YELLOW);
+	            g2.drawString(">", textX2 - gp.tileSize / 2, textY2);
+	        }
+	        g2.setColor(Color.WHITE);
+	        g2.drawString(action + ": " + keyName, textX2, textY2);
+	        textY2 += lineHeight;
+	    }
+
+	    // Draw "Back" option at the bottom center
+	    int backY = Math.max(textY1, textY2) + lineHeight / 4;
+	    if (controlsCommandNum == controlActions.length && !waitingForKey) {
+	        g2.setColor(Color.YELLOW);
+	        g2.drawString(">", getXForCenteredText("Back") - gp.tileSize, backY);
+	    }
+	    g2.setColor(Color.WHITE);
+	    g2.drawString("Back", getXForCenteredText("Back"), backY);
+
+	    if (waitingForKey) {
+	        g2.setColor(Color.CYAN);
+			String kText = "Press a key...";
+	        g2.drawString(kText, getXForCenteredText(kText), backY + 3 * lineHeight / 4);
+	    }
+
+	    if (keyBindWarning) {
+	        g2.setColor(Color.RED);
+	        String warn = "Key already assigned!";
+	        g2.drawString(warn, getXForCenteredText(warn), backY + 3 * lineHeight / 4);
+	        // Hide warning after 2 seconds
+	        if (System.currentTimeMillis() - keyBindWarningTime > 2000) {
+	            keyBindWarning = false;
+	        }
+	    }
 	}
 
 	public void drawSubWindow(int x, int y, int width, int height) {
@@ -1131,5 +1216,6 @@ public class UI {
 	public int getItemIndexOnSlot() {
 		return slotRow * maxInventoryCol + slotCol;
 	}
+
 
 }

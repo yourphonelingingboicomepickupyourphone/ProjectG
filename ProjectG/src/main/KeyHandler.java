@@ -54,21 +54,21 @@ public class KeyHandler implements KeyListener{
 
 	public void titleState(int code){
 		if (gp.ui.titleScreenState == 0) {
-			if (code == KeyEvent.VK_W || code == KeyEvent.VK_UP) {
+			if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
 				gp.ui.commandNum--;
 				if (gp.ui.commandNum < 0) {
 					gp.ui.commandNum = 3;
 				}
 			}
 				
-			if (code == KeyEvent.VK_S || code == KeyEvent.VK_DOWN) {
+			if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
 				gp.ui.commandNum++;
 				if (gp.ui.commandNum > 3) {
 					gp.ui.commandNum = 0;
 				}
 			}
 		
-			if (code == KeyEvent.VK_ENTER) {
+			if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
 				if (gp.ui.commandNum == 0) {
 					gp.ui.titleScreenState = 1; 
 				}
@@ -88,17 +88,17 @@ public class KeyHandler implements KeyListener{
 		}
 			
 		else if (gp.ui.titleScreenState == 1) {
-			if (code == KeyEvent.VK_UP) {
+			if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
 				gp.ui.kbRow = Math.max(0, gp.ui.kbRow - 1);
 				gp.ui.kbCol = Math.min(gp.ui.kbCol, gp.ui.keyboard[gp.ui.kbRow].length - 1);
-			} else if (code == KeyEvent.VK_DOWN) {
+			} else if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
 				gp.ui.kbRow = Math.min(gp.ui.keyboard.length - 1, gp.ui.kbRow + 1);
 				gp.ui.kbCol = Math.min(gp.ui.kbCol, gp.ui.keyboard[gp.ui.kbRow].length - 1);
-			} else if (code == KeyEvent.VK_LEFT) {
+			} else if (code == gp.keyConfig.getKey(KeyConfig.LEFT)) {
 				gp.ui.kbCol = Math.max(0, gp.ui.kbCol - 1);
-			} else if (code == KeyEvent.VK_RIGHT) {
+			} else if (code == gp.keyConfig.getKey(KeyConfig.RIGHT)) {
 				gp.ui.kbCol = Math.min(gp.ui.keyboard[gp.ui.kbRow].length - 1, gp.ui.kbCol + 1);
-			} else if (code == KeyEvent.VK_ENTER) {
+			} else if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
 				String key = gp.ui.keyboard[gp.ui.kbRow][gp.ui.kbCol];
 				if (key.equals("<-")) {
 					if (!gp.player.name.isEmpty()) {
@@ -123,22 +123,22 @@ public class KeyHandler implements KeyListener{
 					}
 				} else if (gp.player.name.length() < 12) // Limit name length
 					gp.player.name += key;
-			} else if (code == KeyEvent.VK_ESCAPE) {
+			} else if (code == gp.keyConfig.getKey(KeyConfig.ESCAPE)) {
 				gp.ui.typingName = false;
 				gp.ui.titleScreenState = 0; // Go back to main menu
 			}
 			return; // Prevent further processing if on name input
 		}
 		else if (gp.ui.titleScreenState == 3) {
-			if (code == KeyEvent.VK_W || code == KeyEvent.VK_UP) {
+			if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
 				gp.ui.commandNum--;
 				if (gp.ui.commandNum < 0) gp.ui.commandNum = 5; // 6 options: 0-5
 			}
-			if (code == KeyEvent.VK_S || code == KeyEvent.VK_DOWN) {
+			if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
 				gp.ui.commandNum++;
 				if (gp.ui.commandNum > 5) gp.ui.commandNum = 0;
 			}
-			if (code == KeyEvent.VK_ENTER) {
+			if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
 				// Handle selection based on gp.ui.commandNum
 				// 0: Music Volume, 1: SFX Volume, 2: Fullscreen, 3: Back
 				if (gp.ui.commandNum == 5) {
@@ -150,21 +150,21 @@ public class KeyHandler implements KeyListener{
 		
 		
 		else if (gp.ui.titleScreenState == 4) {
-			if (code == KeyEvent.VK_ENTER) {
+			if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
 				gp.gameState = gp.playState;
 				gp.ui.titleScreenState = 0; // Go back to main menu
 			}
 		}
 		
 		else if (gp.ui.titleScreenState == 5) {
-			if (code == KeyEvent.VK_ENTER) {
+			if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
 				gp.gameState = gp.playState;
 				gp.ui.titleScreenState = 0; // Go back to main menu
 			}
 		}
 		
 		else if (gp.ui.titleScreenState == 6) {
-			if (code == KeyEvent.VK_ENTER) {
+			if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
 				gp.gameState = gp.playState;
 				gp.ui.titleScreenState = 0; // Go back to main menu
 			}
@@ -173,37 +173,37 @@ public class KeyHandler implements KeyListener{
 	}
 
 	public void playState(int code){
-		if (code == KeyEvent.VK_W || code == KeyEvent.VK_UP) {
+		if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
 			upPressed = true;
 		}
 		
-		if (code == KeyEvent.VK_S || code == KeyEvent.VK_DOWN) {
+		if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
 			downPressed = true;
 		}
 
-		if (code == KeyEvent.VK_A || code == KeyEvent.VK_LEFT) {
+		if (code == gp.keyConfig.getKey(KeyConfig.LEFT)) {
 			leftPressed = true;
 		}
 	
-		if (code == KeyEvent.VK_D || code == KeyEvent.VK_RIGHT) {
+		if (code == gp.keyConfig.getKey(KeyConfig.RIGHT)) {
 			rightPressed = true;
 		}
 	
-		if (code == KeyEvent.VK_ESCAPE) {
+		if (code == gp.keyConfig.getKey(KeyConfig.ESCAPE)) {
 			gp.gameState = gp.pauseState;
 		}
 
-		if (code == KeyEvent.VK_ENTER) {
+		if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
 			enterPressed = true;
 		}
-		if (code == KeyEvent.VK_SPACE) {
+		if (code == gp.keyConfig.getKey(KeyConfig.ATTACK)) {
 			spacePressed = true;
 		}
-		if (code == KeyEvent.VK_C) {
+		if (code == gp.keyConfig.getKey(KeyConfig.CHARACTER)) {
 			gp.gameState = gp.characterState;
 		}
 
-		if (code == KeyEvent.VK_I){
+		if (code == gp.keyConfig.getKey(KeyConfig.INVENTORY)){
 			gp.gameState = gp.inventoryState;
 		}
 	}
@@ -211,7 +211,7 @@ public class KeyHandler implements KeyListener{
 
 	public void pauseState(int code){
 			
-		if (code == KeyEvent.VK_ESCAPE) {
+		if (code == gp.keyConfig.getKey(KeyConfig.ESCAPE)) {
 			gp.gameState = gp.playState;
 		}
 		
@@ -219,11 +219,11 @@ public class KeyHandler implements KeyListener{
 			gp.ui.pauseCommandNum--;
 			if (gp.ui.pauseCommandNum < 0) gp.ui.pauseCommandNum = 3;
 		}
-		if (code == KeyEvent.VK_S || code == KeyEvent.VK_DOWN) {
+		if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
 			gp.ui.pauseCommandNum++;
 			if (gp.ui.pauseCommandNum > 3) gp.ui.pauseCommandNum = 0;
 		}
-		if (code == KeyEvent.VK_ENTER) {
+		if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
 			switch (gp.ui.pauseCommandNum) {
 				case 0: gp.gameState = gp.playState; break; // Continue
 				case 1: gp.gameState = gp.optionsState; break; // Settings
@@ -234,21 +234,21 @@ public class KeyHandler implements KeyListener{
 	}
 
 	public void dialogueState(int code){
-		if (code == KeyEvent.VK_ENTER) {
+		if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
 			gp.gameState = gp.playState;
 		}
 	}
 	
 	public void characterState(int code){
-		if (code == KeyEvent.VK_W || code == KeyEvent.VK_UP) {
+		if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
 			UI.progressionSelectIndex--;
 			if (UI.progressionSelectIndex < 0) UI.progressionSelectIndex = 3;
 		}
-		if (code == KeyEvent.VK_S || code == KeyEvent.VK_DOWN) {
+		if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
 			UI.progressionSelectIndex++;
 			if (UI.progressionSelectIndex > 3) UI.progressionSelectIndex = 0;
 		}
-		if (code == KeyEvent.VK_ENTER && gp.player.progressionPoints > 0) {
+		if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE) && gp.player.progressionPoints > 0) {
 			switch (UI.progressionSelectIndex) {
 				case 0: 
 					gp.player.maxHealth += 100;
@@ -271,10 +271,10 @@ public class KeyHandler implements KeyListener{
 			}
 			gp.player.progressionPoints--;
 		}
-		if (code == KeyEvent.VK_C) {
+		if (code == gp.keyConfig.getKey(KeyConfig.CHARACTER)) {
 			gp.gameState = gp.playState;
 		}
-		if (code == KeyEvent.VK_R) {
+		if (code == gp.keyConfig.getKey(KeyConfig.RESET)) {
 			int totalSpent = 0;
 
 			// Health
@@ -307,69 +307,136 @@ public class KeyHandler implements KeyListener{
 
 			gp.player.progressionPoints += totalSpent;
 		}
-		if (code == KeyEvent.VK_I) {
+		if (code == gp.keyConfig.getKey(KeyConfig.INVENTORY)) {
 			gp.gameState = gp.inventoryState;
 		}
 	}
 
 	public void optionsState(int code){
-		if (code == KeyEvent.VK_ESCAPE) {
-			gp.gameState = gp.pauseState;
-		}
-		
-		if (code == KeyEvent.VK_W || code == KeyEvent.VK_UP) {
-			gp.ui.commandNum--;
-			if (gp.ui.commandNum < 0) gp.ui.commandNum = 3; // 4 options: 0-3
-		}
-		if (code == KeyEvent.VK_S || code == KeyEvent.VK_DOWN) {
-			gp.ui.commandNum++;
-			if (gp.ui.commandNum > 3) gp.ui.commandNum = 0;
-		}
-		if (code == KeyEvent.VK_ENTER) {
-			switch (gp.ui.commandNum) {
-				case 0: // BGM
-					break;
-				case 1: // SFX
-					break;
-				case 2: // Controls
-					break;
-				case 3: // Back
-					gp.gameState = gp.pauseState; 
-					break;
+		if (gp.ui.subState == 0) {
+			if (code == gp.keyConfig.getKey(KeyConfig.ESCAPE)) {
+				gp.gameState = gp.pauseState;
 			}
+			if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
+				gp.ui.commandNum--;
+				if (gp.ui.commandNum < 0) gp.ui.commandNum = 3;
+			}
+			if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
+				gp.ui.commandNum++;
+				if (gp.ui.commandNum > 3) gp.ui.commandNum = 0;
+			}
+			if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
+				switch (gp.ui.commandNum) {
+					case 2: // Controls
+						gp.ui.subState = 1;
+						gp.ui.controlsCommandNum = 0;
+						break;
+					case 3: // Back
+						gp.gameState = gp.pauseState;
+						break;
+				}
+			}
+		} else if (gp.ui.subState == 1) {
+			controlsState(code);
+		}
+	}
+
+	public void controlsState(int code) {
+		if (gp.ui.waitingForKey) {
+			// Check for duplicate key assignment
+			boolean duplicate = false;
+			for (String action : gp.ui.controlActions) {
+				if (gp.keyConfig.getKey(action) == code) {
+					duplicate = true;
+					break;
+				}
+			}
+			if (!duplicate) {
+				gp.keyConfig.setKey(gp.ui.waitingAction, code);
+			} else {
+				gp.ui.keyBindWarning = true;
+				gp.ui.keyBindWarningTime = System.currentTimeMillis();
+			}
+			gp.ui.waitingForKey = false;
+			gp.ui.waitingAction = null;
+			return;
 		}
 
+		if (code == gp.keyConfig.getKey(KeyConfig.ESCAPE)) {
+			gp.ui.subState = 0;
+			return;
+		}
+		if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
+			gp.ui.controlsCommandNum--;
+			if (gp.ui.controlsCommandNum < 0) gp.ui.controlsCommandNum = gp.ui.controlActions.length; // wrap to "Back"
+		}
+		if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
+			gp.ui.controlsCommandNum++;
+			if (gp.ui.controlsCommandNum > gp.ui.controlActions.length) gp.ui.controlsCommandNum = 0; // wrap to first
+		}
+		if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
+			if (gp.ui.controlsCommandNum == gp.ui.controlActions.length) {
+				// Back
+				gp.ui.subState = 0;
+			} else {
+				// Start rebinding
+				gp.ui.waitingForKey = true;
+				gp.ui.waitingAction = gp.ui.controlActions[gp.ui.controlsCommandNum];
+			}
+		}
+		// When in optionsState and controls subState
+		if (gp.gameState == gp.optionsState && gp.ui.subState == 1 && !gp.ui.waitingForKey) {
+		    if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
+		        gp.ui.controlsCommandNum--;
+		        if (gp.ui.controlsCommandNum < 0) gp.ui.controlsCommandNum = gp.ui.controlActions.length; // wrap to "Back"
+		    }
+		    if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
+		        gp.ui.controlsCommandNum++;
+		        if (gp.ui.controlsCommandNum > gp.ui.controlActions.length) gp.ui.controlsCommandNum = 0; // wrap to first
+		    }
+		    // Handle Enter/Choose for rebinding or going back
+		    if (code == KeyEvent.VK_ENTER) {
+		        if (gp.ui.controlsCommandNum == gp.ui.controlActions.length) {
+		            // "Back" selected
+		            gp.ui.subState = 0;
+		        } else {
+		            // Start rebinding
+		            gp.ui.waitingForKey = true;
+		            gp.ui.waitingAction = gp.ui.controlActions[gp.ui.controlsCommandNum];
+		        }
+		    }
+		}
 	}
 
 	public void inventoryState(int code){
-		if (code == KeyEvent.VK_I){
+		if (code == gp.keyConfig.getKey(KeyConfig.INVENTORY)){
 			gp.gameState = gp.playState;
 		}
-		if (code == KeyEvent.VK_C) {
+		if (code == gp.keyConfig.getKey(KeyConfig.CHARACTER)) {
 			gp.gameState = gp.characterState;
 		}
-		if (code == KeyEvent.VK_A || code == KeyEvent.VK_LEFT) {
+		if (code == gp.keyConfig.getKey(KeyConfig.LEFT)) {
 			if (gp.ui.slotCol == 0) {
 				gp.ui.slotCol = gp.ui.maxInventoryCol - 1;
 			} else {
 				gp.ui.slotCol--;
 			}
 		}
-		if (code == KeyEvent.VK_D || code == KeyEvent.VK_RIGHT) {
+		if (code == gp.keyConfig.getKey(KeyConfig.RIGHT)) {
 			if (gp.ui.slotCol == gp.ui.maxInventoryCol - 1) {
 				gp.ui.slotCol = 0;
 			} else {
 				gp.ui.slotCol++;
 			}
 		}
-		if (code == KeyEvent.VK_W || code == KeyEvent.VK_UP) {
+		if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
 			if (gp.ui.slotRow == 0) {
 				gp.ui.slotRow = gp.ui.maxInventoryRow - 1;
 			} else {
 				gp.ui.slotRow--;
 			}
 		}
-		if (code == KeyEvent.VK_S || code == KeyEvent.VK_DOWN) {
+		if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
 			if (gp.ui.slotRow == gp.ui.maxInventoryRow - 1) {
 				gp.ui.slotRow = 0;
 			} else {
@@ -377,10 +444,10 @@ public class KeyHandler implements KeyListener{
 				
 			}
 		}
-		if (code == KeyEvent.VK_ENTER) {
+		if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
 			gp.player.selectItem(0); // The argument is not used, so 0 is fine
 		}
-		if (code == KeyEvent.VK_R){
+		if (code == gp.keyConfig.getKey(KeyConfig.RESET)){
 			gp.player.disposeSelectedItem();
 		}
 	}
@@ -388,29 +455,29 @@ public class KeyHandler implements KeyListener{
 	public void keyReleased(KeyEvent e) {
 		int code = e.getKeyCode();
 		
-		if (code == KeyEvent.VK_W || code == KeyEvent.VK_UP) {
+		if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
 			upPressed = false;
 		}
 		
-		if (code == KeyEvent.VK_S || code == KeyEvent.VK_DOWN) {
+		if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
 			downPressed = false;
 		}
 
-		if (code == KeyEvent.VK_A || code == KeyEvent.VK_LEFT) {
+		if (code == gp.keyConfig.getKey(KeyConfig.LEFT)) {
 			leftPressed = false;
 		}
 
-		if (code == KeyEvent.VK_D || code == KeyEvent.VK_RIGHT) {
+		if (code == gp.keyConfig.getKey(KeyConfig.RIGHT)) {
 			rightPressed = false;
 		}
 
-		if (code == KeyEvent.VK_ENTER) {
+		if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
 			enterPressed = false;
 		}
-		if (code == KeyEvent.VK_SPACE) {
+		if (code == gp.keyConfig.getKey(KeyConfig.ATTACK)) {
 			spacePressed = false;
 		}
-		if (code == KeyEvent.VK_ESCAPE) {
+		if (code == gp.keyConfig.getKey(KeyConfig.ESCAPE)) {
 			escPressed = false;
 		}
 	}

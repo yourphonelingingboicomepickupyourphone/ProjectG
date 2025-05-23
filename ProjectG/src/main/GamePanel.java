@@ -32,6 +32,8 @@ public class GamePanel extends JPanel implements Runnable{
 	public final int maxWorldRow = 100;
 	public final int worldWidth = maxWorldCol * tileSize;
 	public final int worldHeight = maxWorldRow * tileSize;
+
+	public KeyConfig keyConfig = new KeyConfig();	//Key configuration
 	
 	
 	//System Settings
@@ -89,6 +91,7 @@ public class GamePanel extends JPanel implements Runnable{
 		gameThread = new Thread(this);	//passing GamePanel to this thread
 		gameThread.start();
 	}
+	
 	@Override
 	public void run() {
 		
