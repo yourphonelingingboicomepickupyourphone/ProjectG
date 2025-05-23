@@ -141,13 +141,13 @@ public class TileManager {
 			if(gp.player.screenY > gp.player.worldY) {
 				screenY = worldY;
 			}
-			int rightOffset = gp.screenWidth - gp.player.screenX;
+			int rightOffset = gp.baseWidth - gp.player.screenX;
 			if(rightOffset > gp.worldWidth - gp.player.worldX) {
-				screenX = gp.screenWidth - (gp.worldWidth - worldX);
+				screenX = gp.baseWidth - (gp.worldWidth - worldX);
 			}
-			int bottomOffset = gp.screenHeight - gp.player.screenY;
+			int bottomOffset = gp.baseHeight - gp.player.screenY;
 			if(bottomOffset > gp.worldHeight - gp.player.worldY) {
-				screenY = gp.screenHeight - (gp.worldHeight - worldY);
+				screenY = gp.baseHeight - (gp.worldHeight - worldY);
 			}
 
 

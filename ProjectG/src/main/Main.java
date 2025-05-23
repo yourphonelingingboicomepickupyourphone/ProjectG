@@ -1,8 +1,5 @@
 package main;
 
-//import java.awt.GraphicsEnvironment;
-//import java.awt.Window;
-
 import javax.swing.JFrame;
 
 public class Main {
@@ -12,21 +9,23 @@ public class Main {
 		
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setResizable(true);
-		
-//		for ( Window w : Window.getWindows() ) {
-//		    GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow( w );
-//		}
-
 		window.setTitle("Test Game");
-		
-		
 		window.add(gamePanel);
-		
-		window.pack();	//cause window to be sized to fit the preferred size & layouts of GamePanel
-		
+		window.pack();
 		window.setLocationRelativeTo(null);
 		window.setVisible(true);
-		
+
+		// --- FULLSCREEN ON START ---
+		if (gamePanel.ui.fullscreenOn) {
+			java.awt.GraphicsDevice gd = java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+			window.dispose();
+			window.setUndecorated(true);
+			window.setResizable(false);
+			window.setVisible(true);
+			gd.setFullScreenWindow(window);
+		}
+		// ---------------------------
+
 		gamePanel.setupGame();
 		gamePanel.startGameThread();
 	}

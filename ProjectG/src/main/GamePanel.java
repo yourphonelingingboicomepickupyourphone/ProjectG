@@ -24,8 +24,8 @@ public class GamePanel extends JPanel implements Runnable{
 	public final int tileSize = originalTileSize * scale;	//The tile on the game screen will be displayed by 80x80 pixels
 	public final int maxScreenCol = 24;
 	public final int maxScreenRow = 13;
-	public final int screenWidth = tileSize * maxScreenCol;
-	public final int screenHeight = tileSize * maxScreenRow;	//1920x1040
+	public int screenWidth = tileSize * maxScreenCol;
+	public int screenHeight = tileSize * maxScreenRow;	//1920x1040
 	
 	//World Settings
 	public final int maxWorldCol = 100;
@@ -65,6 +65,9 @@ public class GamePanel extends JPanel implements Runnable{
 	public final int optionsState = 7;
 	public final int chestState = 8;
 	public final int gameOverState = 9;
+
+	public final int baseWidth = 1920;
+	public final int baseHeight = 1040;
 
 	public GamePanel() {
 		this.setPreferredSize(new Dimension(screenWidth, screenHeight));
@@ -164,16 +167,22 @@ public class GamePanel extends JPanel implements Runnable{
 	
 	public void paintComponent(Graphics g) {	//draw objects onscreen
 		super.paintComponent(g);
-		
-		Graphics2D g2 = (Graphics2D)g;	//extend Graphics to provide more sophisticated control over geometry
-		
+		Graphics2D g2 = (Graphics2D) g;
 
-		//title screen
+		// Calculate scale factors
+		double scaleX = (double) getWidth() / baseWidth;
+		double scaleY = (double) getHeight() / baseHeight;
+
+		// Save the original transform
+		java.awt.geom.AffineTransform oldTransform = g2.getTransform();
+
+		// Scale the graphics context
+		g2.scale(scaleX, scaleY);
+
+		// Draw everything as if at base resolution
 		if (gameState == titleState) {
-			ui.draw(g2);	//title screen
-		}
-		//others 
-		else {
+			ui.draw(g2);
+		} else {
 			tileM.draw(g2);	//tile draw
 
 			entityList.add(player);	//add player to entity list
@@ -221,10 +230,11 @@ public class GamePanel extends JPanel implements Runnable{
 			entityList.clear();	//clear the entity list for next time
 			
 			ui.draw(g2);	//ui
-			
-			g2.dispose();	//dispose of graphic context & free system resource
 		}
-		
-		
+
+		// Restore the original transform
+		g2.setTransform(oldTransform);
+
+		g2.dispose();	//dispose of graphic context & free system resource
 	}
 }

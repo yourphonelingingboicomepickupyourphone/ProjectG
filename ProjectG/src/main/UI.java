@@ -45,6 +45,17 @@ public class UI {
 	public boolean keyBindWarning = false;
 	public long keyBindWarningTime = 0;
 
+	public int graphicsCommandNum = 0;
+	public String[] resolutions = {
+		"1920x1080", "1600x900", "1280x720", "1024x576", "800x450"
+	};
+	public int resolutionIndex = 0;
+	public boolean vsyncOn = true;
+	public String[] qualities = {"Low", "Medium", "High"};
+	public int qualityIndex = 2;
+
+	public boolean fullscreenOn = true;
+
 	public UI(GamePanel gp) {
 		this.gp = gp;
 		
@@ -126,7 +137,7 @@ public class UI {
 
 		if (titleScreenState == 0) {
 			g2.setColor(new Color(243, 193, 8));
-			g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
+			g2.fillRect(0, 0, gp.baseWidth, gp.baseHeight);
 
 			//Title Name
 			g2.setFont(pixelOperatorBold.deriveFont(Font.PLAIN, 120F));
@@ -152,7 +163,7 @@ public class UI {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			int x2 = gp.screenWidth/2 - (gp.tileSize * 9)/2;	
+			int x2 = gp.baseWidth/2 - (gp.tileSize * 9)/2;	
 			int y2 = gp.tileSize * 1 - gp.tileSize/2;
 			g2.drawImage(logo, x2, y2, gp.tileSize *3, gp.tileSize * 3, null);
 			g2.drawImage(groupLogo, x2 + gp.tileSize * 6, y2 - gp.tileSize / 8, gp.tileSize * 3, gp.tileSize * 3, null);
@@ -161,7 +172,7 @@ public class UI {
 			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 60F));
 			text = "NEW GAME";
 			x = getXForCenteredText(text);
-			y = gp.screenHeight/2 + gp.tileSize * 2 / 3;
+			y = gp.baseHeight/2 + gp.tileSize * 2 / 3;
 			g2.drawString(text, x, y);
 			if (commandNum == 0) {
 				g2.drawString(">", x - gp.tileSize, y);				
@@ -193,7 +204,7 @@ public class UI {
 		} else if (titleScreenState == 1) {
 
 			g2.setColor(new Color(243, 193, 8));
-			g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
+			g2.fillRect(0, 0, gp.baseWidth, gp.baseHeight);
 
 			//Title Name
 			g2.setFont(pixelOperatorBold.deriveFont(Font.PLAIN, 120F));
@@ -219,7 +230,7 @@ public class UI {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			int x2 = gp.screenWidth/2 - (gp.tileSize * 9)/2;	
+			int x2 = gp.baseWidth/2 - (gp.tileSize * 9)/2;	
 			int y2 = gp.tileSize * 1 - gp.tileSize/2;
 			g2.drawImage(logo, x2, y2, gp.tileSize *3, gp.tileSize * 3, null);
 			g2.drawImage(groupLogo, x2 + gp.tileSize * 6, y2 - gp.tileSize / 8, gp.tileSize * 3, gp.tileSize * 3, null);
@@ -237,7 +248,7 @@ public class UI {
 			x2 = getXForCenteredText(gp.player.name);
 			
 			// Draw keyboard
-			// int kbStartX = gp.screenWidth/2 - gp.tileSize * 5;
+			// int kbStartX = gp.baseWidth/2 - gp.tileSize * 5;
 			int kbStartY = y + 3 * gp.tileSize / 2;
 			int keyW = gp.tileSize;
 			int keyH = gp.tileSize;
@@ -253,7 +264,7 @@ public class UI {
 			            totalRowWidth += keyW;
 			        }
 			    }
-			    int rowX = gp.screenWidth/2 - (totalRowWidth)/2;
+			    int rowX = gp.baseWidth/2 - (totalRowWidth)/2;
 			    int currentX = rowX;
 			    for (int col = 0; col < rowLen; col++) {
 			        int buttonW = keyboard[row][col].equals("SPACE") ? keyW * 2 : keyW;
@@ -275,7 +286,7 @@ public class UI {
 			
 		} else if (titleScreenState == 3) {
 			g2.setColor(new Color(243, 193, 8));
-			g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
+			g2.fillRect(0, 0, gp.baseWidth, gp.baseHeight);
 
 			// Title Name
 			g2.setFont(pixelOperatorBold.deriveFont(Font.PLAIN, 100F));
@@ -289,7 +300,7 @@ public class UI {
 
 			// Menu options
 			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 60F));
-			String[] options = {"Music Volume", "SFX Volume", "Fullscreen", "Language", "Controls","Back"};
+			String[] options = {"Music Volume", "SFX Volume", "Graphics", "Language", "Controls","Back"};
 			int menuStartY = y + gp.tileSize * 2;
 			int lineHeight = gp.tileSize + 10;
 
@@ -311,50 +322,86 @@ public class UI {
 			// Instructions
 			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 32F));
 			g2.setColor(Color.YELLOW);
-			g2.drawString("Use W/S or Up/Down to move, Enter to select", getXForCenteredText("Use W/S or Up/Down to move, Enter to select"), menuStartY + options.length * lineHeight + gp.tileSize / 2);
+			String instructions = "Use " +  gp.keyConfig.getKeyName(KeyConfig.UP) + ", " + gp.keyConfig.getKeyName(KeyConfig.DOWN) + " to move, " + gp.keyConfig.getKeyName(KeyConfig.CHOOSE)  + " to select";
+			g2.drawString(instructions, getXForCenteredText(instructions), menuStartY + options.length * lineHeight + gp.tileSize / 2);
+		} else if (titleScreenState == 4) {
+			drawGraphicsScreen();
 		}
+	}
+
+	public void drawGraphicsScreen() {
+		g2.setColor(new Color(243, 193, 8));
+		g2.fillRect(0, 0, gp.baseWidth, gp.baseHeight);
+
+		int textX = gp.tileSize;
+		int textY = gp.tileSize * 2;
+		int lineHeight = gp.tileSize;
+
+		g2.setFont(pixelOperatorBold.deriveFont(Font.PLAIN, 48F));
+		g2.setColor(Color.WHITE);
+		String gText = "Graphics Settings";
+		g2.drawString(gText, getXForCenteredText(gText), textY);
+
+		g2.setFont(pixelOperator.deriveFont(Font.PLAIN, 36F));
+		textY += lineHeight * 2;
+
+		// Resolution
+		if (graphicsCommandNum == 0) g2.setColor(Color.YELLOW); else g2.setColor(Color.WHITE);
+		g2.drawString("Resolution: " + resolutions[resolutionIndex], textX, textY);
+		textY += lineHeight;
+
+		// VSync
+		if (graphicsCommandNum == 1) g2.setColor(Color.YELLOW); else g2.setColor(Color.WHITE);
+		g2.drawString("VSync: " + (vsyncOn ? "On" : "Off"), textX, textY);
+		textY += lineHeight;
+
+		// Quality
+		if (graphicsCommandNum == 2) g2.setColor(Color.YELLOW); else g2.setColor(Color.WHITE);
+		g2.drawString("Quality: " + qualities[qualityIndex], textX, textY);
+		textY += lineHeight;
+
+		// Fullscreen
+		if (graphicsCommandNum == 3) g2.setColor(Color.YELLOW); else g2.setColor(Color.WHITE);
+		g2.drawString("Fullscreen: " + (fullscreenOn ? "On" : "Off"), textX, textY);
+		textY += lineHeight * 2;
+
+		// Back
+		if (graphicsCommandNum == 4) g2.setColor(Color.YELLOW); else g2.setColor(Color.WHITE);
+		g2.drawString("Back", textX, textY);
 	}
 
 	int pauseCommandNum = 0; // to store the command number of the pause menu
 	public void drawPauseScreen() {
-	    // Overlay
-	    g2.setColor(new Color(0, 0, 0, 180));
-	    g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
+	    int frameX = gp.tileSize * 6;
+	    int frameY = gp.tileSize * 3;
+	    int frameWidth = gp.tileSize * 12;
+	    int frameHeight = gp.tileSize * 8;
 
-	    // Title
-	    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 80F));
+	    drawSubWindow(frameX, frameY, frameWidth, frameHeight);
+
+	    g2.setFont(pixelOperatorBold.deriveFont(Font.PLAIN, 48F));
 	    g2.setColor(Color.WHITE);
-	    String text = "PAUSED";
-	    int x = getXForCenteredText(text);
-	    int y = gp.screenHeight/2 - 3 * gp.tileSize;
-	    g2.drawString(text, x, y);
 
-	    // Menu options
-	    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 50F));
-	    String[] options = {"Continue", "Settings", "Save", "Exit"};
-	    int menuStartY = y + gp.tileSize * 2;
-	    int lineHeight = gp.tileSize + 10;
-
+	    String[] options = {"Continue", "Settings", "Return to Main Menu", "Exit"};
+	    int textY = frameY + gp.tileSize * 2;
 	    for (int i = 0; i < options.length; i++) {
-	        String option = options[i];
-	        int optionX = getXForCenteredText(option);
-	        int optionY = menuStartY + i * lineHeight;
-
-	        // Highlight selected option
-	        if (pauseCommandNum == i) {
-	            g2.setColor(new Color(255, 255, 100));
-	            g2.drawString(">", optionX - gp.tileSize, optionY);
-	            g2.setColor(Color.WHITE);
+	        String text = options[i];
+	        int textX = getXForCenteredText(text);
+	        if (gp.ui.pauseCommandNum == i) {
+	            g2.setColor(Color.YELLOW);
+	            g2.drawString(">", textX - gp.tileSize, textY);
 	        }
-	        g2.drawString(option, optionX, optionY);
+	        g2.setColor(Color.WHITE);
+	        g2.drawString(text, textX, textY);
+	        textY += gp.tileSize + 10;
 	    }
 	}
 
 	public void drawDialogueScreen() {
 		//Window
 		int x = gp.tileSize * 4;
-		int y = gp.screenHeight - gp.tileSize * 6;
-		int width = gp.screenWidth - (gp.tileSize * 8);
+		int y = gp.baseHeight - gp.tileSize * 6;
+		int width = gp.baseWidth - (gp.tileSize * 8);
 		int height = gp.tileSize * 5;
 
 		drawSubWindow(x, y, width, height);
@@ -558,21 +605,21 @@ public class UI {
 		g2.drawString("Progression Points: " + gp.player.progressionPoints, textX, textY);
 		textY += lineHeight;
 		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 35F));
-		g2.drawString("[W/Up]/[S/Down]:Select", textX, textY); 
+		g2.drawString("[" + gp.keyConfig.getKeyName(KeyConfig.UP) + "]/[" + gp.keyConfig.getKeyName(KeyConfig.DOWN) + "]:Select", textX, textY); 
 		textY += lineHeight;
-		g2.drawString("[ENTER]: Add Point", textX, textY);
+		g2.drawString("[" + gp.keyConfig.getKeyName(KeyConfig.CHOOSE) + "]: Add Point", textX, textY);
 		textY += lineHeight;
-		g2.drawString("[C]: Close Window", textX, textY);
+		g2.drawString("[" + gp.keyConfig.getKeyName(KeyConfig.CHARACTER) + "]: Close Window", textX, textY);
 		textY += lineHeight;
 
 		// Draw Reset Points button
-		String resetText = "[R] Reset Points";
+		String resetText = "[" + gp.keyConfig.getKeyName(KeyConfig.RESET) + "]: Reset Points";
 		g2.setColor(new Color(255, 100, 100));
 		g2.drawString(resetText, textX, textY);
 		g2.setColor(Color.white);
 		textY += lineHeight;
 
-				// Draw player image size 4x4
+		// Draw player image size 4x4
 		int playerImageX = frameX + (frameWidth - gp.tileSize * 3) / 2 - gp.tileSize / 2;
 		int playerImageY = frameY + gp.tileSize;
 		g2.drawImage(gp.player.fullBody, playerImageX, playerImageY - gp.tileSize / 2, gp.tileSize * 6 + gp.tileSize / 2, gp.tileSize * 6 + gp.tileSize / 2, null);
@@ -787,7 +834,7 @@ public class UI {
 		int infoY = slotYStart + maxInventoryRow * (slotHeight + slotGap);
 
 		// If it would go off the bottom, draw above the grid instead
-		if (infoY + infoHeight > gp.screenHeight - gp.tileSize / 2) {
+		if (infoY + infoHeight > gp.baseHeight - gp.tileSize / 2) {
 		    infoY = slotYStart - infoHeight - gp.tileSize / 6;
 		    // If still off the top, clamp to at least frameY
 		    if (infoY < frameY + 8) infoY = frameY + 8;
@@ -1057,7 +1104,7 @@ public class UI {
 		g2.setFont(pixelOperatorBold.deriveFont(Font.PLAIN, 48F));
 		g2.drawString(text, textX, textY);
 
-		//BGM
+		// BGM
 		textY += gp.tileSize * 2;
 		text = "BGM";
 		g2.drawString(text, textX, textY);
@@ -1065,7 +1112,7 @@ public class UI {
 			g2.drawString(">", textX - gp.tileSize /2, textY);
 		} 
 
-		//SE
+		// SE
 		textY += gp.tileSize;
 		text = "SE";
 		g2.drawString(text, textX, textY);
@@ -1073,7 +1120,7 @@ public class UI {
 			g2.drawString(">", textX - gp.tileSize /2, textY);
 		} 
 
-		//Controls
+		// Controls
 		textY += gp.tileSize;
 		text = "Controls";
 		g2.drawString(text, textX, textY);	
@@ -1081,7 +1128,7 @@ public class UI {
 			g2.drawString(">", textX - gp.tileSize /2, textY);
 		} 
 
-		//Back 
+		// Back 
 		textY += gp.tileSize;
 		text = "Back";
 		g2.drawString(text, textX, textY);
@@ -1174,7 +1221,7 @@ public class UI {
 	}
 	public int getXForCenteredText(String text) {
 		int length = (int)g2.getFontMetrics().getStringBounds(text, g2).getWidth();
-		int x = gp.screenWidth/2 - length/2;
+		int x = gp.baseWidth/2 - length/2;
 		return x;
 	}
 

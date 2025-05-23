@@ -132,16 +132,19 @@ public class KeyHandler implements KeyListener{
 		else if (gp.ui.titleScreenState == 3) {
 			if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
 				gp.ui.commandNum--;
-				if (gp.ui.commandNum < 0) gp.ui.commandNum = 5; // 6 options: 0-5
+				if (gp.ui.commandNum < 0) gp.ui.commandNum = 3; // e.g., 4 options: 0-3
 			}
 			if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
 				gp.ui.commandNum++;
-				if (gp.ui.commandNum > 5) gp.ui.commandNum = 0;
+				if (gp.ui.commandNum > 3) gp.ui.commandNum = 0;
 			}
 			if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
 				// Handle selection based on gp.ui.commandNum
-				// 0: Music Volume, 1: SFX Volume, 2: Fullscreen, 3: Back
-				if (gp.ui.commandNum == 5) {
+				if (gp.ui.commandNum == 2) {
+					gp.ui.commandNum = 0; 
+					gp.ui.titleScreenState = 4;
+				}
+				if (gp.ui.commandNum == 3) {
 					gp.ui.titleScreenState = 0; // Go back to main menu
 				}
 				// Add your logic for other options here
@@ -150,9 +153,66 @@ public class KeyHandler implements KeyListener{
 		
 		
 		else if (gp.ui.titleScreenState == 4) {
+			if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
+				gp.ui.graphicsCommandNum--;
+				if (gp.ui.graphicsCommandNum < 0) gp.ui.graphicsCommandNum = 4; // 5 options: 0-4
+			}
+			if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
+				gp.ui.graphicsCommandNum++;
+				if (gp.ui.graphicsCommandNum > 4) gp.ui.graphicsCommandNum = 0;
+			}
 			if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
-				gp.gameState = gp.playState;
-				gp.ui.titleScreenState = 0; // Go back to main menu
+				switch (gp.ui.graphicsCommandNum) {
+					case 0: // Resolution
+						gp.ui.resolutionIndex = (gp.ui.resolutionIndex + 1) % gp.ui.resolutions.length;
+						String res = gp.ui.resolutions[gp.ui.resolutionIndex];
+						String[] parts = res.split("x");
+						int width = Integer.parseInt(parts[0]);
+						int height = Integer.parseInt(parts[1]);
+						gp.screenWidth = width;
+						gp.screenHeight = height;
+						gp.setPreferredSize(new java.awt.Dimension(width, height));
+						gp.revalidate();
+						gp.getParent().revalidate();
+						java.awt.Window window = javax.swing.SwingUtilities.getWindowAncestor(gp);
+						if (window != null) window.pack();
+						break;
+					case 1: // VSync
+						gp.ui.vsyncOn = !gp.ui.vsyncOn;
+						break;
+					case 2: // Quality
+						gp.ui.qualityIndex = (gp.ui.qualityIndex + 1) % gp.ui.qualities.length;
+						break;
+					case 3: // Fullscreen
+						gp.ui.fullscreenOn = !gp.ui.fullscreenOn;
+						java.awt.Window win = javax.swing.SwingUtilities.getWindowAncestor(gp);
+						java.awt.GraphicsDevice gd = java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+						if (win instanceof javax.swing.JFrame) {
+						 javax.swing.JFrame frame = (javax.swing.JFrame) win;
+						 if (gp.ui.fullscreenOn) {
+						 frame.dispose();
+						 frame.setUndecorated(true);
+						 frame.setResizable(false);
+						 frame.setVisible(true);
+						 gd.setFullScreenWindow(frame);
+						 } else {
+						 gd.setFullScreenWindow(null);
+						 frame.dispose();
+						 frame.setUndecorated(false);
+						 frame.setResizable(true);
+						 frame.setVisible(true);
+						 }
+						}
+						break;
+					case 4: // Back
+						gp.ui.titleScreenState = 3;
+						gp.ui.graphicsCommandNum = 0;
+						break;
+				}
+			}
+			if (code == gp.keyConfig.getKey(KeyConfig.ESCAPE)) {
+				gp.ui.titleScreenState = 3;
+				gp.ui.graphicsCommandNum = 0;
 			}
 		}
 		
@@ -217,7 +277,7 @@ public class KeyHandler implements KeyListener{
 		
 		if (KeyEvent.VK_W == code || KeyEvent.VK_UP == code) {
 			gp.ui.pauseCommandNum--;
-			if (gp.ui.pauseCommandNum < 0) gp.ui.pauseCommandNum = 3;
+			if (gp.ui.pauseCommandNum < 0) gp.ui.pauseCommandNum = 3; // 4 options: 0-3
 		}
 		if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
 			gp.ui.pauseCommandNum++;
@@ -227,7 +287,10 @@ public class KeyHandler implements KeyListener{
 			switch (gp.ui.pauseCommandNum) {
 				case 0: gp.gameState = gp.playState; break; // Continue
 				case 1: gp.gameState = gp.optionsState; break; // Settings
-				// case 2: saveGame(); break; // Save
+				case 2: // Return to Main Menu
+					gp.gameState = gp.titleState;
+					gp.ui.titleScreenState = 0;
+					break;
 				case 3: System.exit(0); break; // Exit
 			}
 		}
@@ -319,7 +382,7 @@ public class KeyHandler implements KeyListener{
 			}
 			if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
 				gp.ui.commandNum--;
-				if (gp.ui.commandNum < 0) gp.ui.commandNum = 3;
+				if (gp.ui.commandNum < 0) gp.ui.commandNum = 3; // Now only 4 options: 0-3
 			}
 			if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
 				gp.ui.commandNum++;
@@ -362,28 +425,6 @@ public class KeyHandler implements KeyListener{
 			return;
 		}
 
-		if (code == gp.keyConfig.getKey(KeyConfig.ESCAPE)) {
-			gp.ui.subState = 0;
-			return;
-		}
-		if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
-			gp.ui.controlsCommandNum--;
-			if (gp.ui.controlsCommandNum < 0) gp.ui.controlsCommandNum = gp.ui.controlActions.length; // wrap to "Back"
-		}
-		if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
-			gp.ui.controlsCommandNum++;
-			if (gp.ui.controlsCommandNum > gp.ui.controlActions.length) gp.ui.controlsCommandNum = 0; // wrap to first
-		}
-		if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
-			if (gp.ui.controlsCommandNum == gp.ui.controlActions.length) {
-				// Back
-				gp.ui.subState = 0;
-			} else {
-				// Start rebinding
-				gp.ui.waitingForKey = true;
-				gp.ui.waitingAction = gp.ui.controlActions[gp.ui.controlsCommandNum];
-			}
-		}
 		// When in optionsState and controls subState
 		if (gp.gameState == gp.optionsState && gp.ui.subState == 1 && !gp.ui.waitingForKey) {
 		    if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
@@ -395,7 +436,7 @@ public class KeyHandler implements KeyListener{
 		        if (gp.ui.controlsCommandNum > gp.ui.controlActions.length) gp.ui.controlsCommandNum = 0; // wrap to first
 		    }
 		    // Handle Enter/Choose for rebinding or going back
-		    if (code == KeyEvent.VK_ENTER) {
+		    if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
 		        if (gp.ui.controlsCommandNum == gp.ui.controlActions.length) {
 		            // "Back" selected
 		            gp.ui.subState = 0;

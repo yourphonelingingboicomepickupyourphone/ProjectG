@@ -35,8 +35,8 @@ public class Player extends Entity{
 		super(gp);
 		this.keyH = kH;
 
-		screenX = gp.screenWidth/2 - gp.tileSize/2;
-		screenY = gp.screenHeight/2 - gp.tileSize/2;
+		screenX = gp.baseWidth/2 - gp.tileSize/2;
+		screenY = gp.baseHeight/2 - gp.tileSize/2;
 		
 		solidArea = new Rectangle();
 		solidArea.x = 40;
@@ -633,13 +633,13 @@ public class Player extends Entity{
 			y = worldY;
 		}
 
-		int rightOffset = gp.screenWidth - screenX;
+		int rightOffset = gp.baseWidth - screenX;
 		if(rightOffset > gp.worldWidth - worldX) {
-			x = gp.screenWidth - (gp.worldWidth - worldX);
+			x = gp.baseWidth - (gp.worldWidth - worldX);
 		}
-		int bottomOffset = gp.screenHeight - screenY;
+		int bottomOffset = gp.baseHeight - screenY;
 		if(bottomOffset > gp.worldHeight - worldY) {
-			y = gp.screenHeight - (gp.worldHeight - worldY);
+			y = gp.baseHeight - (gp.worldHeight - worldY);
 		}
 
 		if (invincible == true){
