@@ -10,7 +10,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Properties;
 
 import javax.imageio.ImageIO;
 
@@ -56,9 +55,6 @@ public class UI {
 	public int qualityIndex = 2;
 
 	public boolean fullscreenOn = true;
-
-	public String language = "en"; // default
-	private Properties langProps = new Properties();
 
 	public UI(GamePanel gp) {
 		this.gp = gp;
@@ -1268,18 +1264,5 @@ public class UI {
 		return slotRow * maxInventoryCol + slotCol;
 	}
 
-	public void loadLanguage(String langCode) {
-        try {
-            InputStream is = getClass().getResourceAsStream("/lang/lang_" + langCode + ".properties");
-            langProps.clear();
-            langProps.load(is);
-            language = langCode;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
-    public String tr(String key) {
-        return langProps.getProperty(key, key); // fallback to key if not found
-    }
 }
