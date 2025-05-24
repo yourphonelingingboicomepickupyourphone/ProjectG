@@ -1,3 +1,14 @@
-0
-On
-en
+fullscreen=false
+resolution=3
+vsync=true
+quality=2
+key_Escape=27
+key_Down=40
+key_Left=37
+key_Character=67
+key_Choose=10
+key_Right=39
+key_Up=38
+key_Attack=32
+key_Reset=82
+key_Inventory=73

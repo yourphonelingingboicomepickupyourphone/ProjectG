@@ -43,6 +43,8 @@ public class GamePanel extends JPanel implements Runnable{
 	public AssetSetter aSetter = new AssetSetter(this);
 	public UI ui = new UI(this);
 	public EventHandler eHandler = new EventHandler(this);
+	public Config config;
+
 	Thread gameThread;
 	
 	//Entity & Object & NPC
@@ -70,6 +72,9 @@ public class GamePanel extends JPanel implements Runnable{
 	public final int baseHeight = 1040;
 
 	public GamePanel() {
+		config = new Config(this);
+		config.loadConfig(); // Load config at startup
+		
 		this.setPreferredSize(new Dimension(screenWidth, screenHeight));
 		this.setBackground(Color.black);
 		this.setDoubleBuffered(true);	//all the drawing will be done in an offscreen painting buffer, improve performance

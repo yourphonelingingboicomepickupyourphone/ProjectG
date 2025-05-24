@@ -82,6 +82,7 @@ public class KeyHandler implements KeyListener{
 				}	
 				if (gp.ui.commandNum == 3) {
 					System.exit(0);
+					gp.config.saveConfig();
 				}
 			}
 			

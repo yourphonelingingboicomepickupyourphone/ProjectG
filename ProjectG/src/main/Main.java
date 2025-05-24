@@ -4,19 +4,19 @@ import javax.swing.JFrame;
 
 public class Main {
 	public static void main(String[] args) {
+		GamePanel gp = new GamePanel();
 		JFrame window = new JFrame();
-		GamePanel gamePanel = new GamePanel();
 		
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setResizable(true);
 		window.setTitle("Test Game");
-		window.add(gamePanel);
+		window.add(gp);
 		window.pack();
 		window.setLocationRelativeTo(null);
 		window.setVisible(true);
 
 		// --- FULLSCREEN ON START ---
-		if (gamePanel.ui.fullscreenOn) {
+		if (gp.ui.fullscreenOn) {
 			java.awt.GraphicsDevice gd = java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 			window.dispose();
 			window.setUndecorated(true);
@@ -26,7 +26,14 @@ public class Main {
 		}
 		// ---------------------------
 
-		gamePanel.setupGame();
-		gamePanel.startGameThread();
+		// Save config on exit
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+			if (gp.config != null) {
+				gp.config.saveConfig();
+			}
+		}));
+
+		gp.setupGame();
+		gp.startGameThread();
 	}
 }

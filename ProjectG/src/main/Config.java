@@ -1,13 +1,9 @@
 package main;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.util.Map;
 
 public class Config {
-
     GamePanel gp;
 
     public Config(GamePanel gp) {
@@ -15,65 +11,45 @@ public class Config {
     }
 
     public void saveConfig() {
-        try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter("config.txt"));
-            bw.write(String.valueOf(gp.ui.resolutionIndex));
-            bw.newLine();
-            bw.write(gp.ui.fullscreenOn ? "On" : "Off");
-            bw.newLine();
-            bw.write(gp.ui.language); 
-            bw.newLine();
-            bw.close();
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("config.txt"))) {
+            // UI settings
+            bw.write("fullscreen=" + gp.ui.fullscreenOn); bw.newLine();
+            bw.write("resolution=" + gp.ui.resolutionIndex); bw.newLine();
+            bw.write("vsync=" + gp.ui.vsyncOn); bw.newLine();
+            bw.write("quality=" + gp.ui.qualityIndex); bw.newLine();
+
+            // Key bindings
+            for (Map.Entry<String, Integer> entry : gp.keyConfig.getAllBindings().entrySet()) {
+                bw.write("key_" + entry.getKey() + "=" + entry.getValue()); bw.newLine();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     public void loadConfig() {
-        try {
-            BufferedReader br = new BufferedReader(new FileReader("config.txt"));
-            String resolutionIndexStr = br.readLine();
-            String fullscreenOn = br.readLine();
-            String language = br.readLine();
-
-            // Parse the index directly
-            try {
-                gp.ui.resolutionIndex = Integer.parseInt(resolutionIndexStr);
-            } catch (NumberFormatException e) {
-                gp.ui.resolutionIndex = 0; // fallback to default
+        File file = new File("config.txt");
+        if (!file.exists()) return;
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (line.startsWith("fullscreen=")) {
+                    gp.ui.fullscreenOn = Boolean.parseBoolean(line.split("=")[1]);
+                } else if (line.startsWith("resolution=")) {
+                    gp.ui.resolutionIndex = Integer.parseInt(line.split("=")[1]);
+                } else if (line.startsWith("vsync=")) {
+                    gp.ui.vsyncOn = Boolean.parseBoolean(line.split("=")[1]);
+                } else if (line.startsWith("quality=")) {
+                    gp.ui.qualityIndex = Integer.parseInt(line.split("=")[1]);
+                } else if (line.startsWith("key_")) {
+                    String[] parts = line.split("=");
+                    String action = parts[0].substring(4);
+                    int keyCode = Integer.parseInt(parts[1]);
+                    gp.keyConfig.setKey(action, keyCode);
+                }
             }
-            gp.ui.fullscreenOn = "On".equals(fullscreenOn);
-
-            // Set resolution and update player screen position
-            String res = gp.ui.resolutions[gp.ui.resolutionIndex];
-            String[] parts = res.split("x");
-            int width = Integer.parseInt(parts[0]);
-            int height = Integer.parseInt(parts[1]);
-            gp.baseWidth = width;
-            gp.baseHeight = height;
-            gp.screenWidth = width;
-            gp.screenHeight = height;
-            gp.updateTileSize();
-            gp.player.screenX = gp.baseWidth / 2 - gp.tileSize / 2;
-            gp.player.screenY = gp.baseHeight / 2 - gp.tileSize / 2;
-            gp.setPreferredSize(new java.awt.Dimension(width, height));
-            gp.revalidate();
-            java.awt.Window window = javax.swing.SwingUtilities.getWindowAncestor(gp);
-            if (window != null) window.pack();
-
-            if (language != null && !language.isEmpty()) {
-                gp.ui.language = language;
-                gp.ui.loadLanguage(language); // <--- Load language file
-            } else {
-                gp.ui.loadLanguage("en");
-            }
-
-            br.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    
 }
-
-
