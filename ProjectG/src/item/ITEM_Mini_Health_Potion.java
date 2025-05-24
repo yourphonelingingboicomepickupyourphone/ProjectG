@@ -29,10 +29,10 @@ public class ITEM_Mini_Health_Potion  extends Entity {
             if (user.health > user.maxHealth) {
                 user.health = user.maxHealth;
             }
-            gp.ui.addMessage("You used a " + name + "!");
-            gp.ui.addMessage("You restored " + healthHeal + " health!");
+            gp.ui.addMessage(gp.ui.tr("message.use_item", name));
+            gp.ui.addMessage(gp.ui.tr("message.restore_health", healthHeal));
         } else {
-            gp.ui.addMessage("You are already at full health!");
+            gp.ui.addMessage(gp.ui.tr("message.full_health"));
         }
     }
 

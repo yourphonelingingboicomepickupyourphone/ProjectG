@@ -629,7 +629,7 @@ public class UI {
 		// Draw progression points and instructions
 		g2.setColor(Color.white);
 		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 35F));
-		g2.drawString(tr("character.points") + ": " + gp.player.progressionPoints, textX, textY);
+		g2.drawString(tr("character.progression_points") + ": " + gp.player.progressionPoints, textX, textY);
 		textY += lineHeight;
 		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 35F));
 		g2.drawString("[" + gp.keyConfig.getKeyName(KeyConfig.UP) + "]/[" + gp.keyConfig.getKeyName(KeyConfig.DOWN) + "]:Select", textX, textY); 
@@ -906,7 +906,7 @@ public class UI {
 		    }
 
 		    if (selectedItem.type == 3 && selectedItem.itemType == 0 || selectedItem.itemType == 1 || selectedItem.itemType == 2 || selectedItem.itemType == 3) {
-		        g2.drawString("Level Required: " + selectedItem.levelRequirement, descX, descY);
+		        g2.drawString(tr("item.level_required") + selectedItem.levelRequirement, descX, descY);
 		        descY += lineHeight;
 		    }
 
@@ -1319,5 +1319,12 @@ public class UI {
 
     public String tr(String key) {
         return langProps.getProperty(key, key); // fallback to key if not found
+    }
+    public String tr(String key, Object... params) {
+        String template = langProps.getProperty(key, key);
+        if (params.length > 0) {
+            return String.format(template, params);
+        }
+        return template;
     }
 }

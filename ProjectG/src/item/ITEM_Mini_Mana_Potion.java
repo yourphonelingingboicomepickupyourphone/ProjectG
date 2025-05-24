@@ -31,10 +31,10 @@ public class ITEM_Mini_Mana_Potion extends Entity{
             if (user.mana > user.maxMana) {
                 user.mana = user.maxMana;
             }
-            gp.ui.addMessage("You used a " + name + "!");
-            gp.ui.addMessage("You restored " + manaHeal + " mana!");
+            gp.ui.addMessage(gp.ui.tr("message.use_item", name));
+            gp.ui.addMessage(gp.ui.tr("message.restore_mana", healthHeal));
         } else {
-            gp.ui.addMessage("You are already at full mana!");
+            gp.ui.addMessage(gp.ui.tr("message.full_mana"));
         }
     }
 

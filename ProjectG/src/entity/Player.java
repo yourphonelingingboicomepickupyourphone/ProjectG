@@ -556,7 +556,7 @@ public class Player extends Entity{
 					gp.monster[i].dying = true;
 					gp.monster[i].dyingCounter = 0;
 					gp.monster[i].damageReaction();
-					gp.ui.addMessage("You defeated " + gp.monster[i].name + "!");
+					gp.ui.addMessage(gp.ui.tr("message.defeat_monster", gp.monster[i].name));
 					gp.player.exp += gp.monster[i].expReward;
 					gp.player.checkLevelUp();
 				}
@@ -575,7 +575,7 @@ public class Player extends Entity{
 			nextLevelExp += 10; // Increase the required experience for the next level
 			totalProgressionPoints += 5;
 			progressionPoints += 5;
-			gp.ui.addMessage("Level up! You are now level " + level + "!");
+			gp.ui.addMessage(gp.ui.tr("message.level_up", level));
 		}
 	}
 
