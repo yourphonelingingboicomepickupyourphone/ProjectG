@@ -20,7 +20,7 @@ public class UI {
 	
 	GamePanel gp;
 	Graphics2D g2;
-	Font pixelOperator, pixelOperatorBold;
+	Font currentFont, currentFontBold;
 	public boolean messageOn = false;
 	// public String message = "";
 	// int messageCounter = 0;
@@ -66,10 +66,10 @@ public class UI {
 		try {
 			//normal
 			InputStream is = getClass().getResourceAsStream("/font/PixelOperator.ttf");
-			pixelOperator = Font.createFont(Font.TRUETYPE_FONT, is);
+			currentFont = Font.createFont(Font.TRUETYPE_FONT, is);
 			//bold
 			is = getClass().getResourceAsStream("/font/PixelOperator-Bold.ttf");
-			pixelOperatorBold = Font.createFont(Font.TRUETYPE_FONT, is);
+			currentFontBold = Font.createFont(Font.TRUETYPE_FONT, is);
 		} catch (FontFormatException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -85,7 +85,7 @@ public class UI {
 	public void draw(Graphics2D g2) {
 		
 		this.g2 = g2;
-		g2.setFont(pixelOperator);
+		g2.setFont(currentFont);
 		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		g2.setColor(Color.white);
 
@@ -144,7 +144,7 @@ public class UI {
 			g2.fillRect(0, 0, gp.baseWidth, gp.baseHeight);
 
 			//Title Name
-			g2.setFont(pixelOperatorBold.deriveFont(Font.PLAIN, 120F));
+			g2.setFont(currentFontBold.deriveFont(Font.PLAIN, 120F));
 			
 			String text = "Legends of the Red Wheels";
 			int x = getXForCenteredText(text);
@@ -211,7 +211,7 @@ public class UI {
 			g2.fillRect(0, 0, gp.baseWidth, gp.baseHeight);
 
 			//Title Name
-			g2.setFont(pixelOperatorBold.deriveFont(Font.PLAIN, 120F));
+			g2.setFont(currentFontBold.deriveFont(Font.PLAIN, 120F));
 		
 			String text = "Legends of the Red Wheels";
 			int x = getXForCenteredText(text);
@@ -293,7 +293,7 @@ public class UI {
 			g2.fillRect(0, 0, gp.baseWidth, gp.baseHeight);
 
 			// Title Name
-			g2.setFont(pixelOperatorBold.deriveFont(Font.PLAIN, 100F));
+			g2.setFont(currentFontBold.deriveFont(Font.PLAIN, 100F));
 			String text = "Options";
 			int x = getXForCenteredText(text);
 			int y = gp.tileSize * 3;
@@ -341,12 +341,12 @@ public class UI {
 		int textY = gp.tileSize * 2;
 		int lineHeight = gp.tileSize;
 
-		g2.setFont(pixelOperatorBold.deriveFont(Font.PLAIN, 48F));
+		g2.setFont(currentFontBold.deriveFont(Font.PLAIN, 48F));
 		g2.setColor(Color.WHITE);
 		String gText = "Graphics Settings";
 		g2.drawString(gText, getXForCenteredText(gText), textY);
 
-		g2.setFont(pixelOperator.deriveFont(Font.PLAIN, 36F));
+		g2.setFont(currentFont.deriveFont(Font.PLAIN, 36F));
 		textY += lineHeight * 2;
 
 		// Resolution
@@ -383,7 +383,7 @@ public class UI {
 
 	    drawSubWindow(frameX, frameY, frameWidth, frameHeight);
 
-	    g2.setFont(pixelOperatorBold.deriveFont(Font.PLAIN, 48F));
+	    g2.setFont(currentFontBold.deriveFont(Font.PLAIN, 48F));
 	    g2.setColor(Color.WHITE);
 
 	    String[] options = {"Continue", "Settings", "Return to Main Menu", "Exit"};
@@ -1105,7 +1105,7 @@ public class UI {
 		textX = getXForCenteredText(text);
 		textY = frameY + gp.tileSize * 1;
 		g2.setColor(Color.WHITE);
-		g2.setFont(pixelOperatorBold.deriveFont(Font.PLAIN, 48F));
+		g2.setFont(currentFontBold.deriveFont(Font.PLAIN, 48F));
 		g2.drawString(text, textX, textY);
 
 		// BGM
@@ -1150,14 +1150,14 @@ public class UI {
 	    int textYStart = frameY + gp.tileSize * 2;
 	    int lineHeight = gp.tileSize;
 
-	    g2.setFont(pixelOperatorBold.deriveFont(Font.PLAIN, 48F));
+	    g2.setFont(currentFontBold.deriveFont(Font.PLAIN, 48F));
 	    g2.setColor(Color.WHITE);
 		String cText = "Customize Controls";
 	    g2.drawString(cText, getXForCenteredText(cText), textYStart - gp.tileSize / 2);
 	    int textY1 = textYStart + lineHeight;
 	    int textY2 = textY1;
 
-		g2.setFont(pixelOperator.deriveFont(Font.PLAIN, 36F));
+		g2.setFont(currentFont.deriveFont(Font.PLAIN, 36F));
 	    // Draw left column
 	    for (int i = 0; i < total; i += 2) {
 	        String action = controlActions[i];
