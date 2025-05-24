@@ -73,8 +73,9 @@ public class GamePanel extends JPanel implements Runnable{
 
 	public GamePanel() {
 		config = new Config(this);
-		config.loadConfig(); // Load config at startup
-		
+		config.loadConfig();
+		ui.loadLanguage(); // Load language settings
+
 		this.setPreferredSize(new Dimension(screenWidth, screenHeight));
 		this.setBackground(Color.black);
 		this.setDoubleBuffered(true);	//all the drawing will be done in an offscreen painting buffer, improve performance

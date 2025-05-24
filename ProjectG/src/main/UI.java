@@ -9,7 +9,9 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Properties;
 
 import javax.imageio.ImageIO;
 
@@ -49,6 +51,9 @@ public class UI {
 	public String[] resolutions = {
 		"1920x1080", "1600x900", "1280x720", "1024x576", "800x450"
 	};
+	public String[] languageCodes = {"en", "vi", "fr", "es", "jp"};
+	public String[] languageNames = {"English", "Tiếng Việt", "Français", "Español", "日本語"};
+	public int languageIndex = 0; // Index of selected language
 	public int resolutionIndex = 0;
 	public boolean vsyncOn = true;
 	public String[] qualities = {"Low", "Medium", "High"};
@@ -56,20 +61,31 @@ public class UI {
 
 	public boolean fullscreenOn = true;
 
+	public String language = "en"; // Default language
+
+	public Properties langProps = new Properties();
+
 	public UI(GamePanel gp) {
 		this.gp = gp;
 		
 		try {
 			//normal
-			InputStream is = getClass().getResourceAsStream("/font/PixelOperator.ttf");
+			InputStream is = getClass().getResourceAsStream("/font/GNUUnifont9.ttf");
 			currentFont = Font.createFont(Font.TRUETYPE_FONT, is);
 			//bold
-			is = getClass().getResourceAsStream("/font/PixelOperator-Bold.ttf");
+			is = getClass().getResourceAsStream("/font/GNUUnifont9.ttf");
 			currentFontBold = Font.createFont(Font.TRUETYPE_FONT, is);
 		} catch (FontFormatException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+		// After loading config or in UI constructor
+		for (int i = 0; i < languageCodes.length; i++) {
+		    if (languageCodes[i].equals(language)) {
+		        languageIndex = i;
+		        break;
+		    }
 		}
 	}
 	
@@ -142,7 +158,7 @@ public class UI {
 			//Title Name
 			g2.setFont(currentFontBold.deriveFont(Font.PLAIN, 120F));
 			
-			String text = "Legends of the Red Wheels";
+			String text = tr("game.title");
 			int x = getXForCenteredText(text);
 			int y = gp.tileSize * 5;
 
@@ -170,7 +186,7 @@ public class UI {
 
 			//Menu
 			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 60F));
-			text = "NEW GAME";
+			text = tr("menu.new_game");
 			x = getXForCenteredText(text);
 			y = gp.baseHeight/2 + gp.tileSize * 2 / 3;
 			g2.drawString(text, x, y);
@@ -178,7 +194,7 @@ public class UI {
 				g2.drawString(">", x - gp.tileSize, y);				
 			}
 
-			text = "LOAD GAME";
+			text = tr("menu.load_game");
 			x = getXForCenteredText(text);
 			y += 3 * gp.tileSize / 2;
 			g2.drawString(text, x, y);
@@ -186,7 +202,7 @@ public class UI {
 				g2.drawString(">", x - gp.tileSize, y);				
 			}
 
-			text = "SETTINGS";
+			text = tr("menu.settings");
 		 	x = getXForCenteredText(text);
 			y += 3 * gp.tileSize / 2;
 			g2.drawString(text, x, y);
@@ -194,7 +210,7 @@ public class UI {
 				g2.drawString(">", x - gp.tileSize, y);				
 			}
 
-			text = "QUIT";
+			text = tr("menu.quit");
 			x = getXForCenteredText(text);
 			y += 3 * gp.tileSize / 2;
 			g2.drawString(text, x, y);
@@ -209,7 +225,7 @@ public class UI {
 			//Title Name
 			g2.setFont(currentFontBold.deriveFont(Font.PLAIN, 120F));
 		
-			String text = "Legends of the Red Wheels";
+			String text = tr("game.title");
 			int x = getXForCenteredText(text);
 			int y = gp.tileSize * 5;
 
@@ -238,7 +254,7 @@ public class UI {
 			//Add player name
 
 			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 60F));
-			text = "Enter your name: ";
+			text = tr("menu.enter_name");
 			x = getXForCenteredText(text);
 			int lineGap = gp.tileSize;
 			y += 3 * lineGap / 2;
@@ -258,7 +274,7 @@ public class UI {
 				// Calculate total width for this row, accounting for SPACE being double width
 			    int totalRowWidth = 0;
 			    for (int col = 0; col < rowLen; col++) {
-			        if (keyboard[row][col].equals("SPACE")) {
+			        if (keyboard[row][col].equals("     ")) {
 			            totalRowWidth += keyW * 2;
 			        } else {
 			            totalRowWidth += keyW;
@@ -267,7 +283,7 @@ public class UI {
 			    int rowX = gp.baseWidth/2 - (totalRowWidth)/2;
 			    int currentX = rowX;
 			    for (int col = 0; col < rowLen; col++) {
-			        int buttonW = keyboard[row][col].equals("SPACE") ? keyW * 2 : keyW;
+			        int buttonW = keyboard[row][col].equals("     ") ? keyW * 2 : keyW;
 			        // Highlight selected key
 			        if (kbRow == row && kbCol == col && typingName) {
 			            g2.setColor(new Color(255, 255, 100));
@@ -290,7 +306,7 @@ public class UI {
 
 			// Title Name
 			g2.setFont(currentFontBold.deriveFont(Font.PLAIN, 100F));
-			String text = "Options";
+			String text = tr("options.title");
 			int x = getXForCenteredText(text);
 			int y = gp.tileSize * 3;
 			g2.setColor(new Color(0, 0, 0, 80));
@@ -300,7 +316,13 @@ public class UI {
 
 			// Menu options
 			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 60F));
-			String[] options = {"Music Volume", "SFX Volume", "Graphics", "Language", "Controls","Back"};
+			String[] options = {
+				tr("options.music_volume"), 
+				tr("options.sfx_volume"), 
+				tr("options.graphics"), 
+				tr("options.language"), 
+				tr("options.controls"),
+				tr("options.back")};
 			int menuStartY = y + gp.tileSize * 2;
 			int lineHeight = gp.tileSize + 10;
 
@@ -322,7 +344,12 @@ public class UI {
 			// Instructions
 			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 32F));
 			g2.setColor(Color.YELLOW);
-			String instructions = "Use " +  gp.keyConfig.getKeyName(KeyConfig.UP) + ", " + gp.keyConfig.getKeyName(KeyConfig.DOWN) + " to move, " + gp.keyConfig.getKeyName(KeyConfig.CHOOSE)  + " to select";
+			String instructions = java.text.MessageFormat.format(
+				tr("instructions.menu"),
+				gp.keyConfig.getKeyName(KeyConfig.UP),
+				gp.keyConfig.getKeyName(KeyConfig.DOWN),
+				gp.keyConfig.getKeyName(KeyConfig.CHOOSE)
+			);
 			g2.drawString(instructions, getXForCenteredText(instructions), menuStartY + options.length * lineHeight + gp.tileSize / 2);
 		} else if (titleScreenState == 4) {
 			drawGraphicsScreen();
@@ -339,7 +366,7 @@ public class UI {
 
 		g2.setFont(currentFontBold.deriveFont(Font.PLAIN, 48F));
 		g2.setColor(Color.WHITE);
-		String gText = "Graphics Settings";
+		String gText = tr("graphics.title");
 		g2.drawString(gText, getXForCenteredText(gText), textY);
 
 		g2.setFont(currentFont.deriveFont(Font.PLAIN, 36F));
@@ -347,27 +374,27 @@ public class UI {
 
 		// Resolution
 		if (graphicsCommandNum == 0) g2.setColor(Color.YELLOW); else g2.setColor(Color.WHITE);
-		g2.drawString("Resolution: " + resolutions[resolutionIndex], textX, textY);
+		g2.drawString(tr("graphics.resolution") + ": " + resolutions[resolutionIndex], textX, textY);
 		textY += lineHeight;
 
 		// VSync
 		if (graphicsCommandNum == 1) g2.setColor(Color.YELLOW); else g2.setColor(Color.WHITE);
-		g2.drawString("VSync: " + (vsyncOn ? "On" : "Off"), textX, textY);
+		g2.drawString(tr("graphics.vsync") + ": " + (vsyncOn ? "On" : "Off"), textX, textY);
 		textY += lineHeight;
 
 		// Quality
 		if (graphicsCommandNum == 2) g2.setColor(Color.YELLOW); else g2.setColor(Color.WHITE);
-		g2.drawString("Quality: " + qualities[qualityIndex], textX, textY);
+		g2.drawString(tr("graphics.quality") + ": " + qualities[qualityIndex], textX, textY);
 		textY += lineHeight;
 
 		// Fullscreen
 		if (graphicsCommandNum == 3) g2.setColor(Color.YELLOW); else g2.setColor(Color.WHITE);
-		g2.drawString("Fullscreen: " + (fullscreenOn ? "On" : "Off"), textX, textY);
+		g2.drawString(tr("graphics.fullscreen") + ": " + (fullscreenOn ? "On" : "Off"), textX, textY);
 		textY += lineHeight * 2;
 
 		// Back
 		if (graphicsCommandNum == 4) g2.setColor(Color.YELLOW); else g2.setColor(Color.WHITE);
-		g2.drawString("Back", textX, textY);
+		g2.drawString(tr("graphics.back"), textX, textY);
 	}
 
 	int pauseCommandNum = 0; // to store the command number of the pause menu
@@ -382,7 +409,7 @@ public class UI {
 	    g2.setFont(currentFontBold.deriveFont(Font.PLAIN, 48F));
 	    g2.setColor(Color.WHITE);
 
-	    String[] options = {"Continue", "Settings", "Return to Main Menu", "Exit"};
+	    String[] options = {tr("pause.continue"), tr("pause.settings"), tr("pause.return_main_menu"), tr("pause.exit")};
 	    int textY = frameY + gp.tileSize * 2;
 	    for (int i = 0; i < options.length; i++) {
 	        String text = options[i];
@@ -557,13 +584,13 @@ public class UI {
 		int textY = frameY + gp.tileSize;
 		final int lineHeight = 4 * gp.tileSize / 7;
 
-		g2.drawString("Name: " + gp.player.name, textX, textY);
+		g2.drawString(tr("character.name") + ": " + gp.player.name, textX, textY);
 		textY += lineHeight;
-		g2.drawString("Level: " + gp.player.level, textX, textY);
+		g2.drawString(tr("character.level") + ": " + gp.player.level, textX, textY);
 		textY += lineHeight;
 
 		// Stats array for easy iteration
-		String[] statNames = {"Health", "Mana", "Attack", "Defense"};
+		String[] statNames = {tr("character.health"), tr("character.mana"), tr("character.attack"), tr("character.defense")};
 		String[] statValues = {
 			(int)gp.player.health + "/" + (int)gp.player.getTotalMaxHealth(),
 			gp.player.mana + "/" + gp.player.getTotalMaxMana(),
@@ -602,18 +629,18 @@ public class UI {
 		// Draw progression points and instructions
 		g2.setColor(Color.white);
 		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 35F));
-		g2.drawString("Progression Points: " + gp.player.progressionPoints, textX, textY);
+		g2.drawString(tr("character.points") + ": " + gp.player.progressionPoints, textX, textY);
 		textY += lineHeight;
 		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 35F));
 		g2.drawString("[" + gp.keyConfig.getKeyName(KeyConfig.UP) + "]/[" + gp.keyConfig.getKeyName(KeyConfig.DOWN) + "]:Select", textX, textY); 
 		textY += lineHeight;
-		g2.drawString("[" + gp.keyConfig.getKeyName(KeyConfig.CHOOSE) + "]: Add Point", textX, textY);
+		g2.drawString("[" + gp.keyConfig.getKeyName(KeyConfig.CHOOSE) + "]: " + tr("character.add_point"), textX, textY);
 		textY += lineHeight;
-		g2.drawString("[" + gp.keyConfig.getKeyName(KeyConfig.CHARACTER) + "]: Close Window", textX, textY);
+		g2.drawString("[" + gp.keyConfig.getKeyName(KeyConfig.CHARACTER) + "]: " + tr("character.close_window"), textX, textY);
 		textY += lineHeight;
 
 		// Draw Reset Points button
-		String resetText = "[" + gp.keyConfig.getKeyName(KeyConfig.RESET) + "]: Reset Points";
+		String resetText = "[" + gp.keyConfig.getKeyName(KeyConfig.RESET) + "]: " + tr("character.reset_points");
 		g2.setColor(new Color(255, 100, 100));
 		g2.drawString(resetText, textX, textY);
 		g2.setColor(Color.white);
@@ -638,7 +665,7 @@ public class UI {
 			// Draw the hat image in the slot
 			g2.setColor(Color.BLACK);
 			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 20F));
-			g2.drawString("Hat", slotsX + 8, slotsStartY + slotSize - 8);
+			g2.drawString(tr("character.hat"), slotsX + 8, slotsStartY + slotSize - 8);
 		}
 		if (gp.player.currentHat != null) {
 			// Draw the hat image in the slot
@@ -655,7 +682,7 @@ public class UI {
 			// Draw the armor image in the slot
 			g2.setColor(Color.BLACK);
 			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 20F));
-			g2.drawString("Armor", slotsX + 8, armorY + slotSize - 8);
+			g2.drawString(tr("character.armor"), slotsX + 8, armorY + slotSize - 8);
 		}
 		if (gp.player.currentArmor != null) {
 			// Draw the armor image in the slot
@@ -672,7 +699,7 @@ public class UI {
 			// Draw the boots image in the slot
 			g2.setColor(Color.BLACK);
 			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 20F));
-			g2.drawString("Boots", slotsX + 2, bootsY + slotSize - 8);
+			g2.drawString(tr("character.boots"), slotsX + 2, bootsY + slotSize - 8);
 		}
 		if (gp.player.currentBoots != null) {
 			// Draw the boots image in the slot
@@ -689,7 +716,7 @@ public class UI {
 			// Draw the weapon image in the slot
 			g2.setColor(Color.BLACK);
 			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 20F));
-			g2.drawString("Weapon", slotsX + 2, weaponSlotY + slotSize - 8);		
+			g2.drawString(tr("character.weapon"), slotsX + 2, weaponSlotY + slotSize - 8);		
 		}
 		
 		if (gp.player.currentWeapon != null) {
@@ -697,10 +724,6 @@ public class UI {
 			g2.drawImage(gp.player.currentWeapon.down1, slotsX + 2, weaponSlotY + 2, slotSize - 4, slotSize - 4, null);
 		}
 
-		//Variable
-		// int tailX = frameX + frameWidth - gp.tileSize / 2;
-		// textX = getXForAllignToRightText(value, tailX);
-		// g2.drawString(value, textX, textY);
 	}
 	
 	public void drawInventoryScreen() {
@@ -790,7 +813,7 @@ public class UI {
 						// Draw placeholder text or icon for empty slot in inventory
 						g2.setColor(new Color(200, 200, 200, 120));
 						g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 20F));
-						String emptyText = "Empty";
+						String emptyText = tr("inventory.empty");
 						int textWidth = g2.getFontMetrics().stringWidth(emptyText);
 						g2.drawString(emptyText, x + (slotWidth - textWidth) / 2, y + slotHeight / 2 + 6);
 					}
@@ -798,7 +821,7 @@ public class UI {
 					// Draw placeholder for slots beyond inventory size
 					g2.setColor(new Color(200, 200, 200, 120));
 					g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 20F));
-					String emptyText = "Empty";
+					String emptyText = tr("inventory.empty");
 					int textWidth = g2.getFontMetrics().stringWidth(emptyText);
 					g2.drawString(emptyText, x + (slotWidth - textWidth) / 2, y + slotHeight / 2 + 6);
 				}
@@ -866,19 +889,19 @@ public class UI {
 		    // Draw basic stats if present
 		    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 22F));
 		    if (selectedItem.healthBonus != 0) {
-		        g2.drawString("Health: " + (selectedItem.healthBonus > 0 ? "+" : "") + selectedItem.healthBonus, descX, descY);
+		        g2.drawString(tr("character.health") + ": " + (selectedItem.healthBonus > 0 ? "+" : "") + selectedItem.healthBonus, descX, descY);
 		        descY += lineHeight;
 		    }
 		    if (selectedItem.manaBonus != 0) {
-		        g2.drawString("Mana: " + (selectedItem.manaBonus > 0 ? "+" : "") + selectedItem.manaBonus, descX, descY);
+		        g2.drawString(tr("character.mana") + ": " + (selectedItem.manaBonus > 0 ? "+" : "") + selectedItem.manaBonus, descX, descY);
 		        descY += lineHeight;
 		    }
 		    if (selectedItem.attackBonus != 0) {
-		        g2.drawString("Attack: " + (selectedItem.attackBonus > 0 ? "+" : "") + selectedItem.attackBonus, descX, descY);
+		        g2.drawString(tr("character.attack") + ": " + (selectedItem.attackBonus > 0 ? "+" : "") + selectedItem.attackBonus, descX, descY);
 		        descY += lineHeight;
 		    }
 		    if (selectedItem.defenseBonus != 0) {
-		        g2.drawString("Defense: " + (selectedItem.defenseBonus > 0 ? "+" : "") + selectedItem.defenseBonus, descX, descY);
+		        g2.drawString(tr("character.defense") + ": " + (selectedItem.defenseBonus > 0 ? "+" : "") + selectedItem.defenseBonus, descX, descY);
 		        descY += lineHeight;
 		    }
 
@@ -895,16 +918,16 @@ public class UI {
 		        // Determine which equipment slot to compare
 		        if (selectedItem.itemType == 0) { // Weapon
 		            equippedItem = gp.player.currentWeapon;
-		            equippedLabel = "Equipped Weapon";
+		            equippedLabel = tr("character.equipped_weapon");
 		        } else if (selectedItem.itemType == 1) { // Hat
 		            equippedItem = gp.player.currentHat;
-		            equippedLabel = "Equipped Hat";
+		            equippedLabel = tr("character.equipped_hat");
 		        } else if (selectedItem.itemType == 2) { // Armor
 		            equippedItem = gp.player.currentArmor;
-		            equippedLabel = "Equipped Armor";
+		            equippedLabel = tr("character.equipped_armor");
 		        } else if (selectedItem.itemType == 3) { // Boots
 		            equippedItem = gp.player.currentBoots;
-		            equippedLabel = "Equipped Boots";
+		            equippedLabel = tr("character.equipped_boots");
 		        }
 		    }
 
@@ -946,7 +969,7 @@ public class UI {
 		            int eqAtk = equippedItem.attackBonus;
 		            int diffAtk = selAtk - eqAtk;
 		            g2.setColor(Color.WHITE);
-		            g2.drawString("Attack: " + eqAtk, compareX + 24, statY);
+		            g2.drawString(tr("character.attack") + ": " + eqAtk, compareX + 24, statY);
 		            if (diffAtk != 0) {
 		                g2.setColor(diffAtk > 0 ? Color.GREEN : Color.RED);
 		                g2.drawString((diffAtk > 0 ? "+" : "") + diffAtk, compareX + 180, statY);
@@ -958,7 +981,7 @@ public class UI {
 		            int eqDef = equippedItem.defenseBonus;
 		            int diffDef = selDef - eqDef;
 		            g2.setColor(Color.WHITE);
-		            g2.drawString("Defense: " + eqDef, compareX + 24, statY);
+		            g2.drawString(tr("character.defense") + ": " + eqDef, compareX + 24, statY);
 		            if (diffDef != 0) {
 		                g2.setColor(diffDef > 0 ? Color.GREEN : Color.RED);
 		                g2.drawString((diffDef > 0 ? "+" : "") + diffDef, compareX + 180, statY);
@@ -971,7 +994,7 @@ public class UI {
 		        int eqHealth = equippedItem.healthBonus;
 		        int diffHealth = selHealth - eqHealth;
 		        g2.setColor(Color.WHITE);
-		        g2.drawString("Health: " + eqHealth, compareX + 24, statY);
+		        g2.drawString(tr("character.health") + ": " + eqHealth, compareX + 24, statY);
 		        if (diffHealth != 0) {
 		            g2.setColor(diffHealth > 0 ? Color.GREEN : Color.RED);
 		            g2.drawString((diffHealth > 0 ? "+" : "") + diffHealth, compareX + 180, statY);
@@ -983,7 +1006,7 @@ public class UI {
 		        int eqMana = equippedItem.manaBonus;
 		        int diffMana = selMana - eqMana;
 		        g2.setColor(Color.WHITE);
-		        g2.drawString("Mana: " + eqMana, compareX + 24, statY);
+		        g2.drawString(tr("character.mana") + ": " + eqMana, compareX + 24, statY);
 		        if (diffMana != 0) {
 		            g2.setColor(diffMana > 0 ? Color.GREEN : Color.RED);
 		            g2.drawString((diffMana > 0 ? "+" : "") + diffMana, compareX + 180, statY);
@@ -996,7 +1019,7 @@ public class UI {
 		            int eqSpeed = equippedItem.speedBonus;
 		            int diffSpeed = selSpeed - eqSpeed;
 		            g2.setColor(Color.WHITE);
-		            g2.drawString("Speed: " + eqSpeed, compareX + 24, statY);
+		            g2.drawString("tr.character.speed" + ": " + eqSpeed, compareX + 24, statY);
 		            if (diffSpeed != 0) {
 		                g2.setColor(diffSpeed > 0 ? Color.GREEN : Color.RED);
 		                g2.drawString((diffSpeed > 0 ? "+" : "") + diffSpeed, compareX + 180, statY);
@@ -1097,7 +1120,7 @@ public class UI {
 		int textX;
 		int textY;
 
-		String text = "Options";
+		String text = tr("options.title");
 		textX = getXForCenteredText(text);
 		textY = frameY + gp.tileSize * 1;
 		g2.setColor(Color.WHITE);
@@ -1106,7 +1129,7 @@ public class UI {
 
 		// BGM
 		textY += gp.tileSize * 2;
-		text = "BGM";
+		text = tr("options.music_volume");
 		g2.drawString(text, textX, textY);
 		if (commandNum == 0){
 			g2.drawString(">", textX - gp.tileSize /2, textY);
@@ -1114,7 +1137,7 @@ public class UI {
 
 		// SE
 		textY += gp.tileSize;
-		text = "SE";
+		text = tr("options.sfx_volume");
 		g2.drawString(text, textX, textY);
 		if (commandNum == 1){
 			g2.drawString(">", textX - gp.tileSize /2, textY);
@@ -1122,17 +1145,25 @@ public class UI {
 
 		// Controls
 		textY += gp.tileSize;
-		text = "Controls";
+		text = tr("options.controls");
 		g2.drawString(text, textX, textY);	
 		if (commandNum == 2){
 			g2.drawString(">", textX - gp.tileSize /2, textY);
 		} 
 
-		// Back 
+		// Language
 		textY += gp.tileSize;
-		text = "Back";
+		text = tr("options.language") +": " + languageNames[languageIndex];
 		g2.drawString(text, textX, textY);
 		if (commandNum == 3){
+			g2.drawString(">", textX - gp.tileSize /2, textY);
+		} 
+
+		// Back 
+		textY += gp.tileSize;
+		text = tr("options.back");
+		g2.drawString(text, textX, textY);
+		if (commandNum == 4){
 			g2.drawString(">", textX - gp.tileSize /2, textY);
 		} 
 	}
@@ -1148,7 +1179,7 @@ public class UI {
 
 	    g2.setFont(currentFontBold.deriveFont(Font.PLAIN, 48F));
 	    g2.setColor(Color.WHITE);
-		String cText = "Customize Controls";
+		String cText = tr("controls.title");
 	    g2.drawString(cText, getXForCenteredText(cText), textYStart - gp.tileSize / 2);
 	    int textY1 = textYStart + lineHeight;
 	    int textY2 = textY1;
@@ -1157,26 +1188,26 @@ public class UI {
 	    // Draw left column
 	    for (int i = 0; i < total; i += 2) {
 	        String action = controlActions[i];
-	        String keyName = gp.keyConfig.getKeyName(action);
+	        String keyName = tr("controls." + action.toLowerCase());
 	        if (controlsCommandNum == i && !waitingForKey) {
 	            g2.setColor(Color.YELLOW);
 	            g2.drawString(">", textX1 - gp.tileSize / 2, textY1);
 	        }
 	        g2.setColor(Color.WHITE);
-	        g2.drawString(action + ": " + keyName, textX1, textY1);
+			g2.drawString(keyName + ": " + gp.keyConfig.getKeyName(action), textX1, textY1);
 	        textY1 += lineHeight;
 	    }
 
 	    // Draw right column
 	    for (int i = 1; i < total; i += 2) {
 	        String action = controlActions[i];
-	        String keyName = gp.keyConfig.getKeyName(action);
+	        String keyName = tr("controls." + action.toLowerCase());
 	        if (controlsCommandNum == i && !waitingForKey) {
 	            g2.setColor(Color.YELLOW);
 	            g2.drawString(">", textX2 - gp.tileSize / 2, textY2);
 	        }
 	        g2.setColor(Color.WHITE);
-	        g2.drawString(action + ": " + keyName, textX2, textY2);
+	        g2.drawString(keyName + ": " + gp.keyConfig.getKeyName(action), textX2, textY2);
 	        textY2 += lineHeight;
 	    }
 
@@ -1184,20 +1215,20 @@ public class UI {
 	    int backY = Math.max(textY1, textY2) + lineHeight / 4;
 	    if (controlsCommandNum == controlActions.length && !waitingForKey) {
 	        g2.setColor(Color.YELLOW);
-	        g2.drawString(">", getXForCenteredText("Back") - gp.tileSize, backY);
+	        g2.drawString(">", getXForCenteredText(tr("controls.back")) - gp.tileSize, backY);
 	    }
 	    g2.setColor(Color.WHITE);
-	    g2.drawString("Back", getXForCenteredText("Back"), backY);
+	    g2.drawString(tr("controls.back"), getXForCenteredText(tr("controls.back")), backY);
 
 	    if (waitingForKey) {
 	        g2.setColor(Color.CYAN);
-			String kText = "Press a key...";
+			String kText = tr("message.press_key");
 	        g2.drawString(kText, getXForCenteredText(kText), backY + 3 * lineHeight / 4);
 	    }
 
 	    if (keyBindWarning) {
 	        g2.setColor(Color.RED);
-	        String warn = "Key already assigned!";
+	        String warn = tr("message.key_already_assigned");
 	        g2.drawString(warn, getXForCenteredText(warn), backY + 3 * lineHeight / 4);
 	        // Hide warning after 2 seconds
 	        if (System.currentTimeMillis() - keyBindWarningTime > 2000) {
@@ -1254,7 +1285,7 @@ public class UI {
 		{"1","2","3","4","5","6","7","8","9","0"},
 		{"Q","W","E","R","T","Y","U","I","O","P"},
 		{"A","S","D","F","G","H","J","K","L","<-"},
-		{"Z","X","C","V","B","N","M", "SPACE","OK"},
+		{"Z","X","C","V","B","N","M", "     ","OK"},
 	};
 	int kbRow = 0;
 	int kbCol = 0;
@@ -1264,5 +1295,29 @@ public class UI {
 		return slotRow * maxInventoryCol + slotCol;
 	}
 
+	public void loadLanguage() {
+    // Sync languageIndex with language code
+    for (int i = 0; i < languageCodes.length; i++) {
+        if (languageCodes[i].equals(language)) {
+            languageIndex = i;
+            break;
+        }
+    }
+    String langFile = "/lang/lang_" + language + ".properties";
+    try (InputStream is = getClass().getResourceAsStream(langFile)) {
+        if (is != null) {
+            try (InputStreamReader reader = new InputStreamReader(is, java.nio.charset.StandardCharsets.UTF_8)) {
+                langProps.load(reader);
+            }
+        } else {
+            System.out.println("Language file not found: " + langFile);
+        }
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
 
+    public String tr(String key) {
+        return langProps.getProperty(key, key); // fallback to key if not found
+    }
 }

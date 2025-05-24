@@ -49,4 +49,17 @@ public class KeyConfig {
         return keyBindings;
     }
 
+    public void resetToDefault() {
+        keyBindings.clear();
+        keyBindings.put(UP, KeyEvent.VK_UP);
+        keyBindings.put(DOWN, KeyEvent.VK_DOWN);
+        keyBindings.put(LEFT, KeyEvent.VK_LEFT);
+        keyBindings.put(RIGHT, KeyEvent.VK_RIGHT);
+        keyBindings.put(CHOOSE, KeyEvent.VK_ENTER);
+        keyBindings.put(ESCAPE, KeyEvent.VK_ESCAPE);
+        keyBindings.put(ATTACK, KeyEvent.VK_SPACE);
+        keyBindings.put(INVENTORY, KeyEvent.VK_I);
+        keyBindings.put(CHARACTER, KeyEvent.VK_C);
+        keyBindings.put(RESET, KeyEvent.VK_R);
+    }
 }

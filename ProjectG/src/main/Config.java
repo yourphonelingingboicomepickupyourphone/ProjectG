@@ -17,6 +17,7 @@ public class Config {
             bw.write("resolution=" + gp.ui.resolutionIndex); bw.newLine();
             bw.write("vsync=" + gp.ui.vsyncOn); bw.newLine();
             bw.write("quality=" + gp.ui.qualityIndex); bw.newLine();
+            bw.write("language=" + gp.ui.language); bw.newLine(); // <--- Add this line
 
             // Key bindings
             for (Map.Entry<String, Integer> entry : gp.keyConfig.getAllBindings().entrySet()) {
@@ -41,6 +42,8 @@ public class Config {
                     gp.ui.vsyncOn = Boolean.parseBoolean(line.split("=")[1]);
                 } else if (line.startsWith("quality=")) {
                     gp.ui.qualityIndex = Integer.parseInt(line.split("=")[1]);
+                } else if (line.startsWith("language=")) {
+                    gp.ui.language = line.split("=")[1]; // <--- Add this line
                 } else if (line.startsWith("key_")) {
                     String[] parts = line.split("=");
                     String action = parts[0].substring(4);

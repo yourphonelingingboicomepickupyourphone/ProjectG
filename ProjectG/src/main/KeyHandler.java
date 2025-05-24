@@ -70,6 +70,8 @@ public class KeyHandler implements KeyListener{
 		
 			if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
 				if (gp.ui.commandNum == 0) {
+					gp.keyConfig.resetToDefault(); // Reset key bindings to default
+					gp.config.saveConfig(); // Load the config to apply changes
 					gp.ui.titleScreenState = 1; 
 				}
 				if (gp.ui.commandNum == 1) {
@@ -133,11 +135,11 @@ public class KeyHandler implements KeyListener{
 		else if (gp.ui.titleScreenState == 3) {
 			if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
 				gp.ui.commandNum--;
-				if (gp.ui.commandNum < 0) gp.ui.commandNum = 3; // e.g., 4 options: 0-3
+				if (gp.ui.commandNum < 0) gp.ui.commandNum = 5; // e.g., 6 options: 0-5
 			}
 			if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
 				gp.ui.commandNum++;
-				if (gp.ui.commandNum > 3) gp.ui.commandNum = 0;
+				if (gp.ui.commandNum > 5) gp.ui.commandNum = 0;
 			}
 			if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
 				// Handle selection based on gp.ui.commandNum
@@ -145,7 +147,7 @@ public class KeyHandler implements KeyListener{
 					gp.ui.commandNum = 0; 
 					gp.ui.titleScreenState = 4;
 				}
-				if (gp.ui.commandNum == 3) {
+				if (gp.ui.commandNum == 5) {
 					gp.ui.titleScreenState = 0; // Go back to main menu
 				}
 				// Add your logic for other options here
@@ -383,11 +385,28 @@ public class KeyHandler implements KeyListener{
 			}
 			if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
 				gp.ui.commandNum--;
-				if (gp.ui.commandNum < 0) gp.ui.commandNum = 3; // Now only 4 options: 0-3
+				if (gp.ui.commandNum < 0) gp.ui.commandNum = 4; 
 			}
 			if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
 				gp.ui.commandNum++;
-				if (gp.ui.commandNum > 3) gp.ui.commandNum = 0;
+				if (gp.ui.commandNum > 4) gp.ui.commandNum = 0;
+			}
+			// ADD THIS BLOCK for language selection
+			if (gp.ui.commandNum == 3) { // Assuming language is option 2
+				if (code == gp.keyConfig.getKey(KeyConfig.LEFT)) {
+					gp.ui.languageIndex--;
+					if (gp.ui.languageIndex < 0) gp.ui.languageIndex = gp.ui.languageCodes.length - 1;
+					gp.ui.language = gp.ui.languageCodes[gp.ui.languageIndex];
+					gp.ui.loadLanguage();
+					gp.config.saveConfig();
+				}
+				if (code == gp.keyConfig.getKey(KeyConfig.RIGHT)) {
+					gp.ui.languageIndex++;
+					if (gp.ui.languageIndex >= gp.ui.languageCodes.length) gp.ui.languageIndex = 0;
+					gp.ui.language = gp.ui.languageCodes[gp.ui.languageIndex];
+					gp.ui.loadLanguage();
+					gp.config.saveConfig();
+				}
 			}
 			if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
 				switch (gp.ui.commandNum) {
@@ -395,7 +414,7 @@ public class KeyHandler implements KeyListener{
 						gp.ui.subState = 1;
 						gp.ui.controlsCommandNum = 0;
 						break;
-					case 3: // Back
+					case 4: // Back
 						gp.gameState = gp.pauseState;
 						break;
 				}
