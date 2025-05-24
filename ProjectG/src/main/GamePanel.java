@@ -21,7 +21,7 @@ public class GamePanel extends JPanel implements Runnable{
 	final int originalTileSize = 16;	//1 tile originally has size of 16x16
 	final int scale = 5;	//The scale by which a tile is enlarged
 	
-	public final int tileSize = originalTileSize * scale;	//The tile on the game screen will be displayed by 80x80 pixels
+	public int tileSize = originalTileSize * scale;	//The tile on the game screen will be displayed by 80x80 pixels
 	public final int maxScreenCol = 24;
 	public final int maxScreenRow = 13;
 	public int screenWidth = tileSize * maxScreenCol;
@@ -43,6 +43,7 @@ public class GamePanel extends JPanel implements Runnable{
 	public AssetSetter aSetter = new AssetSetter(this);
 	public UI ui = new UI(this);
 	public EventHandler eHandler = new EventHandler(this);
+	public Config config = new Config(this);
 	Thread gameThread;
 	
 	//Entity & Object & NPC
@@ -66,8 +67,8 @@ public class GamePanel extends JPanel implements Runnable{
 	public final int chestState = 8;
 	public final int gameOverState = 9;
 
-	public final int baseWidth = 1920;
-	public final int baseHeight = 1040;
+	public int baseWidth = 1920;
+	public int baseHeight = 1040;
 
 	public GamePanel() {
 		this.setPreferredSize(new Dimension(screenWidth, screenHeight));
@@ -236,5 +237,13 @@ public class GamePanel extends JPanel implements Runnable{
 		g2.setTransform(oldTransform);
 
 		g2.dispose();	//dispose of graphic context & free system resource
+	}
+
+	public void updateTileSize() {
+	    // Example: keep 13 rows visible, so tileSize = baseHeight / 13
+	    this.tileSize = baseHeight / maxScreenRow;
+	    // Optionally update screenWidth/screenHeight if you want them to always match the new tile size
+	    this.screenWidth = tileSize * maxScreenCol;
+	    this.screenHeight = tileSize * maxScreenRow;
 	}
 }

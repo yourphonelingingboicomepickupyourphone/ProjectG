@@ -17,8 +17,8 @@ public class Player extends Entity{
 	
 	KeyHandler keyH;
 	
-	public final int screenX;
-	public final int screenY;
+	public int screenX;
+	public int screenY;
 	public boolean justFinishTalking = false;
 	int standCounter = 0;
 	public boolean attackCancel = false;
@@ -35,8 +35,8 @@ public class Player extends Entity{
 		super(gp);
 		this.keyH = kH;
 
-		screenX = gp.baseWidth/2 - gp.tileSize/2;
-		screenY = gp.baseHeight/2 - gp.tileSize/2;
+		this.screenX = gp.baseWidth / 2 - gp.tileSize / 2;
+		this.screenY = gp.baseHeight / 2 - gp.tileSize / 2;
 		
 		solidArea = new Rectangle();
 		solidArea.x = 40;
