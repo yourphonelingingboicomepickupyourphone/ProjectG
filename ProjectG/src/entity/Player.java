@@ -327,7 +327,7 @@ public class Player extends Entity{
 				}
 				// Check collision with monsters using the attackHitbox
 				for (int i = 0; i < gp.monster.length; i++) {
-					Entity monster = gp.monster[i];
+					Entity monster = gp.monster[gp.currentMap][i];
 					if (monster != null && monster.alive) {
 						Rectangle monsterHitbox = new Rectangle(
 							monster.worldX + monster.solidArea.x,
@@ -338,8 +338,8 @@ public class Player extends Entity{
 						if (attackHitbox.intersects(monsterHitbox)) {
 							damageMonster(i);
 							// When damaging a monster
-							gp.monster[i].showHpBar = true;
-							gp.monster[i].hpBarDisplayCounter = 150; // Show for 2.5 second (150 frames)
+							gp.monster[gp.currentMap][i].showHpBar = true;
+							gp.monster[gp.currentMap][i].hpBarDisplayCounter = 150; // Show for 2.5 second (150 frames)
 						}
 					}
 				}
@@ -384,7 +384,7 @@ public class Player extends Entity{
 						break;
 				}
 				for (int i = 0; i < gp.monster.length; i++) {
-					Entity monster = gp.monster[i];
+					Entity monster = gp.monster[gp.currentMap][i];
 					if (monster != null && monster.alive) {
 						Rectangle monsterHitbox = new Rectangle(
 							monster.worldX + monster.solidArea.x,
@@ -394,8 +394,8 @@ public class Player extends Entity{
 						);
 						if (attackHitbox.intersects(monsterHitbox)) {
 							damageMonster(i);
-							gp.monster[i].showHpBar = true; // Show HP bar
-							gp.monster[i].hpBarDisplayCounter = 150; // Show for 2.5 seconds
+							gp.monster[gp.currentMap][i].showHpBar = true; // Show HP bar
+							gp.monster[gp.currentMap][i].hpBarDisplayCounter = 150; // Show for 2.5 seconds
 						}
 					}
 				}
@@ -431,7 +431,7 @@ public class Player extends Entity{
 						break;
 				}
 				for (int i = 0; i < gp.monster.length; i++) {
-					Entity monster = gp.monster[i];
+					Entity monster = gp.monster[gp.currentMap][i];
 					if (monster != null && monster.alive) {
 						Rectangle monsterHitbox = new Rectangle(
 							monster.worldX + monster.solidArea.x,
@@ -441,8 +441,8 @@ public class Player extends Entity{
 						);
 						if (attackHitbox.intersects(monsterHitbox)) {
 							damageMonster(i);
-							gp.monster[i].showHpBar = true; // Show HP bar
-							gp.monster[i].hpBarDisplayCounter = 150; // Show for 2.5 seconds
+							gp.monster[gp.currentMap][i].showHpBar = true; // Show HP bar
+							gp.monster[gp.currentMap][i].hpBarDisplayCounter = 150; // Show for 2.5 seconds
 						}
 					}
 				}
@@ -458,9 +458,9 @@ public class Player extends Entity{
 	}
 
 	public void pickUpObject(int i) {
-	    if (i != 999 && gp.obj[i].pickable) {
+	    if (i != 999 && gp.obj[gp.currentMap][i].pickable) {
 			if (inventory.size() != maxInventorySize) {
-				Entity picked = gp.obj[i];
+				Entity picked = gp.obj[gp.currentMap][i];
 				boolean stacked = false;
 				// Try to stack if same item exists
 				for (Entity item : inventory) {
@@ -493,10 +493,10 @@ public class Player extends Entity{
 				if (gp.npc[j] != null) {
 					// Expand NPC's solid area by talkRange in all directions
 					Rectangle npcArea = new Rectangle(
-						gp.npc[j].worldX + gp.npc[j].solidArea.x - (int)talkRange,
-						gp.npc[j].worldY + gp.npc[j].solidArea.y - (int)talkRange,
-						gp.npc[j].solidArea.width + (int)(talkRange * 2),
-						gp.npc[j].solidArea.height + (int)(talkRange * 2)
+						gp.npc[gp.currentMap][j].worldX + gp.npc[gp.currentMap][j].solidArea.x - (int)talkRange,
+						gp.npc[gp.currentMap][j].worldY + gp.npc[gp.currentMap][j].solidArea.y - (int)talkRange,
+						gp.npc[gp.currentMap][j].solidArea.width + (int)(talkRange * 2),
+						gp.npc[gp.currentMap][j].solidArea.height + (int)(talkRange * 2)
 					);
 					Rectangle playerArea = new Rectangle(
 						worldX + solidArea.x,
@@ -507,8 +507,8 @@ public class Player extends Entity{
 
 					if (npcArea.intersects(playerArea)) {
 						// Calculate center-to-center distance for closest NPC
-						int npcCenterX = gp.npc[j].worldX + gp.npc[j].solidArea.x + gp.npc[j].solidArea.width / 2;
-						int npcCenterY = gp.npc[j].worldY + gp.npc[j].solidArea.y + gp.npc[j].solidArea.height / 2;
+						int npcCenterX = gp.npc[gp.currentMap][j].worldX + gp.npc[gp.currentMap][j].solidArea.x + gp.npc[gp.currentMap][j].solidArea.width / 2;
+						int npcCenterY = gp.npc[gp.currentMap][j].worldY + gp.npc[gp.currentMap][j].solidArea.y + gp.npc[gp.currentMap][j].solidArea.height / 2;
 						int playerCenterX = worldX + solidArea.x + solidArea.width / 2;
 						int playerCenterY = worldY + solidArea.y + solidArea.height / 2;
 						double distance = Math.hypot(npcCenterX - playerCenterX, npcCenterY - playerCenterY);
@@ -524,7 +524,7 @@ public class Player extends Entity{
 			if (closestNpcIndex != -1) {
 				attackCancel = true;
 				gp.gameState = gp.dialogueState;
-				gp.npc[closestNpcIndex].speak();
+				gp.npc[gp.currentMap][closestNpcIndex].speak();
 			}
 		}
 	}
@@ -538,8 +538,8 @@ public class Player extends Entity{
 	public void contactMonster(int i){
 		if(i != 999){
 
-			if (invincible == false && gp.monster[i].collision == true && gp.monster[i].dying == false) {
-				int damage = gp.monster[i].attack - getTotalDefense();
+			if (invincible == false && gp.monster[gp.currentMap][i].collision == true && gp.monster[gp.currentMap][i].dying == false) {
+				int damage = gp.monster[gp.currentMap][i].attack - getTotalDefense();
 				if (damage < 0) {
 					damage = 0;
 				}
@@ -553,22 +553,22 @@ public class Player extends Entity{
 
 	public void damageMonster(int i) {
 		if(i != 999) {
-			if (gp.monster[i].invincible == false) {
-				int dmg = getTotalAttack() - gp.monster[i].defense;
+			if (gp.monster[gp.currentMap][i].invincible == false) {
+				int dmg = getTotalAttack() - gp.monster[gp.currentMap][i].defense;
 
 				if (dmg < 0) {
 					dmg = 0;
 				}
 				
-				gp.monster[i].health -= dmg;
-				gp.monster[i].invincible = true;
+				gp.monster[gp.currentMap][i].health -= dmg;
+				gp.monster[gp.currentMap][i].invincible = true;
 
-				if (gp.monster[i].health <= 0 && gp.monster[i].dying == false) {
-					gp.monster[i].dying = true;
-					gp.monster[i].dyingCounter = 0;
-					gp.monster[i].damageReaction();
-					gp.ui.addMessage(gp.ui.tr("message.defeat_monster", gp.monster[i].name));
-					gp.player.exp += gp.monster[i].expReward;
+				if (gp.monster[gp.currentMap][i].health <= 0 && gp.monster[gp.currentMap][i].dying == false) {
+					gp.monster[gp.currentMap][i].dying = true;
+					gp.monster[gp.currentMap][i].dyingCounter = 0;
+					gp.monster[gp.currentMap][i].damageReaction();
+					gp.ui.addMessage(gp.ui.tr("message.defeat_monster", gp.monster[gp.currentMap][i].name));
+					gp.player.exp += gp.monster[gp.currentMap][i].expReward;
 					gp.player.checkLevelUp();
 				}
 			}

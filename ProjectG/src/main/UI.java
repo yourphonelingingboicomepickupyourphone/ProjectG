@@ -65,6 +65,8 @@ public class UI {
 
 	public Properties langProps = new Properties();
 
+	public int counter = 0; // Counter for various animations and effects
+
 	public UI(GamePanel gp) {
 		this.gp = gp;
 		
@@ -150,6 +152,9 @@ public class UI {
 		}
 		else if (gp.gameState == gp.deathState) {
 			drawDeathAnimation();
+		}
+		else if (gp.gameState == gp.transitionState) {
+			drawTransitionScreen();
 		}
 	}
 
@@ -1272,6 +1277,18 @@ public class UI {
 		}
 	}
 
+	public void drawTransitionScreen() {
+		counter++;
+		g2.setColor(new Color(0, 0, 0, counter * 5));
+		g2.fillRect(0, 0, gp.baseWidth, gp.baseHeight);
+
+		if (counter >= 50) {
+			gp.eHandler.finishTeleport(); // <-- ADD THIS LINE
+			gp.gameState = gp.playState; // Go back to play state after transition
+			counter = 0; // Reset counter for next transition
+		}
+	}
+
 	public void drawSubWindow(int x, int y, int width, int height) {
 		int arc = 35;
 		int borderInset = 7;
@@ -1285,6 +1302,7 @@ public class UI {
 		g2.drawRoundRect(x + borderInset * 3, y + borderInset * 3, width - borderInset * 6, height - borderInset * 6, arc, arc);		
 		g2.setStroke(new BasicStroke(1f)); // Reset to default stroke
 	}
+
 	public int getXForCenteredText(String text) {
 		int length = (int)g2.getFontMetrics().getStringBounds(text, g2).getWidth();
 		int x = gp.baseWidth/2 - length/2;

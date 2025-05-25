@@ -26,74 +26,75 @@ public class AssetSetter {
 	}
 	
 	public void setObject() {
-		gp.obj[0] = new OBJ_SpawnPoint(gp);
-		gp.obj[0].worldX = gp.tileSize * 48;
-		gp.obj[0].worldY = gp.tileSize * 49;
+		gp.obj[1][0] = new OBJ_SpawnPoint(gp);
+		gp.obj[1][0].worldX = gp.tileSize * 48;
+		gp.obj[1][0].worldY = gp.tileSize * 49;
 
-		gp.obj[1] = new OBJ_Pillar(gp);
-		gp.obj[1].worldX = gp.tileSize * 46;
-		gp.obj[1].worldY = gp.tileSize * 43;
+		gp.obj[1][1] = new OBJ_Pillar(gp);
+		gp.obj[1][1].worldX = gp.tileSize * 46;
+		gp.obj[1][1].worldY = gp.tileSize * 43;
 
-		gp.obj[2] = new OBJ_Pillar(gp);
-		gp.obj[2].worldX = gp.tileSize * 53;
-		gp.obj[2].worldY = gp.tileSize * 43;
+		gp.obj[1][2] = new OBJ_Pillar(gp);
+		gp.obj[1][2].worldX = gp.tileSize * 53;
+		gp.obj[1][2].worldY = gp.tileSize * 43;
 
-		gp.obj[3] = new OBJ_Pillar(gp);
-		gp.obj[3].worldX = gp.tileSize * 46;
-		gp.obj[3].worldY = gp.tileSize * 49;
+		gp.obj[1][3] = new OBJ_Pillar(gp);
+		gp.obj[1][3].worldX = gp.tileSize * 46;
+		gp.obj[1][3].worldY = gp.tileSize * 49;
 
-		gp.obj[4] = new OBJ_Pillar(gp);
-		gp.obj[4].worldX = gp.tileSize * 53;
-		gp.obj[4].worldY = gp.tileSize * 49;
+		gp.obj[1][4] = new OBJ_Pillar(gp);
+		gp.obj[1][4].worldX = gp.tileSize * 53;
+		gp.obj[1][4].worldY = gp.tileSize * 49;
 
-		gp.obj[5] = new ITEM_Door_Key(gp);
-		gp.obj[5].worldX = gp.tileSize * 50;
-		gp.obj[5].worldY = gp.tileSize * 59;
+		gp.obj[1][5] = new ITEM_Door_Key(gp);
+		gp.obj[1][5].worldX = gp.tileSize * 50;
+		gp.obj[1][5].worldY = gp.tileSize * 59;
 
-		gp.obj[6] = new ITEM_Door_Key(gp);
-		gp.obj[6].worldX = gp.tileSize * 54;
-		gp.obj[6].worldY = gp.tileSize * 59;
+		gp.obj[1][6] = new ITEM_Door_Key(gp);
+		gp.obj[1][6].worldX = gp.tileSize * 54;
+		gp.obj[1][6].worldY = gp.tileSize * 59;
 
-		gp.obj[7]= new ITEM_Dual_Blade_Axe(gp);
-		gp.obj[7].worldX = gp.tileSize * 50;
-		gp.obj[7].worldY = gp.tileSize * 62;
+		gp.obj[1][7]= new ITEM_Dual_Blade_Axe(gp);
+		gp.obj[1][7].worldX = gp.tileSize * 50;
+		gp.obj[1][7].worldY = gp.tileSize * 62;
 
-		gp.obj[8] = new ITEM_Mini_Health_Potion(gp);
-		gp.obj[8].worldX = gp.tileSize * 54;
-		gp.obj[8].worldY = gp.tileSize * 62;
+		gp.obj[1][8] = new ITEM_Mini_Health_Potion(gp);
+		gp.obj[1][8].worldX = gp.tileSize * 54;
+		gp.obj[1][8].worldY = gp.tileSize * 62;
 
-		gp.obj[9] = new ITEM_Mini_Health_Potion(gp);
-		gp.obj[9].worldX = gp.tileSize * 54;
-		gp.obj[9].worldY = gp.tileSize * 65;
+		gp.obj[1][9] = new ITEM_Mini_Health_Potion(gp);
+		gp.obj[1][9].worldX = gp.tileSize * 54;
+		gp.obj[1][9].worldY = gp.tileSize * 65;
 
-		gp.obj[10] = new ITEM_Armor_Normal(gp);
-		gp.obj[10].worldX = gp.tileSize * 50;
-		gp.obj[10].worldY = gp.tileSize * 65;
+		gp.obj[1][10] = new ITEM_Armor_Normal(gp);
+		gp.obj[1][10].worldX = gp.tileSize * 50;
+		gp.obj[1][10].worldY = gp.tileSize * 65;
 
-		gp.obj[11] = new ITEM_Better_Armor(gp);
-		gp.obj[11].worldX = gp.tileSize * 54;
-		gp.obj[11].worldY = gp.tileSize * 65;
+		gp.obj[1][11] = new ITEM_Better_Armor(gp);
+		gp.obj[1][11].worldX = gp.tileSize * 54;
+		gp.obj[1][11].worldY = gp.tileSize * 65;
 
 	}
 
-	public void setNPC() {
-		gp.npc[0] = new NPC_Wizard(gp);
-		gp.npc[0].worldX = gp.tileSize * 51;
-		gp.npc[0].worldY = gp.tileSize * 80;
 
-		gp.npc[1] = new NPC_Wizard(gp);
-		gp.npc[1].worldX = gp.tileSize * 54;
-		gp.npc[1].worldY = gp.tileSize * 84;
+	public void setNPC() {
+		gp.npc[1][0] = new NPC_Wizard(gp);
+		gp.npc[1][0].worldX = gp.tileSize * 51;
+		gp.npc[1][0].worldY = gp.tileSize * 80;
+
+		gp.npc[1][1] = new NPC_Wizard(gp);
+		gp.npc[1][1].worldX = gp.tileSize * 54;
+		gp.npc[1][1].worldY = gp.tileSize * 84;
 	}
 
 
 	public void setMonster() {
-		gp.monster[0] = new MON_rSlime(gp);
-		gp.monster[0].worldX = gp.tileSize * 50;
-		gp.monster[0].worldY = gp.tileSize * 60;
+		gp.monster[1][0] = new MON_rSlime(gp);
+		gp.monster[1][0].worldX = gp.tileSize * 50;
+		gp.monster[1][0].worldY = gp.tileSize * 60;
 
-		gp.monster[1] = new MON_rSlime(gp);
-		gp.monster[1].worldX = gp.tileSize * 54;
-		gp.monster[1].worldY = gp.tileSize * 60;
+		gp.monster[1][1] = new MON_rSlime(gp);
+		gp.monster[1][1].worldX = gp.tileSize * 54;
+		gp.monster[1][1].worldY = gp.tileSize * 60;
 	}
 }

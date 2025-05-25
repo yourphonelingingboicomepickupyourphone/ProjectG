@@ -3,32 +3,39 @@ package main;
 public class EventHandler {
 
     GamePanel gp;
-    EventRect eventRect[][];
+    EventRect eventRect[][][];
 
     int previousEventX, previousEventY;
     boolean canTouchEvent = true;
+    int tempMap, tempCol, tempRow;
 
     public EventHandler(GamePanel gp) {
         this.gp = gp;
 
-        eventRect = new EventRect[gp.maxWorldCol][gp.maxWorldRow];
+        eventRect = new EventRect[gp.maxMap][gp.maxWorldCol][gp.maxWorldRow];
 
+        int map = 0;
         int col = 0;
         int row = 0;
 
-        while (col < gp.maxWorldCol && row < gp.maxWorldRow) {
-            eventRect[col][row] = new EventRect();
-            eventRect[col][row].x = col * gp.tileSize;
-            eventRect[col][row].y = row * gp.tileSize;
-            eventRect[col][row].width = gp.tileSize;
-            eventRect[col][row].height = gp.tileSize;
-            eventRect[col][row].eventRectDefaultX = eventRect[col][row].x;
-            eventRect[col][row].eventRectDefaultY = eventRect[col][row].y;
+        while (map < gp.maxMap && col < gp.maxWorldCol && row < gp.maxWorldRow) {
+            eventRect[map][col][row] = new EventRect();
+            eventRect[map][col][row].x = col * gp.tileSize;
+            eventRect[map][col][row].y = row * gp.tileSize;
+            eventRect[map][col][row].width = gp.tileSize;
+            eventRect[map][col][row].height = gp.tileSize;
+            eventRect[map][col][row].eventRectDefaultX = eventRect[map][col][row].x;
+            eventRect[map][col][row].eventRectDefaultY = eventRect[map][col][row].y;
 
             col++;
             if (col == gp.maxWorldCol) {
                 col = 0;
                 row++;
+
+                if (row == gp.maxWorldRow) {
+                    row = 0;
+                    map++;
+                }
             }
         }
 
@@ -45,66 +52,89 @@ public class EventHandler {
         }
 
         if(canTouchEvent){
-            // if (hit(20, 28, "any") == true) {
+            // if (hit(1, 20, 28, "any") == true) {
             //     triggerTrap(20, 18, gp.dialogueState);
 
             // }
 
-            // if (hit(23, 28, "any") == true) {
+            // if (hit(1, 23, 28, "any") == true) {
             //     useFountain(23, 28, gp.dialogueState);
 
             // }
-        }
-    }
-
-    public boolean hit(int col, int row, String  reqDirection) {
-        boolean hit = false;
-        gp.player.solidArea.x = gp.player.worldX + gp.player.solidArea.x;
-        gp.player.solidArea.y = gp.player.worldY + gp.player.solidArea.y;
-        eventRect[col][row].x = col * gp.tileSize + eventRect[col][row].x;
-        eventRect[col][row].y = row * gp.tileSize + eventRect[col][row].y;
-        if (gp.player.solidArea.intersects(eventRect[col][row]) && !eventRect[col][row].eventDone) {
-            if (gp.player.direction.contentEquals(reqDirection) || reqDirection.equals("any")) {
-                hit = true;
-
-                previousEventX = gp.player.worldX;
-                previousEventY = gp.player.worldY;
+            if (hit(0, 50, 57, "any")) {
+                teleport(1, 50, 50); // Teleport to map 1 at coordinates (50, 50)
+                System.out.println("Teleported to map");
             }
         }
-
-        // Reset the player's solid area to its default position
-        gp.player.solidArea.x = gp.player.solidAreaDefaultX;
-        gp.player.solidArea.y = gp.player.solidAreaDefaultY;
-        // Reset the event rectangle to its default position
-        eventRect[col][row].x = eventRect[col][row].eventRectDefaultX;
-        eventRect[col][row].y = eventRect[col][row].eventRectDefaultY;
-
-        return hit;
     }
 
-    public void triggerTrap(int col, int row,int gameState) {
+    public boolean hit(int map, int col, int row, String  reqDirection) {
+        boolean hit = false;
+        if (gp.currentMap == map) {
+            
+            gp.player.solidArea.x = gp.player.worldX + gp.player.solidArea.x;
+            gp.player.solidArea.y = gp.player.worldY + gp.player.solidArea.y;
+            eventRect[map][col][row].x = col * gp.tileSize + eventRect[map][col][row].x;
+            eventRect[map][col][row].y = row * gp.tileSize + eventRect[map][col][row].y;
+            if (gp.player.solidArea.intersects(eventRect[map][col][row]) && !eventRect[map][col][row].eventDone) {
+                if (gp.player.direction.contentEquals(reqDirection) || reqDirection.equals("any")) {
+                    hit = true;
+
+                    previousEventX = gp.player.worldX;
+                    previousEventY = gp.player.worldY;
+                }
+            }
+
+            // Reset the player's solid area to its default position
+            gp.player.solidArea.x = gp.player.solidAreaDefaultX;
+            gp.player.solidArea.y = gp.player.solidAreaDefaultY;
+            // Reset the event rectangle to its default position
+            eventRect[map][col][row].x = eventRect[map][col][row].eventRectDefaultX;
+            eventRect[map][col][row].y = eventRect[map][col][row].eventRectDefaultY;
+        }
+        return hit;
+
+    }
+
+    public void triggerTrap(int gameState) {
         gp.gameState = gameState;
         gp.ui.currentDialogue = "You stepped on a trap!";
         gp.player.health -= 50; // Decrease player's health by 10
-        eventRect[col][row].eventDone = true; // Mark the event as done
         gp.keyH.enterPressed = false; // Reset the enter key press
         canTouchEvent = false; // Prevent further event triggering until the player moves
     }
 
-    public void useFountain(int col, int row, int gameState) {
+    public void useFountain(int gameState) {
         gp.gameState = gameState;
         if (gp.keyH.enterPressed == true) {
             gp.gameState = gp.dialogueState;
             gp.ui.currentDialogue = "You feel refreshed!";
             gp.player.health = gp.player.maxHealth; // Heal the player to max health
             gp.player.mana = gp.player.maxMana; // Restore mana to max
-            eventRect[col][row].eventDone = true; // Mark the event as done
             gp.keyH.enterPressed = false; // Reset the enter key press
             canTouchEvent = false; // Prevent further event triggering until the player moves
             System.out.println("Fountain used");
         }
         
         gp.keyH.enterPressed = false;
+    }
+
+    public void teleport(int map, int col, int row) {
+
+        gp.gameState = gp.transitionState; // Set the game state to transition  
+        tempMap = map;
+        tempCol = col;
+        tempRow = row;
+        canTouchEvent = true; // Prevent further event triggering until the player moves
+    }
+
+    public void finishTeleport() {
+        gp.currentMap = tempMap;
+        gp.player.worldX = tempCol * gp.tileSize;
+        gp.player.worldY = tempRow * gp.tileSize;
+        previousEventX = gp.player.worldX;
+        previousEventY = gp.player.worldY;
+        
     }
         
 }

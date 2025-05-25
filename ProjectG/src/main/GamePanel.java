@@ -30,6 +30,8 @@ public class GamePanel extends JPanel implements Runnable{
 	//World Settings
 	public final int maxWorldCol = 100;
 	public final int maxWorldRow = 100;
+	public final int maxMap = 10;	//maximum number of maps
+	public int currentMap = 0;	//current map index, start from 0
 	public final int worldWidth = maxWorldCol * tileSize;
 	public final int worldHeight = maxWorldRow * tileSize;
 
@@ -49,9 +51,9 @@ public class GamePanel extends JPanel implements Runnable{
 	
 	//Entity & Object & NPC
 	public Player player = new Player(this, keyH);
-	public Entity obj[] = new Entity[15];	//number of objects
-	public Entity npc[] = new Entity[10];	//number of NPCs 
-	public Entity monster[] = new Entity[75];	//number of monsters	
+	public Entity obj[][] = new Entity[maxMap][15];	//number of objects
+	public Entity npc[][] = new Entity[maxMap][10];	//number of NPCs 
+	public Entity monster[][] = new Entity[maxMap][75];	//number of monsters	
 	public ArrayList<Entity> entityList = new ArrayList<>();
 	public ArrayList<Entity> projectileList = new ArrayList<>();
 	
@@ -68,6 +70,7 @@ public class GamePanel extends JPanel implements Runnable{
 	public final int chestState = 8;
 	public final int gameOverState = 9;
 	public final int deathState = 10;
+	public final int transitionState = 11;	//Transition state for map change
 
 	public final int baseWidth = 1920;
 	public final int baseHeight = 1040;
@@ -86,6 +89,30 @@ public class GamePanel extends JPanel implements Runnable{
 	
 	
 	public void setupGame() {
+
+		// Initialize all sub-arrays for all maps
+		for (int map = 0; map < maxMap; map++) {
+			npc[map] = new Entity[10];      // or your actual NPC array size
+			monster[map] = new Entity[75];  // or your actual monster array size
+			obj[map] = new Entity[15];      // or your actual object array size
+		}
+
+		// Now safe to clear and set entities
+		for (int i = 0; i < npc.length; i++) {
+			for (int j = 0; j < npc[i].length; j++) {
+				npc[i][j] = null;
+			}
+		}
+		for (int i = 0; i < monster.length; i++) {
+			for (int j = 0; j < monster[i].length; j++) {
+				monster[i][j] = null;
+			}
+		}
+		for (int i = 0; i < obj.length; i++) {
+			for (int j = 0; j < obj[i].length; j++) {
+				obj[i][j] = null;
+			}
+		}
 		
 		aSetter.setObject();
 		aSetter.setNPC();
@@ -136,18 +163,18 @@ public class GamePanel extends JPanel implements Runnable{
 			player.update();	//player update
 
 			for(int i = 0; i < npc.length; i++) {
-				if(npc[i] != null) {
-					npc[i].update();
+				if(npc[currentMap][i] != null) {
+					npc[currentMap][i].update();
 				}
 			}	//NPC update
 
 			for(int i = 0; i < monster.length; i++) {
-				if(monster[i] != null) {
-					if(monster[i].alive == true && monster[i].dying == false) {
-						monster[i].update();
+				if(monster[currentMap][i] != null) {
+					if(monster[currentMap][i].alive == true && monster[currentMap][i].dying == false) {
+						monster[currentMap][i].update();
 					}
-					if (monster[i].alive == false) {
-						monster[i] = null;
+					if (monster[currentMap][i].alive == false) {
+						monster[currentMap][i] = null;
 					}
 				}
 			}	//Monster update
@@ -198,20 +225,20 @@ public class GamePanel extends JPanel implements Runnable{
 			entityList.add(player);	//add player to entity list
 
 			for(int i = 0; i < obj.length; i++) {
-				if(obj[i] != null) {
-					entityList.add(obj[i]);	//add object to entity list
+				if(obj[currentMap][i] != null) {
+					entityList.add(obj[currentMap][i]);	//add object to entity list
 				}
 			}
 
 			for(int i = 0; i < npc.length; i++) {
-				if(npc[i] != null) {
-					entityList.add(npc[i]);	//add NPC to entity list
+				if(npc[currentMap][i] != null) {
+					entityList.add(npc[currentMap][i]);	//add NPC to entity list
 				}
 			}
 
 			for(int i = 0; i < monster.length; i++) {
-				if(monster[i] != null) {
-					entityList.add(monster[i]);	//add monster to entity list
+				if(monster[currentMap][i] != null) {
+					entityList.add(monster[currentMap][i]);	//add monster to entity list
 				}
 			}
 
@@ -248,19 +275,33 @@ public class GamePanel extends JPanel implements Runnable{
 		g2.dispose();	//dispose of graphic context & free system resource
 	}
 	public void resetEntities() {
-	    // Re-create or reset all NPCs, monsters, and objects
+	    // Initialize all sub-arrays for all maps
+	    for (int map = 0; map < maxMap; map++) {
+	        npc[map] = new Entity[10];      // or your actual NPC array size
+	        monster[map] = new Entity[75];  // or your actual monster array size
+	        obj[map] = new Entity[15];      // or your actual object array size
+	    }
+
+	    // Now safe to clear and set entities
 	    for (int i = 0; i < npc.length; i++) {
-	        npc[i] = null;
+	        for (int j = 0; j < npc[i].length; j++) {
+	            npc[i][j] = null;
+	        }
 	    }
 	    for (int i = 0; i < monster.length; i++) {
-	        monster[i] = null;
+	        for (int j = 0; j < monster[i].length; j++) {
+	            monster[i][j] = null;
+	        }
 	    }
 	    for (int i = 0; i < obj.length; i++) {
-	        obj[i] = null;
+	        for (int j = 0; j < obj[i].length; j++) {
+	            obj[i][j] = null;
+	        }
 	    }
+
 	    // Re-add your starting NPCs, monsters, and objects
 	    aSetter.setNPC();
 	    aSetter.setMonster();
-	   	aSetter.setObject();
+	    aSetter.setObject();
 	}
 }
