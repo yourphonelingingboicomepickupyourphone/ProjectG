@@ -1108,10 +1108,11 @@ public class UI {
 	}
 
 	public void drawOptionsScreen(){
-		int frameX = gp.tileSize * 3;
-		int frameY = gp.tileSize * 2;
+		
 		int width = gp.tileSize * 18;
 		int height = gp.tileSize * 10;
+		int frameX = (gp.baseWidth - width) / 2;
+    	int frameY = (gp.baseHeight - height) / 2;
 
 		drawSubWindow(frameX, frameY, width, height);
 
@@ -1127,19 +1128,25 @@ public class UI {
 	}
 
 	public void options_Top(int frameX, int frameY){
-		int textX;
-		int textY;
+		int borderInset = 7;
+		int windowWidth = gp.tileSize * 18;
+		int innerWidth = windowWidth - borderInset * 6;
 
-		String text = tr("options.title");
-		textX = getXForCenteredText(text);
-		textY = frameY + gp.tileSize * 1;
-		g2.setColor(Color.WHITE);
+		// Title
 		g2.setFont(currentFontBold.deriveFont(Font.BOLD, 48F));
+		String text = tr("options.title");
+		int textWidth = (int)g2.getFontMetrics().getStringBounds(text, g2).getWidth();
+		int textX = frameX + borderInset * 3 + (innerWidth - textWidth) / 2;
+		int textY = frameY + gp.tileSize * 3/2;
+		g2.setColor(Color.WHITE);
 		g2.drawString(text, textX, textY);
 
 		// BGM
 		textY += gp.tileSize * 2;
+		g2.setFont(currentFont.deriveFont(Font.PLAIN, 36F));
 		text = tr("options.music_volume");
+		textWidth = (int)g2.getFontMetrics().getStringBounds(text, g2).getWidth();
+		textX = frameX + borderInset * 3 + (innerWidth - textWidth) / 2;
 		g2.drawString(text, textX, textY);
 		if (commandNum == 0){
 			g2.drawString(">", textX - gp.tileSize /2, textY);
@@ -1148,6 +1155,8 @@ public class UI {
 		// SE
 		textY += gp.tileSize;
 		text = tr("options.sfx_volume");
+		textWidth = (int)g2.getFontMetrics().getStringBounds(text, g2).getWidth();
+		textX = frameX + borderInset * 3 + (innerWidth - textWidth) / 2;
 		g2.drawString(text, textX, textY);
 		if (commandNum == 1){
 			g2.drawString(">", textX - gp.tileSize /2, textY);
@@ -1156,6 +1165,8 @@ public class UI {
 		// Controls
 		textY += gp.tileSize;
 		text = tr("options.controls");
+		textWidth = (int)g2.getFontMetrics().getStringBounds(text, g2).getWidth();
+		textX = frameX + borderInset * 3 + (innerWidth - textWidth) / 2;
 		g2.drawString(text, textX, textY);	
 		if (commandNum == 2){
 			g2.drawString(">", textX - gp.tileSize /2, textY);
@@ -1164,6 +1175,8 @@ public class UI {
 		// Language
 		textY += gp.tileSize;
 		text = tr("options.language") +": " + languageNames[languageIndex];
+		textWidth = (int)g2.getFontMetrics().getStringBounds(text, g2).getWidth();
+		textX = frameX + borderInset * 3 + (innerWidth - textWidth) / 2;
 		g2.drawString(text, textX, textY);
 		if (commandNum == 3){
 			g2.drawString(">", textX - gp.tileSize /2, textY);
@@ -1172,6 +1185,8 @@ public class UI {
 		// Back 
 		textY += gp.tileSize;
 		text = tr("options.back");
+		textWidth = (int)g2.getFontMetrics().getStringBounds(text, g2).getWidth();
+		textX = frameX + borderInset * 3 + (innerWidth - textWidth) / 2;
 		g2.drawString(text, textX, textY);
 		if (commandNum == 4){
 			g2.drawString(">", textX - gp.tileSize /2, textY);

@@ -68,18 +68,20 @@ public class EventHandler {
         }
     }
 
-    public boolean hit(int map, int col, int row, String  reqDirection) {
+    public boolean hit(int map, int col, int row, String reqDirection) {
         boolean hit = false;
         if (gp.currentMap == map) {
-            
+            // Reset eventRect to its default position before checking
+            eventRect[map][col][row].x = eventRect[map][col][row].eventRectDefaultX;
+            eventRect[map][col][row].y = eventRect[map][col][row].eventRectDefaultY;
+
+            // Set player's solid area for collision check
             gp.player.solidArea.x = gp.player.worldX + gp.player.solidArea.x;
             gp.player.solidArea.y = gp.player.worldY + gp.player.solidArea.y;
-            eventRect[map][col][row].x = col * gp.tileSize + eventRect[map][col][row].x;
-            eventRect[map][col][row].y = row * gp.tileSize + eventRect[map][col][row].y;
+
             if (gp.player.solidArea.intersects(eventRect[map][col][row]) && !eventRect[map][col][row].eventDone) {
                 if (gp.player.direction.contentEquals(reqDirection) || reqDirection.equals("any")) {
                     hit = true;
-
                     previousEventX = gp.player.worldX;
                     previousEventY = gp.player.worldY;
                 }
@@ -88,9 +90,6 @@ public class EventHandler {
             // Reset the player's solid area to its default position
             gp.player.solidArea.x = gp.player.solidAreaDefaultX;
             gp.player.solidArea.y = gp.player.solidAreaDefaultY;
-            // Reset the event rectangle to its default position
-            eventRect[map][col][row].x = eventRect[map][col][row].eventRectDefaultX;
-            eventRect[map][col][row].y = eventRect[map][col][row].eventRectDefaultY;
         }
         return hit;
 
@@ -130,11 +129,10 @@ public class EventHandler {
 
     public void finishTeleport() {
         gp.currentMap = tempMap;
-        gp.player.worldX = tempCol * gp.tileSize;
-        gp.player.worldY = tempRow * gp.tileSize;
+        gp.player.worldX = tempCol * gp.tileSize - gp.tileSize / 2;
+        gp.player.worldY = tempRow * gp.tileSize - gp.tileSize / 2;
         previousEventX = gp.player.worldX;
         previousEventY = gp.player.worldY;
-        
     }
         
 }
