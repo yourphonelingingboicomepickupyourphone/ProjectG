@@ -145,9 +145,14 @@ public class UI {
 		else if (gp.gameState == gp.optionsState) {
 			drawOptionsScreen();
 		}
-
-
+		else if(gp.gameState == gp.gameOverState) {
+			drawGameOverScreen();
+		}
+		else if (gp.gameState == gp.deathState) {
+			drawDeathAnimation();
+		}
 	}
+
 
 	public void drawTitleScreen(){
 
@@ -156,7 +161,7 @@ public class UI {
 			g2.fillRect(0, 0, gp.baseWidth, gp.baseHeight);
 
 			//Title Name
-			g2.setFont(currentFontBold.deriveFont(Font.PLAIN, 120F));
+			g2.setFont(currentFontBold.deriveFont(Font.BOLD, 120F));
 			
 			String text = tr("game.title");
 			int x = getXForCenteredText(text);
@@ -223,7 +228,7 @@ public class UI {
 			g2.fillRect(0, 0, gp.baseWidth, gp.baseHeight);
 
 			//Title Name
-			g2.setFont(currentFontBold.deriveFont(Font.PLAIN, 120F));
+			g2.setFont(currentFontBold.deriveFont(Font.BOLD, 120F));
 		
 			String text = tr("game.title");
 			int x = getXForCenteredText(text);
@@ -305,7 +310,7 @@ public class UI {
 			g2.fillRect(0, 0, gp.baseWidth, gp.baseHeight);
 
 			// Title Name
-			g2.setFont(currentFontBold.deriveFont(Font.PLAIN, 100F));
+			g2.setFont(currentFontBold.deriveFont(Font.BOLD, 100F));
 			String text = tr("options.title");
 			int x = getXForCenteredText(text);
 			int y = gp.tileSize * 3;
@@ -364,7 +369,7 @@ public class UI {
 		int textY = gp.tileSize * 2;
 		int lineHeight = gp.tileSize;
 
-		g2.setFont(currentFontBold.deriveFont(Font.PLAIN, 48F));
+		g2.setFont(currentFontBold.deriveFont(Font.BOLD, 48F));
 		g2.setColor(Color.WHITE);
 		String gText = tr("graphics.title");
 		g2.drawString(gText, getXForCenteredText(gText), textY);
@@ -406,7 +411,7 @@ public class UI {
 
 	    drawSubWindow(frameX, frameY, frameWidth, frameHeight);
 
-	    g2.setFont(currentFontBold.deriveFont(Font.PLAIN, 48F));
+	    g2.setFont(currentFontBold.deriveFont(Font.BOLD, 48F));
 	    g2.setColor(Color.WHITE);
 
 	    String[] options = {tr("pause.continue"), tr("pause.settings"), tr("pause.return_main_menu"), tr("pause.exit")};
@@ -1124,7 +1129,7 @@ public class UI {
 		textX = getXForCenteredText(text);
 		textY = frameY + gp.tileSize * 1;
 		g2.setColor(Color.WHITE);
-		g2.setFont(currentFontBold.deriveFont(Font.PLAIN, 48F));
+		g2.setFont(currentFontBold.deriveFont(Font.BOLD, 48F));
 		g2.drawString(text, textX, textY);
 
 		// BGM
@@ -1177,7 +1182,7 @@ public class UI {
 	    int textYStart = frameY + gp.tileSize * 2;
 	    int lineHeight = gp.tileSize;
 
-	    g2.setFont(currentFontBold.deriveFont(Font.PLAIN, 48F));
+	    g2.setFont(currentFontBold.deriveFont(Font.BOLD, 48F));
 	    g2.setColor(Color.WHITE);
 		String cText = tr("controls.title");
 	    g2.drawString(cText, getXForCenteredText(cText), textYStart - gp.tileSize / 2);
@@ -1235,6 +1240,36 @@ public class UI {
 	            keyBindWarning = false;
 	        }
 	    }
+	}
+
+	public void drawGameOverScreen() {
+		g2.setColor(new Color(0, 0, 0, 150));
+		g2.fillRect(0, 0, gp.baseWidth, gp.baseHeight);
+		
+		g2.setColor(Color.WHITE);
+
+		g2.setFont(currentFontBold.deriveFont(Font.BOLD, 48F));
+		String text = tr("game_over.title");
+		int textX = getXForCenteredText(text);
+		int textY = gp.tileSize * 2;
+		g2.drawString(text, textX, textY);
+
+		textY += gp.tileSize * 8;
+		g2.setFont(currentFont.deriveFont(Font.PLAIN, 36F));
+		text = tr("game_over.restart");
+		textX = getXForCenteredText(text);
+		g2.drawString(text, textX, textY);
+		if (commandNum == 0) {
+			g2.drawString(">", textX - gp.tileSize / 2, textY);
+		}
+
+		textY += gp.tileSize;
+		text = tr("game_over.exit_to_main_menu");
+		textX = getXForCenteredText(text);
+		g2.drawString(text, textX, textY);
+		if (commandNum == 1) {
+			g2.drawString(">", textX - gp.tileSize / 2, textY);
+		}
 	}
 
 	public void drawSubWindow(int x, int y, int width, int height) {
@@ -1326,5 +1361,21 @@ public class UI {
             return String.format(template, params);
         }
         return template;
+    }
+
+    public void resetKeyboardCursor() {
+        kbRow = 0;
+        kbCol = 0;
+        typingName = true;
+    }
+
+    public void drawDeathAnimation() {
+        // Example: Draw the player sprite with a fade-out effect
+        float alpha = 1.0f - (float)gp.player.deathAnimCounter / gp.player.DEATH_ANIM_DURATION;
+        java.awt.Composite original = g2.getComposite();
+        g2.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, Math.max(0, alpha)));
+        // Draw player at their position
+        g2.drawImage(gp.player.fullBody, gp.player.screenX, gp.player.screenY, gp.tileSize * 2, gp.tileSize * 2, null);
+        g2.setComposite(original);
     }
 }

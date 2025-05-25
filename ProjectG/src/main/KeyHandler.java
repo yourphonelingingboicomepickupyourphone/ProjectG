@@ -48,7 +48,10 @@ public class KeyHandler implements KeyListener{
 		else if (gp.gameState == gp.inventoryState) {
 			inventoryState(code);
 		}
-
+		else if (gp.gameState == gp.gameOverState) {
+			gameOverState(code);
+		}
+		
 
 	}
 
@@ -72,6 +75,9 @@ public class KeyHandler implements KeyListener{
 				if (gp.ui.commandNum == 0) {
 					gp.keyConfig.resetToDefault(); // Reset key bindings to default
 					gp.config.saveConfig(); // Load the config to apply changes
+					gp.ui.resetKeyboardCursor();
+					gp.player.reset(); // Reset player state
+					gp.resetEntities();
 					gp.ui.titleScreenState = 1; 
 				}
 				if (gp.ui.commandNum == 1) {
@@ -113,6 +119,8 @@ public class KeyHandler implements KeyListener{
 					gp.ui.typingName = false;
 					gp.gameState = gp.playState;
 					gp.player.name = gp.player.name.trim();
+					gp.ui.kbCol = 0; // Reset cursor position
+					gp.ui.kbRow = 0; // Reset cursor position
 					// Proceed to next screen or save name
 				} else if (key.equals("OK")) {
 					if (gp.player.name.isEmpty()) {
@@ -511,6 +519,38 @@ public class KeyHandler implements KeyListener{
 		if (code == gp.keyConfig.getKey(KeyConfig.RESET)){
 			gp.player.disposeSelectedItem();
 		}
+	}
+	public void gameOverState(int code) {
+	    // Assume 2 options: 0 = Restart, 1 = Main Menu
+	    if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
+	        gp.ui.commandNum--;
+	        if (gp.ui.commandNum < 0) gp.ui.commandNum = 1;
+	    }
+	    if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
+	        gp.ui.commandNum++;
+	        if (gp.ui.commandNum > 1) gp.ui.commandNum = 0;
+	    }
+	    if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
+	        if (gp.ui.commandNum == 0) {
+	            // Restart the game
+				String playerName = gp.player.name; // Save player name
+	            gp.player.reset(); // Reset player state
+				gp.player.name = playerName; // Restore player name
+				gp.resetEntities(); // Reset entities
+	            gp.gameState = gp.playState;
+	        } else if (gp.ui.commandNum == 1) {
+	            // Return to main menu
+	            gp.player.reset(); // Reset player state
+	            gp.gameState = gp.titleState;
+	            gp.ui.titleScreenState = 0;
+	        }
+	    }
+	    // Optional: ESCAPE always returns to main menu
+	    if (code == gp.keyConfig.getKey(KeyConfig.ESCAPE)) {
+	        gp.player.reset();
+	        gp.gameState = gp.titleState;
+	        gp.ui.titleScreenState = 0;
+	    }
 	}
 	@Override
 	public void keyReleased(KeyEvent e) {

@@ -67,6 +67,7 @@ public class GamePanel extends JPanel implements Runnable{
 	public final int optionsState = 7;
 	public final int chestState = 8;
 	public final int gameOverState = 9;
+	public final int deathState = 10;
 
 	public final int baseWidth = 1920;
 	public final int baseHeight = 1040;
@@ -164,8 +165,11 @@ public class GamePanel extends JPanel implements Runnable{
 
 		}
 
-		else if (gameState == pauseState) {
-			// do nothing
+		else if (gameState == deathState) {
+			player.deathAnimCounter++;
+			if (player.deathAnimCounter >= player.DEATH_ANIM_DURATION) {
+				gameState = gameOverState;	//Switch to game over state after death animation
+			}
 
 		}
 		
@@ -242,5 +246,21 @@ public class GamePanel extends JPanel implements Runnable{
 		g2.setTransform(oldTransform);
 
 		g2.dispose();	//dispose of graphic context & free system resource
+	}
+	public void resetEntities() {
+	    // Re-create or reset all NPCs, monsters, and objects
+	    for (int i = 0; i < npc.length; i++) {
+	        npc[i] = null;
+	    }
+	    for (int i = 0; i < monster.length; i++) {
+	        monster[i] = null;
+	    }
+	    for (int i = 0; i < obj.length; i++) {
+	        obj[i] = null;
+	    }
+	    // Re-add your starting NPCs, monsters, and objects
+	    aSetter.setNPC();
+	    aSetter.setMonster();
+	   	aSetter.setObject();
 	}
 }

@@ -24,6 +24,9 @@ public class Player extends Entity{
 	public ArrayList<Entity> inventory = new ArrayList<>();
 	public int maxInventorySize = 24;
 
+	public int deathAnimCounter = 0;
+	public  final int DEATH_ANIM_DURATION = 120; // 1 second at 60fps
+
 	int collisionRecoilCounter = 0;
     final int RECOIL_DURATION = 10;
     public int attackCooldown = 0;
@@ -255,6 +258,12 @@ public class Player extends Entity{
 		
 		if (justFinishTalking == true) {
 			justFinishTalking = false;
+		}
+
+		if (health <= 0) {
+			health = 0;
+			deathAnimCounter = 0;
+			gp.gameState = gp.gameOverState;
 		}
 
 	}
@@ -682,7 +691,7 @@ public class Player extends Entity{
 		int itemIndex = gp.ui.getItemIndexOnSlot();
 		if (itemIndex < inventory.size()) {
 			Entity selectedItem = inventory.get(itemIndex);
-
+			if (selectedItem == null) return; // Check if the item exists
 			if (selectedItem.itemType == 0) { // Weapon
 				Entity previousWeapon = currentWeapon;
 				currentWeapon = selectedItem;
@@ -732,6 +741,36 @@ public class Player extends Entity{
 	            }
 	        }
 	    }
+	}
+
+	public void reset(){
+		setDefaultValues();
+		health = maxHealth;
+		mana = maxMana;
+		exp = 0;
+		level = 1;
+		progressionPoints = 0;
+		totalProgressionPoints = 0;
+		progressionHealthUpgrades = 0;
+		progressionManaUpgrades = 0;
+		progressionAttackUpgrades = 0;
+		progressionDefenseUpgrades = 0;
+		inventory.clear();
+		currentWeapon = null;
+		currentArmor = null;
+		currentHat = null;
+		currentBoots = null;
+		attackCooldown = 0;
+		invincible = false;
+		invincibleCounter = 0;
+		attacking = false;
+		attackCancel = false;
+		collisionRecoilCounter = 0;
+		standCounter = 0;
+		spriteNum = 1;
+		spriteCounter = 0;
+		direction = "down";
+		setItems();
 	}
 
 	public int getEquipmentHealthBonus() {
