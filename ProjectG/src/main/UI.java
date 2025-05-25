@@ -565,7 +565,7 @@ public class UI {
 	public final int maxInventoryCol = 6; // Example: 6 columns
 	public final int maxInventoryRow = 4; // Example: 4 rows
 
-			public static int progressionSelectIndex = 0; // 0: Health, 1: Mana, 2: Attack, 3: Defense, etc.
+	public static int progressionSelectIndex = 0; // 0: Health, 1: Mana, 2: Attack, 3: Defense, etc.
 	//Character Screen
 	public void drawCharacterScreen() {
 		//Window
@@ -578,7 +578,7 @@ public class UI {
 
 		//Text
 		g2.setColor(Color.white);
-		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 35F));
+		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 25F));
 
 		int textX = frameX + gp.tileSize / 2;
 		int textY = frameY + gp.tileSize;
@@ -628,11 +628,11 @@ public class UI {
 
 		// Draw progression points and instructions
 		g2.setColor(Color.white);
-		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 35F));
+		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 25F));
 		g2.drawString(tr("character.progression_points") + ": " + gp.player.progressionPoints, textX, textY);
 		textY += lineHeight;
-		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 35F));
-		g2.drawString("[" + gp.keyConfig.getKeyName(KeyConfig.UP) + "]/[" + gp.keyConfig.getKeyName(KeyConfig.DOWN) + "]:Select", textX, textY); 
+		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 25F));
+		g2.drawString("[" + gp.keyConfig.getKeyName(KeyConfig.UP) + "]/[" + gp.keyConfig.getKeyName(KeyConfig.DOWN) + "]: " + tr("character.select"), textX, textY); 
 		textY += lineHeight;
 		g2.drawString("[" + gp.keyConfig.getKeyName(KeyConfig.CHOOSE) + "]: " + tr("character.add_point"), textX, textY);
 		textY += lineHeight;
@@ -664,7 +664,7 @@ public class UI {
 		if (gp.player.currentHat == null) {
 			// Draw the hat image in the slot
 			g2.setColor(Color.BLACK);
-			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 20F));
+			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 15F));
 			g2.drawString(tr("character.hat"), slotsX + 8, slotsStartY + slotSize - 8);
 		}
 		if (gp.player.currentHat != null) {
@@ -681,7 +681,7 @@ public class UI {
 		if (gp.player.currentArmor == null) {
 			// Draw the armor image in the slot
 			g2.setColor(Color.BLACK);
-			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 20F));
+			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 15F));
 			g2.drawString(tr("character.armor"), slotsX + 8, armorY + slotSize - 8);
 		}
 		if (gp.player.currentArmor != null) {
@@ -698,7 +698,7 @@ public class UI {
 		if (gp.player.currentBoots == null) {
 			// Draw the boots image in the slot
 			g2.setColor(Color.BLACK);
-			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 20F));
+			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 15F));
 			g2.drawString(tr("character.boots"), slotsX + 2, bootsY + slotSize - 8);
 		}
 		if (gp.player.currentBoots != null) {
@@ -715,7 +715,7 @@ public class UI {
 		if (gp.player.currentWeapon == null) {
 			// Draw the weapon image in the slot
 			g2.setColor(Color.BLACK);
-			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 20F));
+			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 15F));
 			g2.drawString(tr("character.weapon"), slotsX + 2, weaponSlotY + slotSize - 8);		
 		}
 		

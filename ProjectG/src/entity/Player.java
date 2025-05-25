@@ -8,7 +8,6 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import item.ITEM_Sword_Normal;
 import main.GamePanel;
 import main.KeyHandler;
 import projectile.PROJECTILE_Fire_Ball;
@@ -49,7 +48,9 @@ public class Player extends Entity{
 		
 		setDefaultValues();
 		getPlayerImage();
-		getPlayerAttackImage();
+		if (this.currentWeapon != null){
+			getPlayerAttackImage();
+		}
 		setItems();
 	}
 	
@@ -81,11 +82,11 @@ public class Player extends Entity{
 		this.progressionAttackUpgrades = 0;
 		this.progressionDefenseUpgrades = 0;
 		this.ATTACK_COOLDOWN_MAX = 30; // 30 frames = 0.5s at 60fps
-		currentWeapon = new ITEM_Sword_Normal(gp);
+		currentWeapon = null;
 		currentArmor = null;
 		currentHat = null;
 		currentBoots = null;
-		ATTACK_COOLDOWN_MAX += currentWeapon.cooldownBonus;
+		if (currentWeapon != null) ATTACK_COOLDOWN_MAX += currentWeapon.cooldownBonus;
 		Projectile projectileList = new PROJECTILE_Fire_Ball(gp);
 
 
@@ -137,7 +138,8 @@ public class Player extends Entity{
 			return;
 		}
 
-		if (keyH.spacePressed == true && attackCooldown == 0) {
+		if (keyH.spacePressed == true && attackCooldown == 0 && this.currentWeapon != null && 
+				!attackCancel) {
 			attacking = true;
 			attackCooldown = ATTACK_COOLDOWN_MAX; // Reset cooldown
 			keyH.spacePressed = false;
