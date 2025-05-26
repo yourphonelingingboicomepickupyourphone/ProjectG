@@ -37,7 +37,9 @@ public class UI {
 
 	public int subState = 0; 
 
-	public int controlsCommandNum = 0;
+	public int menuControlsCommandNum = 0; // for menu controls screen
+	public int controlsCommandNum = 0;     // for options controls screen
+
 	public boolean waitingForKey = false;
 	public String waitingAction = null;
 	public final String[] controlActions = {
@@ -56,7 +58,7 @@ public class UI {
 	public int languageIndex = 0; // Index of selected language
 	public int resolutionIndex = 0;
 	public boolean vsyncOn = true;
-	public String[] qualities = {"Low", "Medium", "High"};
+	
 	public int qualityIndex = 2;
 
 	public boolean fullscreenOn = true;
@@ -64,6 +66,8 @@ public class UI {
 	public String language = "en"; // Default language
 
 	public Properties langProps = new Properties();
+
+	public String[] qualities; // <-- just declare, don't initialize
 
 	public int counter = 0; // Counter for various animations and effects
 
@@ -89,6 +93,8 @@ public class UI {
 		        break;
 		    }
 		}
+		loadLanguage();
+		updateQualities(); // <-- add this
 	}
 	
 	public void addMessage (String text) {
@@ -166,7 +172,7 @@ public class UI {
 			g2.fillRect(0, 0, gp.baseWidth, gp.baseHeight);
 
 			//Title Name
-			g2.setFont(currentFontBold.deriveFont(Font.BOLD, 120F));
+			g2.setFont(currentFontBold.deriveFont(Font.BOLD, 100F));
 			
 			String text = tr("game.title");
 			int x = getXForCenteredText(text);
@@ -233,7 +239,7 @@ public class UI {
 			g2.fillRect(0, 0, gp.baseWidth, gp.baseHeight);
 
 			//Title Name
-			g2.setFont(currentFontBold.deriveFont(Font.BOLD, 120F));
+			g2.setFont(currentFontBold.deriveFont(Font.BOLD, 100F));
 		
 			String text = tr("game.title");
 			int x = getXForCenteredText(text);
@@ -363,6 +369,10 @@ public class UI {
 			g2.drawString(instructions, getXForCenteredText(instructions), menuStartY + options.length * lineHeight + gp.tileSize / 2);
 		} else if (titleScreenState == 4) {
 			drawGraphicsScreen();
+		} else if (titleScreenState == 5){
+			drawLanguageScreen();
+		} else if (titleScreenState == 6) {
+			drawMenuControlsScreen();
 		}
 	}
 
@@ -374,7 +384,7 @@ public class UI {
 		int textY = gp.tileSize * 2;
 		int lineHeight = gp.tileSize;
 
-		g2.setFont(currentFontBold.deriveFont(Font.BOLD, 48F));
+		g2.setFont(currentFontBold.deriveFont(Font.BOLD, 100F));
 		g2.setColor(Color.WHITE);
 		String gText = tr("graphics.title");
 		g2.drawString(gText, getXForCenteredText(gText), textY);
@@ -389,7 +399,7 @@ public class UI {
 
 		// VSync
 		if (graphicsCommandNum == 1) g2.setColor(Color.YELLOW); else g2.setColor(Color.WHITE);
-		g2.drawString(tr("graphics.vsync") + ": " + (vsyncOn ? "On" : "Off"), textX, textY);
+		g2.drawString(tr("graphics.vsync") + ": " + (vsyncOn ? tr("on"): tr("off")), textX, textY);
 		textY += lineHeight;
 
 		// Quality
@@ -399,7 +409,7 @@ public class UI {
 
 		// Fullscreen
 		if (graphicsCommandNum == 3) g2.setColor(Color.YELLOW); else g2.setColor(Color.WHITE);
-		g2.drawString(tr("graphics.fullscreen") + ": " + (fullscreenOn ? "On" : "Off"), textX, textY);
+		g2.drawString(tr("graphics.fullscreen") + ": " + (fullscreenOn ? tr("on"): tr("off")), textX, textY);
 		textY += lineHeight * 2;
 
 		// Back
@@ -1262,6 +1272,136 @@ public class UI {
 	    }
 	}
 
+	public void drawLanguageScreen(){
+		g2.setColor(new Color(243, 193, 8));
+		g2.fillRect(0, 0, gp.baseWidth, gp.baseHeight);
+
+		int frameY = gp.tileSize * 2;
+		int lineHeight = gp.tileSize;
+
+
+		g2.setFont(currentFontBold.deriveFont(Font.BOLD, 100F));
+		String title = tr("options.language");
+		int titleX = getXForCenteredText(title);
+		int titleY = frameY;
+		g2.setColor(Color.WHITE);
+		g2.drawString(title, titleX, titleY);
+
+		titleY += gp.tileSize * 2;
+
+		g2.setFont(currentFont.deriveFont(Font.PLAIN, 36F));
+		int optionY = titleY + gp.tileSize;
+		for (int i = 0; i < languageNames.length; i++) {
+			int optionX = getXForCenteredText(languageNames[i]);
+			if (languageIndex == i) {
+				g2.setColor(Color.YELLOW);
+				g2.drawString(">", optionX - gp.tileSize, optionY);
+			}
+			g2.setColor(Color.WHITE);
+			g2.drawString(languageNames[i], optionX, optionY);
+			optionY += lineHeight;
+		}
+
+		// Draw "Back" option
+		String back = tr("options.back");
+		int backX = getXForCenteredText(back);
+		if (languageIndex == languageNames.length) {
+			g2.setColor(Color.YELLOW);
+			g2.drawString(">", backX - gp.tileSize, optionY);
+		}
+		g2.setColor(Color.WHITE);
+		g2.drawString(back, backX, optionY);
+	}
+
+	public void drawMenuControlsScreen() {
+	    g2.setColor(new Color(243, 193, 8));
+	    g2.fillRect(0, 0, gp.baseWidth, gp.baseHeight);
+
+
+	    int frameX = gp.tileSize;
+	    int frameY = gp.tileSize * 2;
+	    int frameWidth = gp.tileSize * 10;
+	    int frameHeight = gp.tileSize * (controlActions.length / 2 + 5);
+
+
+	    g2.setFont(currentFontBold.deriveFont(Font.BOLD, 100F));
+	    String title = tr("controls.title");
+	    int titleX = getXForCenteredText(title);
+	    int titleY = frameY;
+	    g2.setColor(Color.WHITE);
+	    g2.drawString(title, titleX, titleY);
+
+
+	    g2.setFont(currentFont.deriveFont(Font.PLAIN, 36F));
+	    int lineHeight = gp.tileSize;
+		int colGap = gp.tileSize * 2; // space between columns
+		int colWidth = (frameWidth - colGap) / 2;
+		int col1X = frameX + (frameWidth - (colWidth * 2 + colGap)) / 2;
+		int col2X = col1X + colWidth + colGap;
+	    int startY = titleY + gp.tileSize * 2;
+
+	    // Draw left and right columns
+	    int total = controlActions.length;
+	    int rows = (total + 1) / 2;
+	    for (int row = 0; row < rows; row++) {
+	        // Left column
+	        int i = row * 2;
+	        if (i < total) {
+	            String action = controlActions[i];
+	            String actionName = tr("controls." + action.toLowerCase());
+	            String keyName = gp.keyConfig.getKeyName(action);
+	            if (menuControlsCommandNum == i && !waitingForKey) {
+	                g2.setColor(Color.YELLOW);
+	                g2.drawString(">", col1X - gp.tileSize, startY + row * lineHeight);
+	            }
+	            g2.setColor(Color.WHITE);
+	            g2.drawString(actionName + ": " + keyName, col1X, startY + row * lineHeight);
+	        }
+	        // Right column
+	        int j = i + 1;
+	        if (j < total) {
+	            String action = controlActions[j];
+	            String actionName = tr("controls." + action.toLowerCase());
+	            String keyName = gp.keyConfig.getKeyName(action);
+	            if (menuControlsCommandNum == j && !waitingForKey) {
+	                g2.setColor(Color.YELLOW);
+	                g2.drawString(">", col2X - gp.tileSize, startY + row * lineHeight);
+	            }
+	            g2.setColor(Color.WHITE);
+	            g2.drawString(actionName + ": " + keyName, col2X, startY + row * lineHeight);
+	        }
+	    }
+
+	    // Draw "Back" option at the bottom center
+	    int backY = startY + rows * lineHeight + lineHeight / 2;
+	    String back = tr("controls.back");
+	    int backX = getXForCenteredText(back);
+	    if (menuControlsCommandNum == controlActions.length && !waitingForKey) {
+	        g2.setColor(Color.YELLOW);
+	        g2.drawString(">", backX - gp.tileSize, backY);
+	    }
+	    g2.setColor(Color.WHITE);
+	    g2.drawString(back, backX, backY);
+
+	    // Show waiting for key message
+	    if (waitingForKey) {
+	        g2.setColor(Color.CYAN);
+	        String kText = tr("message.press_key");
+	        g2.drawString(kText, getXForCenteredText(kText), backY + lineHeight);
+	    }
+
+	    // Show duplicate key warning
+	    if (keyBindWarning) {
+	        g2.setColor(Color.RED);
+	        String warn = tr("message.key_already_assigned");
+	        g2.drawString(warn, getXForCenteredText(warn), backY + lineHeight * 2);
+	        // Hide warning after 2 seconds
+	        if (System.currentTimeMillis() - keyBindWarningTime > 2000) {
+	            keyBindWarning = false;
+	        }
+	    }
+	}
+
 	public void drawGameOverScreen() {
 		g2.setColor(new Color(0, 0, 0, 150));
 		g2.fillRect(0, 0, gp.baseWidth, gp.baseHeight);
@@ -1383,6 +1523,7 @@ public class UI {
     } catch (IOException e) {
         e.printStackTrace();
     }
+    updateQualities(); // <-- add this at the end
 }
 
     public String tr(String key) {
@@ -1411,4 +1552,13 @@ public class UI {
         g2.drawImage(gp.player.fullBody, gp.player.screenX, gp.player.screenY, gp.tileSize * 2, gp.tileSize * 2, null);
         g2.setComposite(original);
     }
+
+    // Add this method:
+public void updateQualities() {
+    qualities = new String[] {
+        tr("quality.low"),
+        tr("quality.medium"),
+        tr("quality.high")
+    };
+}
 }

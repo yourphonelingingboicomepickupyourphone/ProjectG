@@ -20,9 +20,10 @@ public class KeyHandler implements KeyListener{
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		int code = e.getKeyCode();
+    	int code = e.getKeyCode();
 
 		if (gp.gameState == gp.titleState) {
+			// Handle all title screen substates here!
 			titleState(code);
 		}
 
@@ -92,6 +93,7 @@ public class KeyHandler implements KeyListener{
 					System.exit(0);
 					gp.config.saveConfig();
 				}
+
 			}
 			
 		}
@@ -154,6 +156,14 @@ public class KeyHandler implements KeyListener{
 				if (gp.ui.commandNum == 2) {
 					gp.ui.commandNum = 0; 
 					gp.ui.titleScreenState = 4;
+				}
+				if (gp.ui.commandNum == 3) {
+					gp.ui.commandNum = 0; // Reset cursor to first option
+					gp.ui.titleScreenState = 5; // Show language
+				}
+				if (gp.ui.commandNum == 4) {
+					gp.ui.commandNum = 0; // Reset cursor to first option
+					gp.ui.titleScreenState = 6; // Show controls
 				}
 				if (gp.ui.commandNum == 5) {
 					gp.ui.titleScreenState = 0; // Go back to main menu
@@ -228,17 +238,11 @@ public class KeyHandler implements KeyListener{
 		}
 		
 		else if (gp.ui.titleScreenState == 5) {
-			if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
-				gp.gameState = gp.playState;
-				gp.ui.titleScreenState = 0; // Go back to main menu
-			}
+			languageSelectState(code);
 		}
 		
 		else if (gp.ui.titleScreenState == 6) {
-			if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
-				gp.gameState = gp.playState;
-				gp.ui.titleScreenState = 0; // Go back to main menu
-			}
+			menuControlsState(code);
 		}
 
 	}
@@ -586,5 +590,93 @@ public class KeyHandler implements KeyListener{
 	private String generateRandomName() {
 	    String[] names = {"Alex", "Riley", "Morgan", "Casey", "Jordan", "Taylor", "Skyler", "Jamie", "Avery", "Quinn"};
 	    return names[(int)(Math.random() * names.length)];
+	}
+	public void languageSelectState(int code) {
+	    // Move up
+	    if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
+	        gp.ui.languageIndex--;
+	        if (gp.ui.languageIndex < 0) gp.ui.languageIndex = gp.ui.languageNames.length; // wrap to "Back"
+	    }
+	    // Move down
+	    if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
+	        gp.ui.languageIndex++;
+	        if (gp.ui.languageIndex > gp.ui.languageNames.length) gp.ui.languageIndex = 0; // wrap to first
+	    }
+	    // Select
+	    if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
+	        if (gp.ui.languageIndex == gp.ui.languageNames.length) {
+	            // "Back" selected
+	            gp.ui.titleScreenState = 3; // Go back to options/settings
+	        } else {
+	            // Change language
+	            gp.ui.language = gp.ui.languageCodes[gp.ui.languageIndex];
+	            gp.ui.loadLanguage();
+	            gp.config.saveConfig(); // If you want to save the language selection
+	        }
+	    }
+	    // ESCAPE also goes back
+	    if (code == gp.keyConfig.getKey(KeyConfig.ESCAPE)) {
+	        gp.ui.titleScreenState = 3;
+	    }
+	}
+	public void menuControlsState(int code) {
+	    int total = gp.ui.controlActions.length;
+	    int cols = 2;
+	    int rows = (total + 1) / 2;
+
+	    int index = gp.ui.menuControlsCommandNum;
+	    int row = index / cols;
+	    int col = index % cols;
+
+	    if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
+	        if (gp.ui.menuControlsCommandNum == total) {
+	            row = rows - 1;
+	            col = 0;
+	        } else {
+	            row--;
+	            if (row < 0) {
+	                gp.ui.menuControlsCommandNum = total;
+	                return;
+	            }
+	        }
+	    }
+	    if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
+	        row++;
+	        if (row >= rows || (row * cols + col) >= total) {
+	            gp.ui.menuControlsCommandNum = total;
+	            return;
+	        }
+	    }
+	    if (code == gp.keyConfig.getKey(KeyConfig.LEFT)) {
+	        if (gp.ui.menuControlsCommandNum == total) return;
+	        col--;
+	        if (col < 0) col = cols - 1;
+	    }
+	    if (code == gp.keyConfig.getKey(KeyConfig.RIGHT)) {
+	        if (gp.ui.menuControlsCommandNum == total) return;
+	        col++;
+	        if (col >= cols) col = 0;
+	    }
+
+	    int newIndex = row * cols + col;
+	    if (newIndex >= total) newIndex = row * cols;
+	    if (code == gp.keyConfig.getKey(KeyConfig.UP) ||
+	        code == gp.keyConfig.getKey(KeyConfig.DOWN) ||
+	        code == gp.keyConfig.getKey(KeyConfig.LEFT) ||
+	        code == gp.keyConfig.getKey(KeyConfig.RIGHT)) {
+	        gp.ui.menuControlsCommandNum = newIndex;
+	    }
+
+	    if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
+	        if (gp.ui.menuControlsCommandNum == total) {
+	            gp.ui.titleScreenState = 3; // Go back to options/settings
+	        } else {
+	            gp.ui.waitingForKey = true;
+	            gp.ui.waitingAction = gp.ui.controlActions[gp.ui.menuControlsCommandNum];
+	        }
+	    }
+	    if (code == gp.keyConfig.getKey(KeyConfig.ESCAPE)) {
+	        gp.ui.titleScreenState = 3;
+	    }
 	}
 }
