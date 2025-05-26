@@ -7,6 +7,7 @@ import item.ITEM_Armor_Normal;
 import item.ITEM_Better_Armor;
 import item.ITEM_Door_Key;
 import monster.MON_rSlime;
+import object.OBJ_Chest;
 // import object.OBJ_Chest;
 // import object.OBJ_Chest_Locked;
 // import object.OBJ_Door_Closed;
@@ -26,6 +27,10 @@ public class AssetSetter {
 	}
 	
 	public void setObject() {
+		gp.obj[0][0] = new OBJ_Chest(gp);
+		gp.obj[0][0].worldX = gp.tileSize * 47;
+		gp.obj[0][0].worldY = gp.tileSize * 50;
+
 		gp.obj[1][0] = new OBJ_SpawnPoint(gp);
 		gp.obj[1][0].worldX = gp.tileSize * 48;
 		gp.obj[1][0].worldY = gp.tileSize * 49;

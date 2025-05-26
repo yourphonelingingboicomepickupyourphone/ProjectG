@@ -326,7 +326,7 @@ public class Player extends Entity{
 						break;
 				}
 				// Check collision with monsters using the attackHitbox
-				for (int i = 0; i < gp.monster.length; i++) {
+				for (int i = 0; i < gp.monster[gp.currentMap].length; i++) {
 					Entity monster = gp.monster[gp.currentMap][i];
 					if (monster != null && monster.alive) {
 						Rectangle monsterHitbox = new Rectangle(
@@ -383,7 +383,7 @@ public class Player extends Entity{
 						attackHitbox.height = rightHeight;
 						break;
 				}
-				for (int i = 0; i < gp.monster.length; i++) {
+				for (int i = 0; i < gp.monster[gp.currentMap].length; i++) {
 					Entity monster = gp.monster[gp.currentMap][i];
 					if (monster != null && monster.alive) {
 						Rectangle monsterHitbox = new Rectangle(
@@ -430,7 +430,7 @@ public class Player extends Entity{
 						attackHitbox.height = gp.tileSize;
 						break;
 				}
-				for (int i = 0; i < gp.monster.length; i++) {
+				for (int i = 0; i < gp.monster[gp.currentMap].length; i++) {
 					Entity monster = gp.monster[gp.currentMap][i];
 					if (monster != null && monster.alive) {
 						Rectangle monsterHitbox = new Rectangle(
@@ -459,7 +459,7 @@ public class Player extends Entity{
 
 	public void pickUpObject(int i) {
 	    if (i != 999 && gp.obj[gp.currentMap][i].pickable) {
-			if (inventory.size() != maxInventorySize) {
+			if (inventory.size() <= maxInventorySize) {
 				Entity picked = gp.obj[gp.currentMap][i];
 				boolean stacked = false;
 				// Try to stack if same item exists
@@ -474,7 +474,7 @@ public class Player extends Entity{
 				if (!stacked) {
 					inventory.add(picked);
 				}
-				gp.obj[i] = null; // Remove from world
+				gp.obj[gp.currentMap][i] = null; // Remove from world
 			}
 	    }
 	    stackInventory(); // <-- Add this line
@@ -489,8 +489,8 @@ public class Player extends Entity{
 			int closestNpcIndex = -1;
 			double closestDistance = Double.MAX_VALUE;
 
-			for (int j = 0; j < gp.npc.length; j++) {
-				if (gp.npc[j] != null) {
+			for (int j = 0; j < gp.npc[gp.currentMap].length; j++) {
+				if (gp.npc[gp.currentMap][j] != null) {
 					// Expand NPC's solid area by talkRange in all directions
 					Rectangle npcArea = new Rectangle(
 						gp.npc[gp.currentMap][j].worldX + gp.npc[gp.currentMap][j].solidArea.x - (int)talkRange,
@@ -567,6 +567,7 @@ public class Player extends Entity{
 					gp.monster[gp.currentMap][i].dying = true;
 					gp.monster[gp.currentMap][i].dyingCounter = 0;
 					gp.monster[gp.currentMap][i].damageReaction();
+					gp.monster[gp.currentMap][i].checkDrop();
 					gp.ui.addMessage(gp.ui.tr("message.defeat_monster", gp.monster[gp.currentMap][i].name));
 					gp.player.exp += gp.monster[gp.currentMap][i].expReward;
 					gp.player.checkLevelUp();

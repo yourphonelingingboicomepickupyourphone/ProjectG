@@ -3,6 +3,8 @@ package main;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import entity.Entity;
+
 public class KeyHandler implements KeyListener{
 	
 	GamePanel gp;
@@ -51,6 +53,9 @@ public class KeyHandler implements KeyListener{
 		}
 		else if (gp.gameState == gp.gameOverState) {
 			gameOverState(code);
+		}
+		else if (gp.gameState == gp.chestState) {
+			
 		}
 		
 
@@ -507,6 +512,7 @@ public class KeyHandler implements KeyListener{
 				gp.ui.slotRow = gp.ui.maxInventoryRow - 1;
 			} else {
 				gp.ui.slotRow--;
+				
 			}
 		}
 		if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
@@ -518,7 +524,40 @@ public class KeyHandler implements KeyListener{
 			}
 		}
 		if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
-			gp.player.selectItem(0); // The argument is not used, so 0 is fine
+			int itemIndex = gp.ui.getItemIndexOnSlot();
+			if (itemIndex < gp.player.inventory.size()) {
+				Entity selectedItem = gp.player.inventory.get(itemIndex);
+				if (selectedItem != null) {
+					if (selectedItem.itemType == 6) { // Potion or consumable
+						// Use the item
+						selectedItem.use(gp.player);
+						// Decrease quantity or remove if zero
+						selectedItem.quantity--;
+						if (selectedItem.quantity <= 0) {
+							gp.player.inventory.remove(itemIndex);
+							// Adjust cursor if needed
+							int totalItems = gp.player.inventory.size();
+							int maxIndex = totalItems - 1;
+							int currentIndex = gp.ui.slotRow * gp.ui.maxInventoryCol + gp.ui.slotCol;
+							if (currentIndex > maxIndex) {
+								if (gp.ui.slotCol > 0) {
+									gp.ui.slotCol--;
+								} else if (gp.ui.slotRow > 0) {
+									gp.ui.slotRow--;
+									gp.ui.slotCol = gp.ui.maxInventoryCol - 1;
+									currentIndex = gp.ui.slotRow * gp.ui.maxInventoryCol + gp.ui.slotCol;
+									if (currentIndex > maxIndex) {
+										gp.ui.slotCol = maxIndex % gp.ui.maxInventoryCol;
+									}
+								}
+							}
+						}
+					} else {
+						// Equip the item as before
+						gp.player.selectItem(0);
+					}
+				}
+			}
 		}
 		if (code == gp.keyConfig.getKey(KeyConfig.RESET)){
 			gp.player.disposeSelectedItem();
@@ -620,6 +659,26 @@ public class KeyHandler implements KeyListener{
 	    }
 	}
 	public void menuControlsState(int code) {
+	    if (gp.ui.waitingForKey) {
+	        // Check for duplicate key assignment
+	        boolean duplicate = false;
+	        for (String action : gp.ui.controlActions) {
+	            if (gp.keyConfig.getKey(action) == code) {
+	                duplicate = true;
+	                break;
+	            }
+	        }
+	        if (!duplicate) {
+	            gp.keyConfig.setKey(gp.ui.waitingAction, code);
+	        } else {
+	            gp.ui.keyBindWarning = true;
+	            gp.ui.keyBindWarningTime = System.currentTimeMillis();
+	        }
+	        gp.ui.waitingForKey = false;
+	        gp.ui.waitingAction = null;
+	        return;
+	    }
+
 	    int total = gp.ui.controlActions.length;
 	    int cols = 2;
 	    int rows = (total + 1) / 2;
@@ -679,4 +738,5 @@ public class KeyHandler implements KeyListener{
 	        gp.ui.titleScreenState = 3;
 	    }
 	}
+	
 }

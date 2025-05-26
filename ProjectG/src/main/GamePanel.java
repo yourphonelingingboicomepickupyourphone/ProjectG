@@ -304,4 +304,5 @@ public class GamePanel extends JPanel implements Runnable{
 	    aSetter.setMonster();
 	    aSetter.setObject();
 	}
+
 }

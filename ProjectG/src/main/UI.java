@@ -146,8 +146,7 @@ public class UI {
 
 		//Chest State
 		else if (gp.gameState == gp.chestState) {
-			drawInventoryScreen();
-			drawChestScreen();
+			
 		}
 
 		else if (gp.gameState == gp.optionsState) {
@@ -1317,12 +1316,10 @@ public class UI {
 	    g2.setColor(new Color(243, 193, 8));
 	    g2.fillRect(0, 0, gp.baseWidth, gp.baseHeight);
 
-
-	    int frameX = gp.tileSize;
-	    int frameY = gp.tileSize * 2;
 	    int frameWidth = gp.tileSize * 10;
 	    int frameHeight = gp.tileSize * (controlActions.length / 2 + 5);
-
+	    int frameX = (gp.baseWidth - frameWidth) / 2;
+	    int frameY = gp.tileSize * 2;
 
 	    g2.setFont(currentFontBold.deriveFont(Font.BOLD, 100F));
 	    String title = tr("controls.title");
@@ -1334,10 +1331,12 @@ public class UI {
 
 	    g2.setFont(currentFont.deriveFont(Font.PLAIN, 36F));
 	    int lineHeight = gp.tileSize;
-		int colGap = gp.tileSize * 2; // space between columns
-		int colWidth = (frameWidth - colGap) / 2;
-		int col1X = frameX + (frameWidth - (colWidth * 2 + colGap)) / 2;
-		int col2X = col1X + colWidth + colGap;
+	    int colGap = gp.tileSize * 2; // space between columns
+	    int colWidth = (frameWidth - colGap) / 2;
+	    // Center columns horizontally within the screen
+	    int totalColsWidth = colWidth * 2 + colGap;
+	    int col1X = (gp.baseWidth - totalColsWidth) / 2;
+	    int col2X = col1X + colWidth + colGap;
 	    int startY = titleY + gp.tileSize * 2;
 
 	    // Draw left and right columns
@@ -1561,4 +1560,6 @@ public void updateQualities() {
         tr("quality.high")
     };
 }
+
+
 }
