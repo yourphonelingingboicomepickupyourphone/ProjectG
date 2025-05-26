@@ -144,6 +144,7 @@ public class KeyHandler implements KeyListener{
 			} else if (code == gp.keyConfig.getKey(KeyConfig.ESCAPE)) {
 				gp.ui.typingName = false;
 				gp.ui.titleScreenState = 0; // Go back to main menu
+				gp.ui.commandNum = 0; // Reset command number
 			}
 			return; // Prevent further processing if on name input
 		}
@@ -172,6 +173,7 @@ public class KeyHandler implements KeyListener{
 				}
 				if (gp.ui.commandNum == 5) {
 					gp.ui.titleScreenState = 0; // Go back to main menu
+					gp.ui.commandNum = 0; // Reset command number
 				}
 				// Add your logic for other options here
 			}
@@ -310,6 +312,7 @@ public class KeyHandler implements KeyListener{
 				case 2: // Return to Main Menu
 					gp.gameState = gp.titleState;
 					gp.ui.titleScreenState = 0;
+					gp.ui.commandNum = 0; // Reset command number
 					break;
 				case 3: System.exit(0); break; // Exit
 			}
@@ -586,6 +589,7 @@ public class KeyHandler implements KeyListener{
 	            gp.player.reset(); // Reset player state
 	            gp.gameState = gp.titleState;
 	            gp.ui.titleScreenState = 0;
+				gp.ui.commandNum = 0;
 	        }
 	    }
 	    // Optional: ESCAPE always returns to main menu
@@ -729,6 +733,7 @@ public class KeyHandler implements KeyListener{
 	    if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
 	        if (gp.ui.menuControlsCommandNum == total) {
 	            gp.ui.titleScreenState = 3; // Go back to options/settings
+	            gp.ui.menuControlsCommandNum = 0;
 	        } else {
 	            gp.ui.waitingForKey = true;
 	            gp.ui.waitingAction = gp.ui.controlActions[gp.ui.menuControlsCommandNum];
@@ -736,6 +741,7 @@ public class KeyHandler implements KeyListener{
 	    }
 	    if (code == gp.keyConfig.getKey(KeyConfig.ESCAPE)) {
 	        gp.ui.titleScreenState = 3;
+	        gp.ui.menuControlsCommandNum = 0;
 	    }
 	}
 	

@@ -693,22 +693,29 @@ public class Player extends Entity{
 		if (itemIndex < inventory.size()) {
 			Entity selectedItem = inventory.get(itemIndex);
 			if (selectedItem == null) return; // Check if the item exists
+			if (selectedItem.itemType == 0 || selectedItem.itemType == 1 || selectedItem.itemType == 2 || selectedItem.itemType == 3) {
+				// Equipment: Weapon, Hat, Armor, Boots
+				if (!canEquip(selectedItem)) {
+					gp.ui.addMessage(gp.ui.tr("message.level_too_low", selectedItem.levelRequirement));
+					return;
+				}
+			}
 			if (selectedItem.itemType == 0) { // Weapon
 				Entity previousWeapon = currentWeapon;
 				currentWeapon = selectedItem;
 				inventory.set(itemIndex, previousWeapon);
 			}
-			else if (selectedItem.itemType == 1) { // Hat
+			else if (selectedItem.itemType == 1) {
 				Entity previousHat = currentHat;
 				currentHat = selectedItem;
 				inventory.set(itemIndex, previousHat);
 			}
-			else if (selectedItem.itemType == 2) { // Armor
+			else if (selectedItem.itemType == 2) {
 				Entity previousArmor = currentArmor;
 				currentArmor = selectedItem;
 				inventory.set(itemIndex, previousArmor);
 			}
-			else if (selectedItem.itemType == 3) { // Boots
+			else if (selectedItem.itemType == 3) {
 				Entity previousBoots = currentBoots;
 				currentBoots = selectedItem;
 				inventory.set(itemIndex, previousBoots);
@@ -824,5 +831,38 @@ public class Player extends Entity{
 
 	public int getTotalMaxMana() {
 	    return maxMana + getEquipmentManaBonus();
+	}
+	
+	public boolean canEquip(Entity item) {
+	    return this.level >= item.levelRequirement;
+	}
+
+	public void equipItem(Entity item) {
+	    if (canEquip(item)) {
+	        // Equip logic here
+	        if (item.itemType == 0) { // Weapon
+				Entity previousWeapon = currentWeapon;
+				currentWeapon = item;
+				inventory.set(inventory.indexOf(item), previousWeapon);
+			}
+			else if (item.itemType == 1) { // Hat
+				Entity previousHat = currentHat;
+				currentHat = item;
+				inventory.set(inventory.indexOf(item), previousHat);
+			}
+			else if (item.itemType == 2) { // Armor
+				Entity previousArmor = currentArmor;
+				currentArmor = item;
+				inventory.set(inventory.indexOf(item), previousArmor);
+			}
+			else if (item.itemType == 3) { // Boots
+				Entity previousBoots = currentBoots;
+				currentBoots = item;
+				inventory.set(inventory.indexOf(item), previousBoots);
+			}
+	    } else {
+	        // Show message: "You need to be level " + item.levelRequirement + " to equip this item."
+	    	gp.ui.addMessage("You need to be level " + item.levelRequirement + " to equip this item.");
+	    }
 	}
 }

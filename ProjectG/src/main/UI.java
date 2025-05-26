@@ -925,7 +925,7 @@ public class UI {
 		    }
 
 		    if (selectedItem.type == 3 && selectedItem.itemType == 0 || selectedItem.itemType == 1 || selectedItem.itemType == 2 || selectedItem.itemType == 3) {
-		        g2.drawString(tr("item.level_required") + selectedItem.levelRequirement, descX, descY);
+		        g2.drawString(tr("item.level_required") + ": " + selectedItem.levelRequirement, descX, descY);
 		        descY += lineHeight;
 		    }
 
@@ -1337,7 +1337,7 @@ public class UI {
 	    int totalColsWidth = colWidth * 2 + colGap;
 	    int col1X = (gp.baseWidth - totalColsWidth) / 2;
 	    int col2X = col1X + colWidth + colGap;
-	    int startY = titleY + gp.tileSize * 2;
+	    int startY = titleY + gp.tileSize * 5 / 2;
 
 	    // Draw left and right columns
 	    int total = controlActions.length;
@@ -1351,7 +1351,7 @@ public class UI {
 	            String keyName = gp.keyConfig.getKeyName(action);
 	            if (menuControlsCommandNum == i && !waitingForKey) {
 	                g2.setColor(Color.YELLOW);
-	                g2.drawString(">", col1X - gp.tileSize, startY + row * lineHeight);
+	                g2.drawString(">", col1X - gp.tileSize / 2, startY + row * lineHeight);
 	            }
 	            g2.setColor(Color.WHITE);
 	            g2.drawString(actionName + ": " + keyName, col1X, startY + row * lineHeight);
@@ -1364,7 +1364,7 @@ public class UI {
 	            String keyName = gp.keyConfig.getKeyName(action);
 	            if (menuControlsCommandNum == j && !waitingForKey) {
 	                g2.setColor(Color.YELLOW);
-	                g2.drawString(">", col2X - gp.tileSize, startY + row * lineHeight);
+	                g2.drawString(">", col2X - gp.tileSize / 2, startY + row * lineHeight);
 	            }
 	            g2.setColor(Color.WHITE);
 	            g2.drawString(actionName + ": " + keyName, col2X, startY + row * lineHeight);
@@ -1372,7 +1372,7 @@ public class UI {
 	    }
 
 	    // Draw "Back" option at the bottom center
-	    int backY = startY + rows * lineHeight + lineHeight / 2;
+	    int backY = startY + rows * lineHeight + lineHeight * 3 / 2;
 	    String back = tr("controls.back");
 	    int backX = getXForCenteredText(back);
 	    if (menuControlsCommandNum == controlActions.length && !waitingForKey) {
