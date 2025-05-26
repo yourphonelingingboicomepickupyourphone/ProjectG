@@ -1,9 +1,13 @@
 package object;
 
+import java.util.ArrayList;
+
 import entity.Entity;
 import main.GamePanel;
 
 public class OBJ_Chest extends Entity{
+	
+	public ArrayList<Entity> chestInventory = new ArrayList<>();
 	
 	public OBJ_Chest(GamePanel gp) {
 		

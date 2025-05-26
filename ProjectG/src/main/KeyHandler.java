@@ -55,7 +55,22 @@ public class KeyHandler implements KeyListener{
 			gameOverState(code);
 		}
 		else if (gp.gameState == gp.chestState) {
-			chestState(code);
+			if (code == KeyEvent.VK_ENTER) {
+				gp.player.selectChestItem(gp.ui.chestRow, gp.ui.chestCol);
+			}
+			if (code == KeyEvent.VK_UP && gp.ui.chestRow > 0) {
+				gp.ui.chestRow--;
+			}
+			if (code == KeyEvent.VK_DOWN && gp.ui.chestRow < gp.ui.maxChestRow - 1) {
+				gp.ui.chestRow++;
+			}
+			if (code == KeyEvent.VK_LEFT && gp.ui.chestCol > 0) {
+				gp.ui.chestCol--;
+			}
+			if (code == KeyEvent.VK_RIGHT && gp.ui.chestCol < gp.ui.maxChestCol - 1) {
+				gp.ui.chestCol++;
+			}
+
 		}
 		
 
@@ -748,9 +763,7 @@ public class KeyHandler implements KeyListener{
 	public void chestState(int code) {
 		if (code == gp.keyConfig.getKey(KeyConfig.ESCAPE)) {
 			gp.gameState = gp.playState; // Close chest and return to play state
-		}
-		if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
-			
+			gp.player.currentChest = null; // Clear current chest reference
 		}
 	}
 }

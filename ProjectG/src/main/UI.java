@@ -16,6 +16,7 @@ import java.util.Properties;
 import javax.imageio.ImageIO;
 
 import entity.Entity;
+import object.OBJ_Chest;
 
 public class UI {
 	
@@ -1061,6 +1062,8 @@ public class UI {
 
 
 	public void drawChestScreen() {
+		OBJ_Chest chest = (OBJ_Chest) gp.player.currentChest;
+		if (chest == null) return; // No chest
 		// Window
 		int frameX = gp.tileSize * 13;
 		int frameY = gp.tileSize;
@@ -1115,6 +1118,135 @@ public class UI {
 		g2.setStroke(new BasicStroke(5));
 		g2.fillRoundRect(cursorX, cursorY, chestWidth, chestHeight, cursorArc, cursorArc);
 		g2.setStroke(new BasicStroke(1f)); // Reset stroke
+
+		// Draw items in slots (skip nulls)
+		int itemIndex = 0;
+		for (int row = 0; row < maxChestRow; row++) {
+			for (int col = 0; col < maxChestCol; col++) {
+				int x = chestXStart + col * (chestWidth + chestGap);
+				int y = chestYStart + row * (chestHeight + chestGap);
+
+				if (itemIndex < chest.chestInventory.size()) {
+					Entity item = chest.chestInventory.get(itemIndex);
+					if (item != null) {
+						if (item.down1 != null) {
+							g2.drawImage(
+								item.down1,
+								x + (chestWidth - gp.tileSize) / 2,
+								y + (chestHeight - gp.tileSize) / 2,
+								gp.tileSize, gp.tileSize,
+								null
+							);
+						}
+						// Display quantity for stackable items
+						if (item != null && item.quantity > 1) {
+						    g2.setFont(g2.getFont().deriveFont(Font.BOLD, 18F));
+						    g2.setColor(Color.WHITE);
+						    String qtyText = "x" + item.quantity;
+						    int qtyWidth = g2.getFontMetrics().stringWidth(qtyText);
+						    g2.drawString(qtyText, x + chestWidth - qtyWidth - 4, y + chestHeight - 6);
+						}
+					} else {
+						// Draw placeholder text or icon for empty slot in inventory
+						g2.setColor(new Color(200, 200, 200, 120));
+						g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 20F));
+						String emptyText = tr("inventory.empty");
+						int textWidth = g2.getFontMetrics().stringWidth(emptyText);
+						g2.drawString(emptyText, x + (chestWidth - textWidth) / 2, y + chestHeight / 2 + 6);
+					}
+				} else {
+					// Draw placeholder for slots beyond inventory size
+					g2.setColor(new Color(200, 200, 200, 120));
+					g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 20F));
+					String emptyText = tr("inventory.empty");
+					int textWidth = g2.getFontMetrics().stringWidth(emptyText);
+					g2.drawString(emptyText, x + (chestWidth - textWidth) / 2, y + chestHeight / 2 + 6);
+				}
+				itemIndex++;
+			}
+		}
+		
+		// Draw selected item's name and info below the grid
+		int selectedIndex = chestRow * maxChestCol + chestCol;
+		Entity selectedItem = null;
+		if (selectedIndex < chest.chestInventory.size()) {
+		    selectedItem = chest.chestInventory.get(selectedIndex);
+		}
+
+		// Draw selected item's name and info below the grid
+		// Calculate info area position (always, so variables are in scope)
+		int infoX = frameX + gp.tileSize / 2;
+		int infoWidth = width - gp.tileSize;
+		int infoHeight = gp.tileSize * 3 + gp.tileSize / 2;
+
+		// Clamp info box to not go beyond the inventory window
+		if (infoX + infoWidth > frameX + width - 8) {
+		    infoWidth = frameX + width - 8 - infoX;
+		}
+
+		// Don't let info box overlap character window
+		int characterWindowX = gp.tileSize * 13;
+		if (infoX + infoWidth > characterWindowX - 8) {
+		    infoWidth = characterWindowX - 8 - infoX;
+		}
+
+		// Default: draw below the grid
+		int infoY = chestYStart + maxChestRow * (chestHeight + chestGap);
+
+		// If it would go off the bottom, draw above the grid instead
+		if (infoY + infoHeight > gp.baseHeight - gp.tileSize / 2) {
+		    infoY = chestYStart - infoHeight - gp.tileSize / 6;
+		    // If still off the top, clamp to at least frameY
+		    if (infoY < frameY + 8) infoY = frameY + 8;
+		}
+
+		// Draw info background
+		g2.setColor(new Color(40, 40, 40, 220));
+		g2.fillRoundRect(infoX, infoY, infoWidth, infoHeight, 20, 20);
+
+		if (selectedItem != null) {
+		    // Draw selected item's name and info below the grid
+		    g2.setColor(Color.WHITE);
+		    g2.setFont(g2.getFont().deriveFont(Font.BOLD, 32F));
+		    g2.drawString(selectedItem.name, infoX + 24, infoY + 40);
+
+		    // Draw item description/info (wrap or trim as needed)
+		    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 24F));
+		    int descX = infoX + 24;
+		    int descY = infoY + 80;
+		    int lineHeight = g2.getFontMetrics().getHeight();
+		    int maxDescWidth = infoWidth - 48;
+
+		    java.util.List<String> lines = wrapText(selectedItem.description, maxDescWidth, g2);
+		    for (String line : lines) {
+		        g2.drawString(line, descX, descY);
+		        descY += lineHeight;
+		    }
+
+		    // Draw basic stats if present
+		    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 22F));
+		    if (selectedItem.healthBonus != 0) {
+		        g2.drawString(tr("character.health") + ": " + (selectedItem.healthBonus > 0 ? "+" : "") + selectedItem.healthBonus, descX, descY);
+		        descY += lineHeight;
+		    }
+		    if (selectedItem.manaBonus != 0) {
+		        g2.drawString(tr("character.mana") + ": " + (selectedItem.manaBonus > 0 ? "+" : "") + selectedItem.manaBonus, descX, descY);
+		        descY += lineHeight;
+		    }
+		    if (selectedItem.attackBonus != 0) {
+		        g2.drawString(tr("character.attack") + ": " + (selectedItem.attackBonus > 0 ? "+" : "") + selectedItem.attackBonus, descX, descY);
+		        descY += lineHeight;
+		    }
+		    if (selectedItem.defenseBonus != 0) {
+		        g2.drawString(tr("character.defense") + ": " + (selectedItem.defenseBonus > 0 ? "+" : "") + selectedItem.defenseBonus, descX, descY);
+		        descY += lineHeight;
+		    }
+
+		    if (selectedItem.type == 3 && selectedItem.itemType == 0 || selectedItem.itemType == 1 || selectedItem.itemType == 2 || selectedItem.itemType == 3) {
+		        g2.drawString(tr("item.level_required") + ": " + selectedItem.levelRequirement, descX, descY);
+		        descY += lineHeight;
+		    }
+		}
 	}
 
 	public void drawOptionsScreen(){

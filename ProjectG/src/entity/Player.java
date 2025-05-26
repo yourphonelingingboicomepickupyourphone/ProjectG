@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import main.GamePanel;
 import main.KeyHandler;
+import object.OBJ_Chest;
 import projectile.PROJECTILE_Fire_Ball;
 
 public class Player extends Entity{
@@ -23,7 +24,6 @@ public class Player extends Entity{
 	public boolean justFinishTalking = false;
 	int standCounter = 0;
 	public boolean attackCancel = false;
-	public ArrayList<Entity> inventory = new ArrayList<>();
 	public int maxInventorySize = 24;
 
 	public int deathAnimCounter = 0;
@@ -33,6 +33,8 @@ public class Player extends Entity{
     final int RECOIL_DURATION = 10;
     public int attackCooldown = 0;
     public int ATTACK_COOLDOWN_MAX; 
+	public ArrayList<Entity> inventory = new ArrayList<>();
+	public Entity currentChest;
 
 	public Player(GamePanel gp, KeyHandler kH) {
 
@@ -540,7 +542,7 @@ public class Player extends Entity{
 
 	public void interactChest(int i) {
 		if (i != 999 && gp.obj[gp.currentMap][i] != null && gp.obj[gp.currentMap][i].name.equals("Chest")) {
-			// Open the chest
+			gp.player.currentChest = (OBJ_Chest) gp.obj[gp.currentMap][i];
 			((object.OBJ_Chest)gp.obj[gp.currentMap][i]).openChest();
 		}
 	}
@@ -884,4 +886,19 @@ public class Player extends Entity{
 		// Optionally reset direction or other properties
 		this.direction = "down";
 	}
+
+	public void selectChestItem(int row, int col) {
+		if (currentChest == null || !(currentChest instanceof OBJ_Chest)) return;
+
+		OBJ_Chest chest = (OBJ_Chest) currentChest;
+		int index = row * gp.ui.maxChestCol + col;
+		if (index >= 0 && index < chest.chestInventory.size()) {
+			Entity item = chest.chestInventory.get(index);
+			if (item != null && inventory.size() < maxInventorySize) {
+				inventory.add(item);
+				chest.chestInventory.set(index, null); // Remove item from chest
+			}
+		}
+	}
+
 }
