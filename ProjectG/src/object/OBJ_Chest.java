@@ -25,5 +25,8 @@ public class OBJ_Chest extends Entity{
 		collision = true;
 	}
 	
+	public void openChest(){
+		gp.gameState = gp.chestState;
+	}
 	
 }

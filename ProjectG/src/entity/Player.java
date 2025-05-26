@@ -18,6 +18,8 @@ public class Player extends Entity{
 	
 	public final int screenX;
 	public final int screenY;
+	public int defaultWorldX;
+    public int defaultWorldY;
 	public boolean justFinishTalking = false;
 	int standCounter = 0;
 	public boolean attackCancel = false;
@@ -60,6 +62,9 @@ public class Player extends Entity{
 	public void setDefaultValues() {
 		worldX = gp.tileSize * 50 - gp.tileSize/2;
 		worldY = gp.tileSize * 50 - gp.tileSize/2;
+
+		this.defaultWorldX = this.worldX;
+        this.defaultWorldY = this.worldY;
 
 		int defaultSpeed = 5;
 		speed = defaultSpeed;
@@ -182,7 +187,11 @@ public class Player extends Entity{
 
 			if (keyH.enterPressed == true) {
 				if (objIndex != 999) {
-					pickUpObject(objIndex);
+					if (gp.obj[gp.currentMap][objIndex] != null && gp.obj[gp.currentMap][objIndex].name.equals("Chest")) {
+						interactChest(objIndex);
+					} else {
+						pickUpObject(objIndex);
+					}
 				} else if (npcIndex != 999) {
 					interactNPC(npcIndex);
 				}
@@ -530,8 +539,9 @@ public class Player extends Entity{
 	}
 
 	public void interactChest(int i) {
-		if (i != 999) {
-			
+		if (i != 999 && gp.obj[gp.currentMap][i] != null && gp.obj[gp.currentMap][i].name.equals("Chest")) {
+			// Open the chest
+			((object.OBJ_Chest)gp.obj[gp.currentMap][i]).openChest();
 		}
 	}
 
@@ -779,6 +789,7 @@ public class Player extends Entity{
 		spriteCounter = 0;
 		direction = "down";
 		setItems();
+		gp.resetToFirstMap();
 	}
 
 	public int getEquipmentHealthBonus() {
@@ -864,5 +875,13 @@ public class Player extends Entity{
 	        // Show message: "You need to be level " + item.levelRequirement + " to equip this item."
 	    	gp.ui.addMessage("You need to be level " + item.levelRequirement + " to equip this item.");
 	    }
+	}
+
+	public void setDefaultPosition() {
+		// Set default world coordinates (customize as needed)
+		this.worldX = 0;
+		this.worldY = 0;
+		// Optionally reset direction or other properties
+		this.direction = "down";
 	}
 }

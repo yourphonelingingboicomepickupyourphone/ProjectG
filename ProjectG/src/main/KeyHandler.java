@@ -55,7 +55,7 @@ public class KeyHandler implements KeyListener{
 			gameOverState(code);
 		}
 		else if (gp.gameState == gp.chestState) {
-			
+			chestState(code);
 		}
 		
 
@@ -745,4 +745,12 @@ public class KeyHandler implements KeyListener{
 	    }
 	}
 	
+	public void chestState(int code) {
+		if (code == gp.keyConfig.getKey(KeyConfig.ESCAPE)) {
+			gp.gameState = gp.playState; // Close chest and return to play state
+		}
+		if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
+			
+		}
+	}
 }

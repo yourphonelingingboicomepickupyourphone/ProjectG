@@ -146,7 +146,8 @@ public class UI {
 
 		//Chest State
 		else if (gp.gameState == gp.chestState) {
-			
+			drawChestScreen();
+			drawInventoryScreen();
 		}
 
 		else if (gp.gameState == gp.optionsState) {

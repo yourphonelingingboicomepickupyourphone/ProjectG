@@ -305,4 +305,21 @@ public class GamePanel extends JPanel implements Runnable{
 	    aSetter.setObject();
 	}
 
+	public void resetToFirstMap() {
+	    currentMap = 0;
+	    for (int i = 0; i < obj[currentMap].length; i++) {
+	        obj[currentMap][i] = null;
+	    }
+	    // If you have an assetSetter, re-place objects for the first map
+	    if (aSetter != null) {
+	        aSetter.setObject();
+	        aSetter.setMonster();
+	    }
+	    // Reset player position to the starting point of the first map
+	    if (player != null) {
+	        player.worldX = player.defaultWorldX;
+	        player.worldY = player.defaultWorldY;
+	    }
+	    // ...add any other resets needed...
+	}
 }
