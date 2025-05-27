@@ -11,6 +11,7 @@ import java.util.Comparator;
 
 import javax.swing.JPanel;
 
+import ai.PathFinder;
 import entity.Entity;
 import entity.Player;
 import tile.TileManager;
@@ -39,13 +40,14 @@ public class GamePanel extends JPanel implements Runnable{
 	
 	
 	//System Settings
-	TileManager tileM = new TileManager(this);
+	public TileManager tileM = new TileManager(this);
 	public KeyHandler keyH = new KeyHandler(this);
 	public CollisionChecker cChecker = new CollisionChecker(this);
 	public AssetSetter aSetter = new AssetSetter(this);
 	public UI ui = new UI(this);
 	public EventHandler eHandler = new EventHandler(this);
 	public Config config;
+	public PathFinder pFinder = new PathFinder(this);
 
 	Thread gameThread;
 	
@@ -71,6 +73,8 @@ public class GamePanel extends JPanel implements Runnable{
 	public final int gameOverState = 9;
 	public final int deathState = 10;
 	public final int transitionState = 11;	//Transition state for map change
+
+	public boolean debugMode = false;	//Debug mode, true to enable debug features
 
 	public final int baseWidth = 1920;
 	public final int baseHeight = 1040;
@@ -267,6 +271,24 @@ public class GamePanel extends JPanel implements Runnable{
 			entityList.clear();	//clear the entity list for next time
 			
 			ui.draw(g2);	//ui
+		}
+
+		if (debugMode) {
+			g2.setColor(Color.YELLOW);
+			g2.drawString("DEBUG MODE ON", 10, 20);
+			for (int map = 0; map < monster.length; map++) {
+				for (int i = 0; i < monster[map].length; i++) {
+					Entity m = monster[map][i];
+					if (m != null && m.onPath && m.pathList != null) {
+						g2.setColor(java.awt.Color.RED);
+						for (ai.Node node : m.pathList) {
+							int screenX = node.col * tileSize - player.worldX + player.screenX;
+							int screenY = node.row * tileSize - player.worldY + player.screenY;
+							g2.drawRect(screenX, screenY, tileSize, tileSize);
+						}
+					}
+				}
+			}
 		}
 
 		// Restore the original transform

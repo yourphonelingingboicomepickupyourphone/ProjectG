@@ -290,6 +290,10 @@ public class KeyHandler implements KeyListener{
 		if (code == gp.keyConfig.getKey(KeyConfig.INVENTORY)){
 			gp.gameState = gp.inventoryState;
 		}
+
+		if (code == KeyEvent.VK_F3) {
+			gp.debugMode = !gp.debugMode; // Toggle debug mode
+		}
 	}
 
 

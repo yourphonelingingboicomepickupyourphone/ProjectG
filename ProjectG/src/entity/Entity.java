@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
@@ -37,6 +38,10 @@ public class Entity {
 	public boolean collisionOn = false;
 	public int type; //0 = player, 1 = monster, 2 = npc, 3 = object, 4 = tile
 
+	public int knockbackCounter = 0;
+	public int knockbackDuration = 10; // frames
+	public int knockbackDX = 0;
+	public int knockbackDY = 0;
 	public int actionLockCounter = 0; //to control the action of the entity
 	public boolean invincible = false; //to check if the entity is invincible
 	public int invincibleCounter = 0; //to check the invincibility counter
@@ -54,7 +59,9 @@ public class Entity {
 	public boolean alive = true;
 	public boolean dying = false;
 	public int dyingCounter = 0;
-
+	public boolean onPath = false; //to check if the entity is on a path
+	public ArrayList<ai.Node> pathList = new ArrayList<>();
+	
 	//Attributes
 	public float maxHealth;
 	public float health;
@@ -122,7 +129,17 @@ public class Entity {
 	}
 
 	public void damageReaction() {
-	
+		int dx = worldX - gp.player.worldX;
+		int dy = worldY - gp.player.worldY;
+		int mag = (int)Math.sqrt(dx*dx + dy*dy);
+		if (mag != 0) {
+			knockbackDX = (int)(dx * 8 / (double)mag); // 8 is knockback strength, adjust as needed
+			knockbackDY = (int)(dy * 8 / (double)mag);
+		} else {
+			knockbackDX = 0;
+			knockbackDY = 0;
+		}
+		knockbackCounter = knockbackDuration;
 	}
 
 	public void use(Entity entity) {
@@ -158,6 +175,18 @@ public class Entity {
 		}
 	}
 
+	public void checkCollision(){
+		collisionOn = false;
+		gp.cChecker.checkTile(this); //check tile collision
+		gp.cChecker.checkObject(this, false); //check object collision
+		gp.cChecker.checkEntity(this, gp.npc); //check entity 
+		gp.cChecker.checkEntity(this, gp.monster); //check monster collision
+		boolean contactPlayer = gp.cChecker.checkPlayer(this); //check player collision
+
+		if (this.type == 1 && contactPlayer == true) {
+			damagePlayer(attack);
+		}
+	}
 	public void update() {
 
 		if (gp.gameState == gp.dialogueState) {
@@ -167,25 +196,9 @@ public class Entity {
 		}
 		
 		setAction();
+		checkCollision();
 
-		collisionOn = false;
-		gp.cChecker.checkTile(this); //check tile collision
-		gp.cChecker.checkObject(this, false); //check object collision
-		gp.cChecker.checkEntity(this, gp.npc); //check entity 
-		gp.cChecker.checkEntity(this, gp.monster); //check monster collision
-		boolean contactPlayer = gp.cChecker.checkPlayer(this); //check player collision
-
-		if (this.type == 1 && contactPlayer == true) {
-			if (gp.player.invincible == false && gp.player.collision == true) {
-				int damage = attack - gp.player.getTotalDefense();
-				if (damage < 0) {
-					damage = 0;
-				}
-				gp.player.health -= damage;
-				gp.player.invincible = true;
-				gp.player.invincibleCounter = 0;
-			}
-		}
+		
 		if (this.type == 1 && alive && !dying){
 			timeSinceLastHit++;
 			if (timeSinceLastHit >= healDelay) {
@@ -245,6 +258,14 @@ public class Entity {
 			if (hpBarDisplayCounter <= 0) {
 				showHpBar = false;
 			}
+		}
+
+		if (knockbackCounter > 0) {
+			worldX += knockbackDX;
+			worldY += knockbackDY;
+			knockbackCounter--;
+			// Optionally, check collision and stop knockback if blocked
+			return; // Skip normal movement while being knocked back
 		}
 	}
 
@@ -354,11 +375,87 @@ public class Entity {
 		return image;
 	}
 
+	public void damagePlayer(int attack){
+		if (gp.player.invincible == false && gp.player.collision == true) {
+			int damage = attack - gp.player.getTotalDefense();
+			if (damage < 0) {
+				damage = 0;
+			}
+			gp.player.health -= damage;
+			gp.player.invincible = true;
+			gp.player.invincibleCounter = 0;
+		}
+	}
+
 	public void facePlayer(){
 		// Make NPC face the player (no position flip)
 		if (gp.player.direction.equals("up")) this.direction = "down";
 		else if (gp.player.direction.equals("down")) this.direction = "up";
 		else if (gp.player.direction.equals("left")) this.direction = "right";
 		else if (gp.player.direction.equals("right")) this.direction = "left";
+	}
+
+	public void searchPath(int goalCol, int goalRow) {
+
+		int startCol = (worldX + solidArea.x) / gp.tileSize;
+		int startRow = (worldY + solidArea.y) / gp.tileSize;
+
+		gp.pFinder.setNodes(startCol, startRow, goalCol, goalRow, this);
+
+		if (gp.pFinder.search() == true){
+
+			int nextX = gp.pFinder.pathList.get(0).col * gp.tileSize;
+			int nextY = gp.pFinder.pathList.get(0).row * gp.tileSize;
+
+			int enLeftX = worldX + solidArea.x;
+			int enRightX = worldX + solidArea.x + solidArea.width;
+			int enTopY = worldY + solidArea.y;
+			int enBottomY = worldY + solidArea.y + solidArea.height;
+
+			if (enTopY > nextY && enLeftX >= nextX && enRightX < nextX + gp.tileSize) {
+				if (enTopY > nextY) {
+					direction = "up";
+				}
+				if (enTopY < nextY) {
+					direction = "down";
+				}
+			} else if (enTopY >= nextY && enBottomY < nextY + gp.tileSize) {
+				if (enLeftX < nextX) {
+					direction = "right";
+				} else if (enRightX > nextX + gp.tileSize) {
+					direction = "left";
+				}
+			} else if (enTopY > nextY && enLeftX > nextX){
+				direction = "up";
+				checkCollision();
+				if (collisionOn == true) {
+					direction = "left";
+				}
+			} else if (enTopY > nextY && enLeftX < nextX){
+				direction = "up";
+				checkCollision();
+				if (collisionOn == true) {
+					direction = "right";
+				}
+			} else if (enTopY < nextY && enLeftX > nextX){
+				direction = "down";
+				checkCollision();
+				if (collisionOn == true) {
+					direction = "left";
+				}
+			} else if (enTopY < nextY && enLeftX < nextX){
+				direction = "down";
+				checkCollision();
+				if (collisionOn == true) {
+					direction = "right";
+				}
+			}
+
+			int nextCol = gp.pFinder.pathList.get(0).col;
+			int nextRow = gp.pFinder.pathList.get(0).row;
+			if(goalCol == nextCol && goalRow == nextRow && (worldX / gp.tileSize == goalCol && worldY / gp.tileSize == goalRow)) {
+				onPath = false;
+			} 
+		}
 	}
 }

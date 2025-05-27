@@ -50,6 +50,13 @@ public class NPC_Wizard extends Entity {
     }
 
     public void setAction() {
+
+        if (onPath == true){
+            int goalCol = (gp.player.worldX + gp.player.solidArea.x) / gp.tileSize;
+            int goalRow = (gp.player.worldY + gp.player.solidArea.y) / gp.tileSize;
+
+            searchPath(goalCol, goalRow);
+        } else {
             actionLockCounter++;
             if(actionLockCounter == 240) //direction changes after 2 secs
             {
@@ -73,8 +80,10 @@ public class NPC_Wizard extends Entity {
                 }
                 actionLockCounter = 0; // reset
             }
+        }
     }
     public void speak() {
         super.speak();
+        onPath = true;
     }
 }

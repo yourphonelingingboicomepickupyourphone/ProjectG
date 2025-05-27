@@ -39,6 +39,10 @@ public class Player extends Entity{
 	public int FLASH_COOLDOWN_MAX = 3600; // 60 seconds at 60fps
 	public int FLASH_RANGE = 4; // 4 tiles
 
+	public boolean monsterNearby = false;
+	public int monsterNearbyCounter = 0;
+	public int MONSTER_NEARBY_DURATION = 60; // 1 seconds at 60fps
+
 	public Player(GamePanel gp, KeyHandler kH) {
 
 		super(gp);
@@ -142,6 +146,21 @@ public class Player extends Entity{
 	}
 
 	public void update() {
+
+		if (knockbackCounter > 0) {
+			worldX += knockbackDX;
+			worldY += knockbackDY;
+			knockbackCounter--;
+			// Optionally, check collision and stop knockback if blocked
+			return; // Skip normal movement while being knocked back
+		}
+
+		if (collisionRecoilCounter > 0) {
+			collisionRecoilCounter--;
+			standCounter = 0; // Reset standCounter when recoiling
+			spriteNum = 1; // Set spriteNum to 1 during recoil
+			return; // Skip the rest of the update method during recoil
+		}
 
 		if (attackCooldown > 0) {
             attackCooldown--;
@@ -291,6 +310,22 @@ public class Player extends Entity{
 		if (flashCooldown > 0) {
 			flashCooldown--;
 		}
+
+		// Check for nearby monsters
+		monsterNearby = false;
+		int range = gp.tileSize * 4; // 4 tiles
+		for (int i = 0; i < gp.monster[gp.currentMap].length; i++) {
+			Entity m = gp.monster[gp.currentMap][i];
+			if (m != null && m.alive && !m.dying) {
+				int dx = (worldX + solidArea.x + solidArea.width / 2) - (m.worldX + m.solidArea.x + m.solidArea.width / 2);
+				int dy = (worldY + solidArea.y + solidArea.height / 2) - (m.worldY + m.solidArea.y + m.solidArea.height / 2);
+				double distance = Math.sqrt(dx * dx + dy * dy);
+				if (distance <= range) {
+					monsterNearby = true;
+					break;
+				}
+			}
+		}		
 	}
 	
 	public void attacking(){
@@ -573,6 +608,19 @@ public class Player extends Entity{
 				collisionRecoilCounter = RECOIL_DURATION;
 				spriteNum = 1; // Set spriteNum to 1 during recoil
 				invincible = true;
+
+				// Knockback direction: away from monster
+				int dx = worldX - gp.monster[gp.currentMap][i].worldX;
+				int dy = worldY - gp.monster[gp.currentMap][i].worldY;
+				int mag = (int)Math.sqrt(dx*dx + dy*dy);
+				if (mag != 0) {
+					knockbackDX = (int)(dx * 8 / (double)mag); // 8 is knockback strength, adjust as needed
+					knockbackDY = (int)(dy * 8 / (double)mag);
+				} else {
+					knockbackDX = 0;
+					knockbackDY = 0;
+				}
+				knockbackCounter = knockbackDuration;
 			}
 		}
 	}
@@ -591,10 +639,12 @@ public class Player extends Entity{
 
 				gp.monster[gp.currentMap][i].timeSinceLastHit = 0;
 
+				// --- Always apply knockback on hit ---
+				gp.monster[gp.currentMap][i].damageReaction();
+
 				if (gp.monster[gp.currentMap][i].health <= 0 && gp.monster[gp.currentMap][i].dying == false) {
 					gp.monster[gp.currentMap][i].dying = true;
 					gp.monster[gp.currentMap][i].dyingCounter = 0;
-					gp.monster[gp.currentMap][i].damageReaction();
 					gp.monster[gp.currentMap][i].checkDrop();
 					gp.ui.addMessage(gp.ui.tr("message.defeat_monster", gp.monster[gp.currentMap][i].name));
 					gp.player.exp += gp.monster[gp.currentMap][i].expReward;
@@ -687,8 +737,23 @@ public class Player extends Entity{
 		}
 		// Draw image with scaling
     	g2.drawImage(image, x, y, gp.tileSize * 2, gp.tileSize * 2, null); // 160x160 final size
-		g2.setColor(Color.RED);
-		g2.drawRect(x + solidArea.x, y + solidArea.y, solidArea.width, solidArea.height);
+
+		if (monsterNearby && monsterNearbyCounter < MONSTER_NEARBY_DURATION) {
+			g2.setColor(Color.ORANGE);
+			g2.setFont(g2.getFont().deriveFont(32f));
+			int markX = x + gp.tileSize - 8;
+			int markY = y - 10;
+			g2.drawString("!", markX, markY);
+			monsterNearbyCounter++;
+		} if (monsterNearbyCounter >= MONSTER_NEARBY_DURATION) {
+			monsterNearby = false;
+			monsterNearbyCounter = 0;
+		}
+
+		if (gp.debugMode){
+			g2.setColor(Color.RED);
+			g2.drawRect(x + solidArea.x, y + solidArea.y, solidArea.width, solidArea.height);
+		}
 		// Restore composite
 		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 
@@ -701,7 +766,7 @@ public class Player extends Entity{
 	        boolean stacked = false;
 	        for (Entity stackedItem : newInventory) {
 	            // Stack if same class and (optionally) same name
-	            if (stackedItem != null && item.getClass() == stackedItem.getClass() && 
+	            if (stackedItem != null && item.getClass() == stackedItem.getClass() && stackedItem.stackable && 
 	                (item.name == null || item.name.equals(stackedItem.name))) {
 	                stackedItem.quantity += item.quantity;
 	                stacked = true;
@@ -835,8 +900,9 @@ public class Player extends Entity{
 	    if (currentArmor != null) bonus += currentArmor.attackBonus;
 	    if (currentBoots != null) bonus += currentBoots.attackBonus;
 	    if (currentHat != null) bonus += currentHat.attackBonus;
-	    return bonus;
+		return bonus;
 	}
+	   
 
 	public int getEquipmentDefenseBonus() {
 	    int bonus = 0;

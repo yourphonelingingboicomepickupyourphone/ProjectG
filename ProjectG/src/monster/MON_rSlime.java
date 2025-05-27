@@ -1,5 +1,6 @@
 package monster;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import entity.Entity;
@@ -50,13 +51,34 @@ public class MON_rSlime extends Entity{
         left2 = setup("/monsters/slime_left_2");
         right1 = setup("/monsters/slime_right_1");
         right2 = setup("/monsters/slime_right_2");
+    }
 
-        
+    public void update(){
+        super.update();
+
+        int xDistance = Math.abs(worldX - gp.player.worldX);
+        int yDistance = Math.abs(worldY - gp.player.worldY);
+        int tileDistance = (xDistance + yDistance) / gp.tileSize;
+
+        if (!onPath && tileDistance <= 6){
+            onPath = true; // Start pathfinding if within range
+        }
+
     }
 
     public void setAction() {
-        actionLockCounter++;
-            if(actionLockCounter == 240) //direction changes after 4 secs
+    
+        if (onPath == true){
+            int goalCol = (gp.player.worldX + gp.player.solidArea.x) / gp.tileSize;
+            int goalRow = (gp.player.worldY + gp.player.solidArea.y) / gp.tileSize;
+
+            searchPath(goalCol, goalRow);
+            if (gp.pFinder != null) {
+                this.pathList = new ArrayList<>(gp.pFinder.pathList);
+            }
+        } else {
+            actionLockCounter++;
+            if(actionLockCounter == 240) //direction changes after 2 secs
             {
                 Random random = new Random();
                 int i = random.nextInt(100) + 1;  // pick up a number from 1 to 100
@@ -78,11 +100,13 @@ public class MON_rSlime extends Entity{
                 }
                 actionLockCounter = 0; // reset
             }
+        }
     }
 
     public void damageReaction() {
         direction = gp.player.direction;
         actionLockCounter = 0;
+        onPath = true; // Start pathfinding when damaged
     }
 
 public void checkDrop() {

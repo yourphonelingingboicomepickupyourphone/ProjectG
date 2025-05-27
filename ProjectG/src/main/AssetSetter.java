@@ -39,6 +39,11 @@ public class AssetSetter {
 		gp.obj[map][i] = new ITEM_Sword_Normal(gp);
 		gp.obj[map][i].worldX = gp.tileSize * 50;
 		gp.obj[map][i].worldY = gp.tileSize * 47;
+		i++;
+		gp.obj[map][i] = new ITEM_Sword_Normal(gp);
+		gp.obj[map][i].worldX = gp.tileSize * 50;
+		gp.obj[map][i].worldY = gp.tileSize * 51;
+		i++;
 
 		map = 1;
 		i = 0;
