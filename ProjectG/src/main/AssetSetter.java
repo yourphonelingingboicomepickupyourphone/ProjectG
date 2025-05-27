@@ -3,6 +3,7 @@ package main;
 import entity.NPC_Wizard;
 import item.ITEM_Dual_Blade_Axe;
 import item.ITEM_Mini_Health_Potion;
+import item.ITEM_Sword_Normal;
 import item.ITEM_Armor_Normal;
 import item.ITEM_Better_Armor;
 import item.ITEM_Door_Key;
@@ -27,79 +28,109 @@ public class AssetSetter {
 	}
 	
 	public void setObject() {
-		gp.obj[0][0] = new OBJ_Chest(gp);
-		gp.obj[0][0].worldX = gp.tileSize * 47;
-		gp.obj[0][0].worldY = gp.tileSize * 50;
+	
 
-		gp.obj[1][0] = new OBJ_SpawnPoint(gp);
-		gp.obj[1][0].worldX = gp.tileSize * 48;
-		gp.obj[1][0].worldY = gp.tileSize * 49;
+		int map = 0;
+		int i = 0;
+		gp.obj[map][i] = new OBJ_Chest(gp);
+		gp.obj[map][i].worldX = gp.tileSize * 47;
+		gp.obj[map][i].worldY = gp.tileSize * 50;
+		i++;
+		gp.obj[map][i] = new ITEM_Sword_Normal(gp);
+		gp.obj[map][i].worldX = gp.tileSize * 50;
+		gp.obj[map][i].worldY = gp.tileSize * 47;
 
-		gp.obj[1][1] = new OBJ_Pillar(gp);
-		gp.obj[1][1].worldX = gp.tileSize * 46;
-		gp.obj[1][1].worldY = gp.tileSize * 43;
+		map = 1;
+		i = 0;
+		gp.obj[map][i] = new OBJ_SpawnPoint(gp);
+		gp.obj[map][i].worldX = gp.tileSize * 48;
+		gp.obj[map][i].worldY = gp.tileSize * 49;
+		i++;
 
-		gp.obj[1][2] = new OBJ_Pillar(gp);
-		gp.obj[1][2].worldX = gp.tileSize * 53;
-		gp.obj[1][2].worldY = gp.tileSize * 43;
+		gp.obj[map][i] = new OBJ_Pillar(gp);
+		gp.obj[map][i].worldX = gp.tileSize * 46;
+		gp.obj[map][i].worldY = gp.tileSize * 43;
+		i++;
 
-		gp.obj[1][3] = new OBJ_Pillar(gp);
-		gp.obj[1][3].worldX = gp.tileSize * 46;
-		gp.obj[1][3].worldY = gp.tileSize * 49;
+		gp.obj[map][i] = new OBJ_Pillar(gp);
+		gp.obj[map][i].worldX = gp.tileSize * 53;
+		gp.obj[map][i].worldY = gp.tileSize * 43;
+		i++;
 
-		gp.obj[1][4] = new OBJ_Pillar(gp);
-		gp.obj[1][4].worldX = gp.tileSize * 53;
-		gp.obj[1][4].worldY = gp.tileSize * 49;
+		gp.obj[map][i] = new OBJ_Pillar(gp);
+		gp.obj[map][i].worldX = gp.tileSize * 46;
+		gp.obj[map][i].worldY = gp.tileSize * 49;
+		i++;
 
-		gp.obj[1][5] = new ITEM_Door_Key(gp);
-		gp.obj[1][5].worldX = gp.tileSize * 50;
-		gp.obj[1][5].worldY = gp.tileSize * 59;
+		gp.obj[map][i] = new OBJ_Pillar(gp);
+		gp.obj[map][i].worldX = gp.tileSize * 53;
+		gp.obj[map][i].worldY = gp.tileSize * 49;
+		i++;
 
-		gp.obj[1][6] = new ITEM_Door_Key(gp);
-		gp.obj[1][6].worldX = gp.tileSize * 54;
-		gp.obj[1][6].worldY = gp.tileSize * 59;
+		gp.obj[map][i] = new ITEM_Door_Key(gp);
+		gp.obj[map][i].worldX = gp.tileSize * 50;
+		gp.obj[map][i].worldY = gp.tileSize * 59;
+		i++;
 
-		gp.obj[1][7]= new ITEM_Dual_Blade_Axe(gp);
-		gp.obj[1][7].worldX = gp.tileSize * 50;
-		gp.obj[1][7].worldY = gp.tileSize * 62;
+		gp.obj[map][i] = new ITEM_Door_Key(gp);
+		gp.obj[map][i].worldX = gp.tileSize * 54;
+		gp.obj[map][i].worldY = gp.tileSize * 59;
+		i++;
 
-		gp.obj[1][8] = new ITEM_Mini_Health_Potion(gp);
-		gp.obj[1][8].worldX = gp.tileSize * 54;
-		gp.obj[1][8].worldY = gp.tileSize * 62;
+		gp.obj[map][i]= new ITEM_Dual_Blade_Axe(gp);
+		gp.obj[map][i].worldX = gp.tileSize * 50;
+		gp.obj[map][i].worldY = gp.tileSize * 62;
+		i++;
 
-		gp.obj[1][9] = new ITEM_Mini_Health_Potion(gp);
-		gp.obj[1][9].worldX = gp.tileSize * 54;
-		gp.obj[1][9].worldY = gp.tileSize * 65;
+		gp.obj[map][i] = new ITEM_Mini_Health_Potion(gp);
+		gp.obj[map][i].worldX = gp.tileSize * 54;
+		gp.obj[map][i].worldY = gp.tileSize * 62;
+		i++;
 
-		gp.obj[1][10] = new ITEM_Armor_Normal(gp);
-		gp.obj[1][10].worldX = gp.tileSize * 50;
-		gp.obj[1][10].worldY = gp.tileSize * 65;
+		gp.obj[map][i] = new ITEM_Mini_Health_Potion(gp);
+		gp.obj[map][i].worldX = gp.tileSize * 54;
+		gp.obj[map][i].worldY = gp.tileSize * 65;
+		i++;
 
-		gp.obj[1][11] = new ITEM_Better_Armor(gp);
-		gp.obj[1][11].worldX = gp.tileSize * 54;
-		gp.obj[1][11].worldY = gp.tileSize * 65;
+		gp.obj[map][i] = new ITEM_Armor_Normal(gp);
+		gp.obj[map][i].worldX = gp.tileSize * 50;
+		gp.obj[map][i].worldY = gp.tileSize * 65;
+		i++;
+
+		gp.obj[map][i] = new ITEM_Better_Armor(gp);
+		gp.obj[map][i].worldX = gp.tileSize * 54;
+		gp.obj[map][i].worldY = gp.tileSize * 65;
+		i++;
 
 	}
 
 
 	public void setNPC() {
-		gp.npc[1][0] = new NPC_Wizard(gp);
-		gp.npc[1][0].worldX = gp.tileSize * 51;
-		gp.npc[1][0].worldY = gp.tileSize * 80;
+		int map = 1;
+		int i = 0;
+		gp.npc[map][i] = new NPC_Wizard(gp);
+		gp.npc[map][i].worldX = gp.tileSize * 51;
+		gp.npc[map][i].worldY = gp.tileSize * 80;
+		i++;
 
-		gp.npc[1][1] = new NPC_Wizard(gp);
-		gp.npc[1][1].worldX = gp.tileSize * 54;
-		gp.npc[1][1].worldY = gp.tileSize * 84;
+		gp.npc[map][i] = new NPC_Wizard(gp);
+		gp.npc[map][i].worldX = gp.tileSize * 54;
+		gp.npc[map][i].worldY = gp.tileSize * 84;
+		i++;
 	}
 
 
 	public void setMonster() {
-		gp.monster[1][0] = new MON_rSlime(gp);
-		gp.monster[1][0].worldX = gp.tileSize * 50;
-		gp.monster[1][0].worldY = gp.tileSize * 60;
+		int map = 1;
+		int i = 0;
+		gp.monster[map][i] = new MON_rSlime(gp);
+		gp.monster[map][i].worldX = gp.tileSize * 50;
+		gp.monster[map][i].worldY = gp.tileSize * 60;
+		i++;
 
-		gp.monster[1][1] = new MON_rSlime(gp);
-		gp.monster[1][1].worldX = gp.tileSize * 54;
-		gp.monster[1][1].worldY = gp.tileSize * 60;
+		gp.monster[map][i] = new MON_rSlime(gp);
+		gp.monster[map][i].worldX = gp.tileSize * 54;
+		gp.monster[map][i].worldY = gp.tileSize * 60;
+		i++;
 	}
 }
