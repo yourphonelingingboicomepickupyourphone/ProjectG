@@ -107,6 +107,8 @@ public class Entity {
 
 	//Monster attributes
 	public int expReward;
+	public int timeSinceLastHit = 0; // in frames
+	public int healDelay = 300; // 5 seconds at 60fps
 
 
 	public Entity(GamePanel gp) {
@@ -182,6 +184,17 @@ public class Entity {
 				gp.player.health -= damage;
 				gp.player.invincible = true;
 				gp.player.invincibleCounter = 0;
+			}
+		}
+		if (this.type == 1 && alive && !dying){
+			timeSinceLastHit++;
+			if (timeSinceLastHit >= healDelay) {
+				if (health < maxHealth) {
+					health += 0.1 * maxHealth; // Heal 10% health every 5 seconds
+					if (health > maxHealth) {
+						health = maxHealth;
+					}
+				}	
 			}
 		}
 

@@ -13,7 +13,7 @@ public class KeyHandler implements KeyListener{
 
 	}
 	
-	public boolean upPressed, downPressed, leftPressed, rightPressed, enterPressed, spacePressed, escPressed;
+	public boolean upPressed, downPressed, leftPressed, rightPressed, enterPressed, spacePressed, escPressed, flashPressed;
 
 	@Override
 	public void keyTyped(KeyEvent e) {
@@ -279,6 +279,9 @@ public class KeyHandler implements KeyListener{
 		}
 		if (code == gp.keyConfig.getKey(KeyConfig.ATTACK)) {
 			spacePressed = true;
+		}
+		if (code == gp.keyConfig.getKey(KeyConfig.FLASH)) {
+			flashPressed = true;
 		}
 		if (code == gp.keyConfig.getKey(KeyConfig.CHARACTER)) {
 			gp.gameState = gp.characterState;
@@ -627,10 +630,20 @@ public class KeyHandler implements KeyListener{
 		if (code == gp.keyConfig.getKey(KeyConfig.ESCAPE)) {
 			escPressed = false;
 		}
+		if (code == gp.keyConfig.getKey(KeyConfig.FLASH)){
+			flashPressed = false;
+		}
 	}
 
 	private String generateRandomName() {
-	    String[] names = {"Alex", "Riley", "Morgan", "Casey", "Jordan", "Taylor", "Skyler", "Jamie", "Avery", "Quinn"};
+	    String[] names = {
+			"Alex", "Riley", "Morgan", "Casey", "Jordan", "Taylor", "Skyler", "Jamie", "Avery", "Quinn", "TrungTT",
+        "Harper", "Rowan", "Dakota", "Emerson", "Finley", "Oner", "Peyton", "Reese", "Sawyer", "Sage",
+        "Charlie", "Elliot", "Jules", "Kai", "Logan", "Milan", "Noel", "Phoenix", "River", "Shiloh",
+        "Blake", "Cameron", "Drew", "Frankie", "Jesse", "Kendall", "Lane", "Doran", "Parker", "Remy",
+        "Sam", "Tatum", "Val", "Wren", "Zion", "Aspen", "Briar", "Cory", "Devon", "Keria", "Gray",
+        "Indigo", "Jaden", "Kieran", "Faker", "Micah", "Oakley", "Perry", "Quincy", "Robin", "Sasha"
+		};
 	    return names[(int)(Math.random() * names.length)];
 	}
 	public void languageSelectState(int code) {

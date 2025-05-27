@@ -35,6 +35,9 @@ public class Player extends Entity{
     public int ATTACK_COOLDOWN_MAX; 
 	public ArrayList<Entity> inventory = new ArrayList<>();
 	public Entity currentChest;
+	public int flashCooldown = 0;
+	public int FLASH_COOLDOWN_MAX = 3600; // 60 seconds at 60fps
+	public int FLASH_RANGE = 4; // 4 tiles
 
 	public Player(GamePanel gp, KeyHandler kH) {
 
@@ -92,6 +95,7 @@ public class Player extends Entity{
 		this.progressionAttackUpgrades = 0;
 		this.progressionDefenseUpgrades = 0;
 		this.ATTACK_COOLDOWN_MAX = 30; // 30 frames = 0.5s at 60fps
+		this.FLASH_COOLDOWN_MAX = 3600; // 60 seconds at 60fps
 		currentWeapon = null;
 		currentArmor = null;
 		currentHat = null;
@@ -277,6 +281,16 @@ public class Player extends Entity{
 			gp.gameState = gp.gameOverState;
 		}
 
+		if (keyH.flashPressed && flashCooldown == 0){
+			flash();
+			flashCooldown = FLASH_COOLDOWN_MAX;
+			keyH.flashPressed = false; // Reset flashPressed after using
+			return;
+		}
+
+		if (flashCooldown > 0) {
+			flashCooldown--;
+		}
 	}
 	
 	public void attacking(){
@@ -575,6 +589,8 @@ public class Player extends Entity{
 				gp.monster[gp.currentMap][i].health -= dmg;
 				gp.monster[gp.currentMap][i].invincible = true;
 
+				gp.monster[gp.currentMap][i].timeSinceLastHit = 0;
+
 				if (gp.monster[gp.currentMap][i].health <= 0 && gp.monster[gp.currentMap][i].dying == false) {
 					gp.monster[gp.currentMap][i].dying = true;
 					gp.monster[gp.currentMap][i].dyingCounter = 0;
@@ -781,6 +797,7 @@ public class Player extends Entity{
 		currentHat = null;
 		currentBoots = null;
 		attackCooldown = 0;
+		flashCooldown = 0;
 		invincible = false;
 		invincibleCounter = 0;
 		attacking = false;
@@ -899,6 +916,42 @@ public class Player extends Entity{
 				chest.chestInventory.set(index, null); // Remove item from chest
 			}
 		}
+	}
+
+	public void flash(){
+		int dx = 0;
+		int dy = 0;
+		switch (direction) {
+			case "up": dy = -1; break;
+			case "down": dy = 1; break;
+			case "left": dx = -1; break;
+			case "right": dx = 1; break;
+		}
+		for (int i = 1; i <= FLASH_RANGE; i++) {
+			int targetX = worldX + dx * gp.tileSize * i;
+			int targetY = worldY + dy * gp.tileSize * i;
+
+			// Check collision at target position
+			Rectangle testArea = new Rectangle(targetX + solidArea.x, targetY + solidArea.y, solidArea.width, solidArea.height);
+			boolean blocked = false;
+			// Temporarily move player for collision check
+			int oldX = worldX, oldY = worldY;
+			worldX = targetX; worldY = targetY;
+			collisionOn = false;
+			gp.cChecker.checkTile(this);
+			blocked = collisionOn;
+			worldX = oldX; worldY = oldY;
+
+			if (blocked) {
+				// Stop at previous position
+				worldX += dx * gp.tileSize * (i - 1);
+				worldY += dy * gp.tileSize * (i - 1);
+				return;
+			}
+		}
+
+		worldX += dx * gp.tileSize * FLASH_RANGE;
+		worldY += dy * gp.tileSize * FLASH_RANGE;
 	}
 
 }

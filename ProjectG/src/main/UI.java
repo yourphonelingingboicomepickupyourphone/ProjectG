@@ -20,6 +20,7 @@ import object.OBJ_Chest;
 
 public class UI {
 	
+	BufferedImage flash;
 	GamePanel gp;
 	Graphics2D g2;
 	Font currentFont, currentFontBold;
@@ -45,7 +46,7 @@ public class UI {
 	public String waitingAction = null;
 	public final String[] controlActions = {
 		KeyConfig.UP, KeyConfig.DOWN, KeyConfig.LEFT, KeyConfig.RIGHT,
-		KeyConfig.ATTACK, KeyConfig.CHOOSE, KeyConfig.ESCAPE, KeyConfig.INVENTORY, KeyConfig.CHARACTER, KeyConfig.RESET
+		KeyConfig.ATTACK, KeyConfig.CHOOSE, KeyConfig.ESCAPE, KeyConfig.INVENTORY, KeyConfig.CHARACTER, KeyConfig.RESET, KeyConfig.FLASH
 	};
 	public boolean keyBindWarning = false;
 	public long keyBindWarningTime = 0;
@@ -82,6 +83,13 @@ public class UI {
 			//bold
 			is = getClass().getResourceAsStream("/font/GNUUnifont9.ttf");
 			currentFontBold = Font.createFont(Font.TRUETYPE_FONT, is);
+
+			is = getClass().getResourceAsStream("/skills/flash.png");
+			if (is != null) {
+				flash = ImageIO.read(is);
+			} else {
+				System.err.println("ERROR: /skills/flash.png not found in resources!");
+			}
 		} catch (FontFormatException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -120,6 +128,7 @@ public class UI {
 			drawPlayerHealth();
 			drawPlayerMana();
 			drawPlayerIcon();
+			drawFlashCooldown();
 			//Draw messages
 			drawMessages();
 		}
@@ -1505,7 +1514,7 @@ public class UI {
 	    }
 
 	    // Draw "Back" option at the bottom center
-	    int backY = startY + rows * lineHeight + lineHeight * 3 / 2;
+	    int backY = startY + rows * lineHeight;
 	    String back = tr("controls.back");
 	    int backX = getXForCenteredText(back);
 	    if (menuControlsCommandNum == controlActions.length && !waitingForKey) {
@@ -1526,7 +1535,7 @@ public class UI {
 	    if (keyBindWarning) {
 	        g2.setColor(Color.RED);
 	        String warn = tr("message.key_already_assigned");
-	        g2.drawString(warn, getXForCenteredText(warn), backY + lineHeight * 2);
+	        g2.drawString(warn, getXForCenteredText(warn), backY + lineHeight);
 	        // Hide warning after 2 seconds
 	        if (System.currentTimeMillis() - keyBindWarningTime > 2000) {
 	            keyBindWarning = false;
@@ -1686,13 +1695,41 @@ public class UI {
     }
 
     // Add this method:
-public void updateQualities() {
-    qualities = new String[] {
-        tr("quality.low"),
-        tr("quality.medium"),
-        tr("quality.high")
-    };
-}
+	public void updateQualities() {
+		qualities = new String[] {
+			tr("quality.low"),
+			tr("quality.medium"),
+			tr("quality.high")
+		};
+	}
 
+	public void drawFlashCooldown() {
+		int iconSize = gp.tileSize;
+		int x = 5 * gp.tileSize / 2 + gp.tileSize * 6 + gp.tileSize / 2; // Right of health bar
+		int y = gp.tileSize / 2;
 
+		// Draw icon
+		if (flash != null) {
+			g2.drawImage(flash, x, y, iconSize, iconSize, null);
+		} else {
+			// Draw placeholder if icon missing
+			g2.setColor(Color.YELLOW);
+			g2.fillOval(x, y, iconSize, iconSize);
+		}
+
+		// Draw cooldown overlay if on cooldown
+		if (gp.player.flashCooldown > 0) {
+			float percent = (float)gp.player.flashCooldown / gp.player.FLASH_COOLDOWN_MAX;
+			int overlayHeight = (int)(iconSize * percent);
+			g2.setColor(new Color(0, 0, 0, 120));
+			g2.fillRect(x, y, iconSize, overlayHeight);
+
+			// Draw cooldown seconds
+			g2.setColor(Color.WHITE);
+			g2.setFont(g2.getFont().deriveFont(Font.BOLD, 32F));
+			String cdText = String.format("%.1f", gp.player.flashCooldown / 60.0);
+			int textWidth = g2.getFontMetrics().stringWidth(cdText);
+			g2.drawString(cdText, x + (iconSize - textWidth) / 2, y + iconSize / 2 + 12);
+		}
+	}
 }

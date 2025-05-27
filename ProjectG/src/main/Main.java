@@ -9,7 +9,7 @@ public class Main {
 		
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setResizable(true);
-		window.setTitle("Test Game");
+		window.setTitle("LOTRW - Alpha Test");
 		window.add(gp);
 		window.pack();
 		window.setLocationRelativeTo(null);
@@ -29,7 +29,7 @@ public class Main {
 		// Save config on exit
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
 			if (gp.config != null) {
-				gp.config.saveConfig();
+				gp.config.saveConfig();	
 			}
 		}));
 

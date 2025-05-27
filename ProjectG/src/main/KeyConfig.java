@@ -16,6 +16,7 @@ public class KeyConfig {
     public static final String INVENTORY = "Inventory";
     public static final String CHARACTER = "Character";
     public static final String RESET = "Reset";
+    public static final String FLASH = "Flash";
 
     private final Map<String, Integer> keyBindings = new HashMap<>();
 
@@ -31,6 +32,7 @@ public class KeyConfig {
         keyBindings.put(INVENTORY, KeyEvent.VK_I);
         keyBindings.put(CHARACTER, KeyEvent.VK_C);
         keyBindings.put(RESET, KeyEvent.VK_R);
+        keyBindings.put(FLASH, KeyEvent.VK_F); 
     }
 
     public int getKey(String action) {
@@ -61,5 +63,6 @@ public class KeyConfig {
         keyBindings.put(INVENTORY, KeyEvent.VK_I);
         keyBindings.put(CHARACTER, KeyEvent.VK_C);
         keyBindings.put(RESET, KeyEvent.VK_R);
+        keyBindings.put(FLASH, KeyEvent.VK_F);
     }
 }
