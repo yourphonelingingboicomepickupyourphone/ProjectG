@@ -98,8 +98,8 @@ public class AssetSetter {
 		i++;
 
 		gp.obj[map][i] = new ITEM_Better_Armor(gp);
-		gp.obj[map][i].worldX = gp.tileSize * 54;
-		gp.obj[map][i].worldY = gp.tileSize * 65;
+		gp.obj[map][i].worldX = gp.tileSize * 50;
+		gp.obj[map][i].worldY = gp.tileSize * 68;
 		i++;
 
 	}
