@@ -3,6 +3,10 @@ package main;
 import java.io.*;
 import java.util.Map;
 
+import data.DataStorage;
+import entity.Entity;
+import entity.Player;
+
 public class Config {
     GamePanel gp;
 
@@ -54,5 +58,64 @@ public class Config {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void savePlayer(Player player) {
+		DataStorage data = player.toDataStorage();
+		data.savePlayerData(data);
+	}
+
+    public void loadPlayer(Player player) {
+        DataStorage data = new DataStorage().loadPlayerData();
+        if (data != null) {
+            player.fromDataStorage(data);
+        }
+
+        // Helper to "re-instantiate" an item and copy fields
+        java.util.function.Function<Entity, Entity> reloadItem = (oldItem) -> {
+            if (oldItem == null) return null;
+            try {
+                Entity newItem = oldItem.getClass()
+                    .getConstructor(main.GamePanel.class)
+                    .newInstance(player.gp);
+                // Copy important fields
+                newItem.quantity = oldItem.quantity;
+                newItem.stackable = oldItem.stackable;
+                newItem.pickable = oldItem.pickable;
+                newItem.type = oldItem.type;
+                newItem.level = oldItem.level;
+                // newItem.upgrade = oldItem.upgrade;
+                newItem.name = oldItem.name;
+                newItem.description = oldItem.description;
+                newItem.healthBonus = oldItem.healthBonus;
+                newItem.manaBonus = oldItem.manaBonus;
+                newItem.attackBonus = oldItem.attackBonus;
+                newItem.defenseBonus = oldItem.defenseBonus;
+                newItem.speedBonus = oldItem.speedBonus;
+                newItem.rarity = oldItem.rarity;
+                newItem.levelRequirement = oldItem.levelRequirement;
+                // ...add more fields as needed...
+                return newItem;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return oldItem; // fallback: use the old item (will have no image)
+            }
+        };
+
+        // Reload inventory items
+        for (int i = 0; i < player.inventory.size(); i++) {
+            Entity oldItem = player.inventory.get(i);
+            Entity newItem = reloadItem.apply(oldItem);
+            player.inventory.set(i, newItem);
+        }
+
+        // Reload equipped items
+        player.currentWeapon = reloadItem.apply(player.currentWeapon);
+        player.currentArmor = reloadItem.apply(player.currentArmor);
+        player.currentHat = reloadItem.apply(player.currentHat);
+        player.currentBoots = reloadItem.apply(player.currentBoots);
+
+        player.setItems(); // reload player images if needed
+        player.gp.gameState = player.gp.playState;
     }
 }

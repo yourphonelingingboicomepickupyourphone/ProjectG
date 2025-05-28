@@ -9,7 +9,8 @@ public class ITEM_Chest_Key extends Entity{
 		
 		super(gp);
 
-		name = "Chest_Key";
+		name = gp.ui.tr("item.chest_key.name");
+		description = gp.ui.tr("item.chest_key.description");
 		down1 = setup("/objects/key");
 		renderLayer = 1;
 		pickable = true;

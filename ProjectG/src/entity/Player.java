@@ -8,6 +8,7 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
+import data.DataStorage;
 import main.GamePanel;
 import main.KeyHandler;
 import object.OBJ_Chest;
@@ -39,6 +40,8 @@ public class Player extends Entity{
 	public int FLASH_COOLDOWN_MAX = 3600; // 60 seconds at 60fps
 	public int FLASH_RANGE = 4; // 4 tiles
 	public Entity quickUseItem;
+	public Class<?> quickUseItemClass = null;
+	public String quickUseItemName = null;
 
 	public boolean monsterNearby = false;
 	public int monsterNearbyCounter = 0;
@@ -110,6 +113,66 @@ public class Player extends Entity{
 		Projectile projectileList = new PROJECTILE_Fire_Ball(gp);
 
 
+	}
+
+	public DataStorage toDataStorage() {
+		DataStorage data = new DataStorage();
+		data.name = this.name;
+		data.maxHealth = this.maxHealth;
+		data.health = this.health;
+		data.maxMana = this.maxMana;
+		data.mana = this.mana;
+		data.level = this.level;
+		data.attack = this.attack;
+		data.defense = this.defense;
+		data.exp = this.exp;
+		data.speed = this.speed;
+		data.totalProgressionPoints = this.totalProgressionPoints;
+		data.progressionPoints = this.progressionPoints;
+		data.progressionHealthUpgrades = this.progressionHealthUpgrades;
+		data.progressionManaUpgrades = this.progressionManaUpgrades;
+		data.progressionAttackUpgrades = this.progressionAttackUpgrades;
+		data.progressionDefenseUpgrades = this.progressionDefenseUpgrades;
+		data.currentWeapon = this.currentWeapon;
+		data.currentArmor = this.currentArmor;
+		data.currentHat = this.currentHat;
+		data.currentBoots = this.currentBoots;
+		data.inventory = new ArrayList<>(this.inventory); // Save inventory
+		// Save quick use info if needed
+		data.quickUseItemClass = this.quickUseItemClass != null ? this.quickUseItemClass.getName() : null;
+		data.quickUseItemName = this.quickUseItemName;
+		return data;
+	}
+
+	public void fromDataStorage(DataStorage data) {
+		this.name = data.name;
+		this.maxHealth = data.maxHealth;
+		this.health = data.health;
+		this.maxMana = data.maxMana;
+		this.mana = data.mana;
+		this.level = data.level;
+		this.attack = data.attack;
+		this.defense = data.defense;
+		this.exp = data.exp;
+		this.speed = data.speed;
+		this.totalProgressionPoints = data.totalProgressionPoints;
+		this.progressionPoints = data.progressionPoints;
+		this.progressionHealthUpgrades = data.progressionHealthUpgrades;
+		this.progressionManaUpgrades = data.progressionManaUpgrades;
+		this.progressionAttackUpgrades = data.progressionAttackUpgrades;
+		this.progressionDefenseUpgrades = data.progressionDefenseUpgrades;
+		this.currentWeapon = data.currentWeapon;
+		this.currentArmor = data.currentArmor;
+		this.currentHat = data.currentHat;
+		this.currentBoots = data.currentBoots;
+		this.inventory = new ArrayList<>(data.inventory); // Load inventory
+		// Restore quick use info if needed
+		try {
+			this.quickUseItemClass = data.quickUseItemClass != null ? Class.forName(data.quickUseItemClass) : null;
+		} catch (Exception e) {
+			this.quickUseItemClass = null;
+		}
+		this.quickUseItemName = data.quickUseItemName;
 	}
 
 	public void setItems(){

@@ -7,7 +7,8 @@ public class ITEM_Hat_Normal extends Entity{
     public ITEM_Hat_Normal(GamePanel gp) {
         super(gp);
         
-        name = "Normal Hat";
+        name = gp.ui.tr("item.hat_normal.name");
+        description = gp.ui.tr("item.hat_normal.description");
         level = 1;
         down1 = setup("/items/normal_hat");
         healthBonus = 10;

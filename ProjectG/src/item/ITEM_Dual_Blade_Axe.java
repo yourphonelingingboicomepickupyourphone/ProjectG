@@ -6,7 +6,8 @@ public class ITEM_Dual_Blade_Axe extends ITEM_Axe_Normal {
     public ITEM_Dual_Blade_Axe(GamePanel gp) {
         super(gp);
 
-        name = "Dual Blade Axe";
+        name = gp.ui.tr("item.dual_blade_axe.name");
+        description = gp.ui.tr("item.dual_blade_axe.description");
         level = 1;
         down1 = setup("/items/dual_blade_axe");
         rarity = 0;
@@ -15,9 +16,6 @@ public class ITEM_Dual_Blade_Axe extends ITEM_Axe_Normal {
         defenseBonus = 10;
         levelRequirement = 2; //level requirement to use the item
 
-
-
-        description = "A powerful axe with dual blades. It can deal massive damage, but is heavy to wield.";
     }
 
 }

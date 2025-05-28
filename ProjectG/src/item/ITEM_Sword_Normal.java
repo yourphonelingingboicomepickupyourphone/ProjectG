@@ -7,7 +7,8 @@ public class ITEM_Sword_Normal extends Entity{
     public ITEM_Sword_Normal(GamePanel gp) {
         super(gp);
         
-        name = "Normal Sword";
+        name = gp.ui.tr("item.sword_normal.name");
+        description = gp.ui.tr("item.sword_normal.description");
         type = 3;
         itemType = 0;
         level = 1;
@@ -29,7 +30,6 @@ public class ITEM_Sword_Normal extends Entity{
         levelRequirement = 1; //level requirement to use the item
         attackRange = 1; //attack range of the item
         weaponType = 0; //0 = sword, 1 = axe, 2 = spear, 3 = bow, 4 = wand
-        description = "A normal sword. It is not very powerful, but it is better than nothing." ;
 
         pickable = true;
         stackable = false;

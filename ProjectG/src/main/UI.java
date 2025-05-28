@@ -439,7 +439,7 @@ public class UI {
 	    g2.setFont(currentFontBold.deriveFont(Font.BOLD, 48F));
 	    g2.setColor(Color.WHITE);
 
-	    String[] options = {tr("pause.continue"), tr("pause.settings"), tr("pause.return_main_menu"), tr("pause.exit")};
+	    String[] options = {tr("pause.continue"), tr("pause.save"), tr("pause.settings"), tr("pause.return_main_menu"), tr("pause.exit")};
 	    int textY = frameY + gp.tileSize * 2;
 	    for (int i = 0; i < options.length; i++) {
 	        String text = options[i];
@@ -903,20 +903,35 @@ public class UI {
 		    g2.setFont(g2.getFont().deriveFont(Font.BOLD, 32F));
 		    g2.drawString(selectedItem.name, infoX + 24, infoY + 40);
 
-		    // Draw item description/info (wrap or trim as needed)
-		    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 24F));
+		    // --- Auto-fit description ---
+		    String desc = selectedItem.description;
 		    int descX = infoX + 24;
 		    int descY = infoY + 80;
-		    int lineHeight = g2.getFontMetrics().getHeight();
 		    int maxDescWidth = infoWidth - 48;
 
-		    java.util.List<String> lines = wrapText(selectedItem.description, maxDescWidth, g2);
+		    // Reserve more space for stats (e.g., 5 lines of stats)
+		    int reservedStatLines = 5;
+		    int statLineHeight = 22; // Approximate, matches your stat font size
+		    int maxDescHeight = infoHeight - 40 - reservedStatLines * statLineHeight; // 40 for name/title
+
+		    int fontSize = 22; // Start a bit smaller
+		    java.util.List<String> lines;
+		    int totalHeight;
+		    do {
+		        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, (float)fontSize));
+		        lines = wrapText(desc, maxDescWidth, g2);
+		        int lineHeight = g2.getFontMetrics().getHeight();
+		        totalHeight = lines.size() * lineHeight;
+		        fontSize--;
+		    } while ((totalHeight > maxDescHeight) && fontSize > 10);
+
+		    int lineHeight = g2.getFontMetrics().getHeight();
 		    for (String line : lines) {
 		        g2.drawString(line, descX, descY);
 		        descY += lineHeight;
 		    }
 
-		    // Draw basic stats if present
+		    // Now descY is just below the description, and there is always space for stats!
 		    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 22F));
 		    if (selectedItem.healthBonus != 0) {
 		        g2.drawString(tr("character.health") + ": " + (selectedItem.healthBonus > 0 ? "+" : "") + selectedItem.healthBonus, descX, descY);
@@ -934,129 +949,9 @@ public class UI {
 		        g2.drawString(tr("character.defense") + ": " + (selectedItem.defenseBonus > 0 ? "+" : "") + selectedItem.defenseBonus, descX, descY);
 		        descY += lineHeight;
 		    }
-
-		    if (selectedItem.type == 3 && selectedItem.itemType == 0 || selectedItem.itemType == 1 || selectedItem.itemType == 2 || selectedItem.itemType == 3) {
+		    if (selectedItem.type == 3 && (selectedItem.itemType == 0 || selectedItem.itemType == 1 || selectedItem.itemType == 2 || selectedItem.itemType == 3)) {
 		        g2.drawString(tr("item.level_required") + ": " + selectedItem.levelRequirement, descX, descY);
 		        descY += lineHeight;
-		    }
-
-		    // Draw comparison box if selected item is equipment and not the equipped one
-		    Entity equippedItem = null;
-		    String equippedLabel = "";
-
-		    if (selectedItem != null) {
-		        // Determine which equipment slot to compare
-		        if (selectedItem.itemType == 0) { // Weapon
-		            equippedItem = gp.player.currentWeapon;
-		            equippedLabel = tr("character.equipped_weapon");
-		        } else if (selectedItem.itemType == 1) { // Hat
-		            equippedItem = gp.player.currentHat;
-		            equippedLabel = tr("character.equipped_hat");
-		        } else if (selectedItem.itemType == 2) { // Armor
-		            equippedItem = gp.player.currentArmor;
-		            equippedLabel = tr("character.equipped_armor");
-		        } else if (selectedItem.itemType == 3) { // Boots
-		            equippedItem = gp.player.currentBoots;
-		            equippedLabel = tr("character.equipped_boots");
-		        }
-		    }
-
-		    // Only show if equipped item exists, is not the selected item, and is the same type
-		    if (
-		        selectedItem != null &&
-		        equippedItem != null &&
-		        selectedItem != equippedItem &&
-				selectedItem.type == equippedItem.type &&
-		        selectedItem.itemType == equippedItem.itemType // <--- THIS IS CRUCIAL
-		    ) {
-		        int charFrameX = gp.tileSize * 13;
-		        int charFrameY = gp.tileSize * 11 + gp.tileSize / 2;
-		        int charFrameWidth = gp.tileSize * 10 ;
-		        int charFrameHeight = gp.tileSize * 10 ;
-
-		        int compareWidth = charFrameWidth - gp.tileSize;
-		        int compareHeight = gp.tileSize * 2 + gp.tileSize / 2;
-		        int compareX = charFrameX;
-		        // Move above the character box:
-		        int compareY = charFrameY - compareHeight - gp.tileSize / 2;
-		        if (compareY < 0) compareY = 0; // Prevent going off the top of the screen
-
-		        g2.setColor(new Color(60, 60, 60, 240));
-		        g2.fillRoundRect(compareX, compareY, compareWidth, compareHeight, 20, 20);
-
-		        g2.setColor(Color.WHITE);
-		        g2.setFont(g2.getFont().deriveFont(Font.BOLD, 28F));
-		        g2.drawString(equippedLabel + ": " + equippedItem.name, compareX + 24, compareY + 40);
-
-		        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 22F));
-		        int statY = compareY + 80;
-		        int statLine = g2.getFontMetrics().getHeight();
-
-		        // Only show stats that are relevant for the item type
-		        if (selectedItem.itemType == 0 || selectedItem.itemType == 2) { // Weapon or Armor
-		            // Attack
-		            int selAtk = selectedItem.attackBonus;
-		            int eqAtk = equippedItem.attackBonus;
-		            int diffAtk = selAtk - eqAtk;
-		            g2.setColor(Color.WHITE);
-		            g2.drawString(tr("character.attack") + ": " + eqAtk, compareX + 24, statY);
-		            if (diffAtk != 0) {
-		                g2.setColor(diffAtk > 0 ? Color.GREEN : Color.RED);
-		                g2.drawString((diffAtk > 0 ? "+" : "") + diffAtk, compareX + 180, statY);
-		            }
-		            statY += statLine;
-
-		            // Defense
-		            int selDef = selectedItem.defenseBonus;
-		            int eqDef = equippedItem.defenseBonus;
-		            int diffDef = selDef - eqDef;
-		            g2.setColor(Color.WHITE);
-		            g2.drawString(tr("character.defense") + ": " + eqDef, compareX + 24, statY);
-		            if (diffDef != 0) {
-		                g2.setColor(diffDef > 0 ? Color.GREEN : Color.RED);
-		                g2.drawString((diffDef > 0 ? "+" : "") + diffDef, compareX + 180, statY);
-		            }
-		            statY += statLine;
-		        }
-
-		        // Health
-		        int selHealth = selectedItem.healthBonus;
-		        int eqHealth = equippedItem.healthBonus;
-		        int diffHealth = selHealth - eqHealth;
-		        g2.setColor(Color.WHITE);
-		        g2.drawString(tr("character.health") + ": " + eqHealth, compareX + 24, statY);
-		        if (diffHealth != 0) {
-		            g2.setColor(diffHealth > 0 ? Color.GREEN : Color.RED);
-		            g2.drawString((diffHealth > 0 ? "+" : "") + diffHealth, compareX + 180, statY);
-		        }
-		        statY += statLine;
-
-		        // Mana
-		        int selMana = selectedItem.manaBonus;
-		        int eqMana = equippedItem.manaBonus;
-		        int diffMana = selMana - eqMana;
-		        g2.setColor(Color.WHITE);
-		        g2.drawString(tr("character.mana") + ": " + eqMana, compareX + 24, statY);
-		        if (diffMana != 0) {
-		            g2.setColor(diffMana > 0 ? Color.GREEN : Color.RED);
-		            g2.drawString((diffMana > 0 ? "+" : "") + diffMana, compareX + 180, statY);
-		        }
-		        statY += statLine;
-
-		        // Speed (for boots, if you have this stat)
-		        if (selectedItem.itemType == 3) { // Boots
-		            int selSpeed = selectedItem.speedBonus;
-		            int eqSpeed = equippedItem.speedBonus;
-		            int diffSpeed = selSpeed - eqSpeed;
-		            g2.setColor(Color.WHITE);
-		            g2.drawString("tr.character.speed" + ": " + eqSpeed, compareX + 24, statY);
-		            if (diffSpeed != 0) {
-		                g2.setColor(diffSpeed > 0 ? Color.GREEN : Color.RED);
-		                g2.drawString((diffSpeed > 0 ? "+" : "") + diffSpeed, compareX + 180, statY);
-		            }
-		            statY += statLine;
-		        }
-		        g2.setColor(Color.WHITE);
 		    }
 		}
 	}
@@ -1219,20 +1114,35 @@ public class UI {
 		    g2.setFont(g2.getFont().deriveFont(Font.BOLD, 32F));
 		    g2.drawString(selectedItem.name, infoX + 24, infoY + 40);
 
-		    // Draw item description/info (wrap or trim as needed)
-		    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 24F));
+		    // --- Auto-fit description ---
+		    String desc = selectedItem.description;
 		    int descX = infoX + 24;
 		    int descY = infoY + 80;
-		    int lineHeight = g2.getFontMetrics().getHeight();
 		    int maxDescWidth = infoWidth - 48;
 
-		    java.util.List<String> lines = wrapText(selectedItem.description, maxDescWidth, g2);
+		    // Reserve more space for stats (e.g., 5 lines of stats)
+		    int reservedStatLines = 5;
+		    int statLineHeight = 22; // Approximate, matches your stat font size
+		    int maxDescHeight = infoHeight - 40 - reservedStatLines * statLineHeight; // 40 for name/title
+
+		    int fontSize = 22; // Start a bit smaller
+		    java.util.List<String> lines;
+		    int totalHeight;
+		    do {
+		        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, (float)fontSize));
+		        lines = wrapText(desc, maxDescWidth, g2);
+		        int lineHeight = g2.getFontMetrics().getHeight();
+		        totalHeight = lines.size() * lineHeight;
+		        fontSize--;
+		    } while ((totalHeight > maxDescHeight) && fontSize > 10);
+
+		    int lineHeight = g2.getFontMetrics().getHeight();
 		    for (String line : lines) {
 		        g2.drawString(line, descX, descY);
 		        descY += lineHeight;
 		    }
 
-		    // Draw basic stats if present
+		    // Now descY is just below the description, and there is always space for stats!
 		    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 22F));
 		    if (selectedItem.healthBonus != 0) {
 		        g2.drawString(tr("character.health") + ": " + (selectedItem.healthBonus > 0 ? "+" : "") + selectedItem.healthBonus, descX, descY);
@@ -1250,8 +1160,7 @@ public class UI {
 		        g2.drawString(tr("character.defense") + ": " + (selectedItem.defenseBonus > 0 ? "+" : "") + selectedItem.defenseBonus, descX, descY);
 		        descY += lineHeight;
 		    }
-
-		    if (selectedItem.type == 3 && selectedItem.itemType == 0 || selectedItem.itemType == 1 || selectedItem.itemType == 2 || selectedItem.itemType == 3) {
+		    if (selectedItem.type == 3 && (selectedItem.itemType == 0 || selectedItem.itemType == 1 || selectedItem.itemType == 2 || selectedItem.itemType == 3)) {
 		        g2.drawString(tr("item.level_required") + ": " + selectedItem.levelRequirement, descX, descY);
 		        descY += lineHeight;
 		    }
@@ -1634,6 +1543,7 @@ public class UI {
 		{"1","2","3","4","5","6","7","8","9","0"},
 		{"Q","W","E","R","T","Y","U","I","O","P"},
 		{"A","S","D","F","G","H","J","K","L","<-"},
+		
 		{"Z","X","C","V","B","N","M", "     ","OK"},
 	};
 	int kbRow = 0;
@@ -1649,6 +1559,7 @@ public class UI {
     for (int i = 0; i < languageCodes.length; i++) {
         if (languageCodes[i].equals(language)) {
             languageIndex = i;
+           
             break;
         }
     }
@@ -1719,13 +1630,24 @@ public class UI {
 		g2.drawRect(quickX - 2, quickY - 2, quickSize + 4, quickSize + 4);
 		g2.setStroke(new BasicStroke(1));
 
-		// Draw quick-use item icon if assigned
-		if (gp.player.quickUseItem != null && gp.player.quickUseItem.down1 != null) {
-			g2.drawImage(gp.player.quickUseItem.down1, quickX, quickY, quickSize, quickSize, null);
+		Entity quickItem = null;
+		if (gp.player.quickUseItemClass != null) {
+			for (Entity item : gp.player.inventory) {
+				if (item != null
+					&& item.getClass() == gp.player.quickUseItemClass
+					&& (gp.player.quickUseItemName == null || gp.player.quickUseItemName.equals(item.name))
+					&& item.quantity > 0) {
+					quickItem = item;
+					break;
+				}
+			}
+		}
+		if (quickItem != null && quickItem.down1 != null) {
+			g2.drawImage(quickItem.down1, quickX, quickY, quickSize, quickSize, null);
 			// Draw quantity if stackable
-			if (gp.player.quickUseItem.stackable && gp.player.quickUseItem.quantity > 1) {
+			if (quickItem.stackable && quickItem.quantity > 1) {
 				g2.setFont(g2.getFont().deriveFont(Font.BOLD, 18F));
-				String qtyText = "x" + gp.player.quickUseItem.quantity;
+				String qtyText = "x" + quickItem.quantity;
 				int qtyWidth = g2.getFontMetrics().stringWidth(qtyText);
 				g2.setColor(Color.WHITE);
 				g2.drawString(qtyText, quickX + quickSize - qtyWidth - 4, quickY + quickSize - 6);
@@ -1787,7 +1709,7 @@ public class UI {
 		g2.setFont(g2.getFont().deriveFont(Font.BOLD, 22F));
 		g2.setColor(Color.WHITE);
 		int quickKeyWidth = g2.getFontMetrics().stringWidth(quickKey);
-		g2.drawString(quickKey, quickX + quickSize - quickKeyWidth - 4, quickY + quickSize - 4);
+		g2.drawString(quickKey, quickX + 4, quickY + quickSize - 4);
 
 		// --- Draw flash icon box to the right ---
 		int flashX = quickX + quickSize + gp.tileSize / 2;
@@ -1826,6 +1748,6 @@ public class UI {
 		g2.setFont(g2.getFont().deriveFont(Font.BOLD, 22F));
 		g2.setColor(Color.WHITE);
 		int keyTextWidth = g2.getFontMetrics().stringWidth(keyName);
-		g2.drawString(keyName, flashX + iconSize - keyTextWidth - 4, flashY + iconSize - 4);
+		g2.drawString(keyName, flashX + 4, flashY + iconSize - 4);
 	}
 }

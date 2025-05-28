@@ -7,7 +7,8 @@ public class ITEM_Spear_Normal extends Entity {
     public ITEM_Spear_Normal(GamePanel gp) {
         super(gp);
         
-        name = "Normal Spear";
+        name = gp.ui.tr("item.spear_normal.name");
+        description = gp.ui.tr("item.spear_normal.description");
         type = 3;
         itemType = 0;
         level = 1;

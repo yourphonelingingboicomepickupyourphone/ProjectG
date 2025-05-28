@@ -86,8 +86,7 @@ public class KeyHandler implements KeyListener{
 					gp.ui.titleScreenState = 1; 
 				}
 				if (gp.ui.commandNum == 1) {
-					//load game
-
+					gp.config.loadPlayer(gp.player);
 				}
 				if (gp.ui.commandNum == 2) {
 					gp.ui.commandNum = 0; // Reset cursor to first option
@@ -303,11 +302,38 @@ public class KeyHandler implements KeyListener{
 		}
 
 		if (code == gp.keyConfig.getKey(KeyConfig.QUICK_USE)) {
-			if (gp.player.quickUseItem != null) {
-				gp.player.quickUseItem.use(gp.player);
-				gp.player.quickUseItem.quantity--;
-				if (gp.player.quickUseItem.quantity <= 0) {
-					gp.player.quickUseItem = null;
+			Entity quickItem = null;
+			for (Entity item : gp.player.inventory) {
+				if (item != null
+					&& gp.player.quickUseItemClass != null
+					&& item.getClass() == gp.player.quickUseItemClass
+					&& (gp.player.quickUseItemName == null || gp.player.quickUseItemName.equals(item.name))
+					&& item.quantity > 0) {
+					quickItem = item;
+					break;
+				}
+			}
+			if (quickItem != null) {
+				quickItem.use(gp.player);
+				quickItem.quantity--;
+				if (quickItem.quantity <= 0) {
+					gp.player.inventory.remove(quickItem);
+				}
+				// If no more of this item, clear quick use slot
+				boolean found = false;
+				for (Entity item : gp.player.inventory) {
+					if (item != null
+						&& gp.player.quickUseItemClass != null
+						&& item.getClass() == gp.player.quickUseItemClass
+						&& (gp.player.quickUseItemName == null || gp.player.quickUseItemName.equals(item.name))
+						&& item.quantity > 0) {
+						found = true;
+						break;
+					}
+				}
+				if (!found) {
+					gp.player.quickUseItemClass = null;
+					gp.player.quickUseItemName = null;
 				}
 			}
 		}
@@ -326,22 +352,27 @@ public class KeyHandler implements KeyListener{
 		
 		if (KeyEvent.VK_W == code || KeyEvent.VK_UP == code) {
 			gp.ui.pauseCommandNum--;
-			if (gp.ui.pauseCommandNum < 0) gp.ui.pauseCommandNum = 3; // 4 options: 0-3
+			if (gp.ui.pauseCommandNum < 0) gp.ui.pauseCommandNum = 4;
 		}
 		if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
 			gp.ui.pauseCommandNum++;
-			if (gp.ui.pauseCommandNum > 3) gp.ui.pauseCommandNum = 0;
+			if (gp.ui.pauseCommandNum > 4) gp.ui.pauseCommandNum = 0;
 		}
 		if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
 			switch (gp.ui.pauseCommandNum) {
 				case 0: gp.gameState = gp.playState; break; // Continue
-				case 1: gp.gameState = gp.optionsState; break; // Settings
-				case 2: // Return to Main Menu
+				case 1: 
+					gp.config.savePlayer(gp.player);
+					gp.gameState = gp.playState;
+					gp.ui.addMessage(gp.ui.tr("message.saved"));
+					break; // Save
+				case 2: gp.gameState = gp.optionsState; break; // Settings
+				case 3: // Return to Main Menu
 					gp.gameState = gp.titleState;
 					gp.ui.titleScreenState = 0;
 					gp.ui.commandNum = 0; // Reset command number
 					break;
-				case 3: System.exit(0); break; // Exit
+				case 4: System.exit(0); break; // Exit
 			}
 		}
 	}
@@ -590,12 +621,13 @@ public class KeyHandler implements KeyListener{
 			}
 		}
 
-			if (code == gp.keyConfig.getKey(KeyConfig.ASSIGN_QUICK_USE)) {
+		if (code == gp.keyConfig.getKey(KeyConfig.ASSIGN_QUICK_USE)) {
 			int itemIndex = gp.ui.getItemIndexOnSlot();
 			if (itemIndex < gp.player.inventory.size()) {
 				Entity selectedItem = gp.player.inventory.get(itemIndex);
 				if (selectedItem != null && selectedItem.itemType == 6) { // Only allow potions/consumables
-					gp.player.quickUseItem = selectedItem;
+					gp.player.quickUseItemClass = selectedItem.getClass();
+					gp.player.quickUseItemName = selectedItem.name;
 					gp.ui.addMessage(gp.ui.tr("message.quick_use_assigned", selectedItem.name));
 				} else {
 					gp.ui.addMessage(gp.ui.tr("message.quick_use_invalid"));

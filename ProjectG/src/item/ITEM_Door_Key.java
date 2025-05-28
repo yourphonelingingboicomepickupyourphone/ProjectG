@@ -9,7 +9,8 @@ public class ITEM_Door_Key extends Entity{
 		
 		super(gp);
 
-		name = "Door Key";
+		name = gp.ui.tr("item.door_key.name");
+		description = gp.ui.tr("item.door_key.description");
 		down1 = setup("/objects/door_key");
 		renderLayer = 1;
 		pickable = true;

@@ -7,7 +7,8 @@ public class ITEM_Staff_Normal extends Entity {
     public ITEM_Staff_Normal(GamePanel gp) {
         super(gp);
         
-        name = "Normal Staff";
+        name = gp.ui.tr("item.staff_normal.name");
+        description = gp.ui.tr("item.staff_normal.description");
         type = 3;
         itemType = 0;
         level = 1;

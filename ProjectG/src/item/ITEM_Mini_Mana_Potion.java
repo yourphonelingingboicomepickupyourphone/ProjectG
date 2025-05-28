@@ -10,13 +10,13 @@ public class ITEM_Mini_Mana_Potion extends Entity{
         
         this.gp = gp;
 
-        name = "Mini Mana Potion";
+        name = gp.ui.tr("item.mini_mana_potion.name");
         level = 1;
         down1 = setup("/items/mana_potion");
         manaBonus = 30;
         rarity = 0; //0 = common, 1 = rare, 2 = epic, 3 = legendary
         levelRequirement = 0; //level requirement to use the item
-        description = "A potion that restores mana. It is not very powerful, but it is better than nothing.";
+        description = gp.ui.tr("item.mini_mana_potion.description");
         manaHeal = 100; //mana heal of the item
         
         type = 3;

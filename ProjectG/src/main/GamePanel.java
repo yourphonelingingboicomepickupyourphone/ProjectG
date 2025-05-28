@@ -12,6 +12,7 @@ import java.util.Comparator;
 import javax.swing.JPanel;
 
 import ai.PathFinder;
+import data.DataStorage;
 import entity.Entity;
 import entity.Player;
 import tile.TileManager;
@@ -342,6 +343,7 @@ public class GamePanel extends JPanel implements Runnable{
 	        player.worldX = player.defaultWorldX;
 	        player.worldY = player.defaultWorldY;
 	    }
-	    // ...add any other resets needed...
 	}
+
+
 }

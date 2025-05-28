@@ -8,13 +8,13 @@ public class ITEM_Mini_Health_Potion  extends Entity {
         
         this.gp = gp;
 
-        name = "Mini Health Potion";
+        name = gp.ui.tr("item.mini_health_potion.name");
         level = 1;
         down1 = setup("/items/heal_potion");
         healthBonus = 100;
         rarity = 0; //0 = common, 1 = rare, 2 = epic, 3 = legendary
         levelRequirement = 0; //level requirement to use the item
-        description = "A potion that restores health. It is not very powerful, but it is better than nothing.";
+        description = gp.ui.tr("item.mini_health_potion.description");
         healthHeal = 100; //health heal of the item
         
         type = 3; 
