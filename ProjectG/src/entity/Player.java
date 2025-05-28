@@ -38,6 +38,7 @@ public class Player extends Entity{
 	public int flashCooldown = 0;
 	public int FLASH_COOLDOWN_MAX = 3600; // 60 seconds at 60fps
 	public int FLASH_RANGE = 4; // 4 tiles
+	public Entity quickUseItem;
 
 	public boolean monsterNearby = false;
 	public int monsterNearbyCounter = 0;
@@ -100,6 +101,7 @@ public class Player extends Entity{
 		this.progressionDefenseUpgrades = 0;
 		this.ATTACK_COOLDOWN_MAX = 30; // 30 frames = 0.5s at 60fps
 		this.FLASH_COOLDOWN_MAX = 3600; // 60 seconds at 60fps
+
 		currentWeapon = null;
 		currentArmor = null;
 		currentHat = null;
@@ -742,7 +744,7 @@ public class Player extends Entity{
 			g2.setColor(Color.ORANGE);
 			g2.setFont(g2.getFont().deriveFont(32f));
 			int markX = x + gp.tileSize - 8;
-			int markY = y - 10;
+			int markY = y - 6;
 			g2.drawString("!", markX, markY);
 			monsterNearbyCounter++;
 		} if (monsterNearbyCounter >= MONSTER_NEARBY_DURATION) {

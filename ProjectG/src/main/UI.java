@@ -1705,16 +1705,105 @@ public class UI {
 
 	public void drawFlashCooldown() {
 		int iconSize = gp.tileSize;
-		int x = 5 * gp.tileSize / 2 + gp.tileSize * 6 + gp.tileSize / 2; // Right of health bar
+		int x = 5 * gp.tileSize / 2 + gp.tileSize * 6 + gp.tileSize / 2; // Leftmost box (now quick use)
 		int y = gp.tileSize / 2;
+
+		// --- Draw quick-use box on the left ---
+		int quickX = x;
+		int quickY = y;
+		int quickSize = iconSize;
+
+		// Frame for quick-use box
+		g2.setColor(Color.WHITE);
+		g2.setStroke(new BasicStroke(4));
+		g2.drawRect(quickX - 2, quickY - 2, quickSize + 4, quickSize + 4);
+		g2.setStroke(new BasicStroke(1));
+
+		// Draw quick-use item icon if assigned
+		if (gp.player.quickUseItem != null && gp.player.quickUseItem.down1 != null) {
+			g2.drawImage(gp.player.quickUseItem.down1, quickX, quickY, quickSize, quickSize, null);
+			// Draw quantity if stackable
+			if (gp.player.quickUseItem.stackable && gp.player.quickUseItem.quantity > 1) {
+				g2.setFont(g2.getFont().deriveFont(Font.BOLD, 18F));
+				String qtyText = "x" + gp.player.quickUseItem.quantity;
+				int qtyWidth = g2.getFontMetrics().stringWidth(qtyText);
+				g2.setColor(Color.WHITE);
+				g2.drawString(qtyText, quickX + quickSize - qtyWidth - 4, quickY + quickSize - 6);
+			}
+		} else {
+            // Draw placeholder
+            g2.setColor(new Color(200, 200, 200, 200));
+            g2.fillRect(quickX, quickY, quickSize, quickSize);
+            g2.setColor(Color.GRAY);
+
+            // Multi-line fit for placeholder text
+            String text = tr("quick_use.empty");
+            int fontSize = 16;
+            int maxWidth = quickSize - 8;
+            java.util.List<String> lines = new java.util.ArrayList<>();
+            String[] words = text.split(" ");
+            StringBuilder line = new StringBuilder();
+            for (String word : words) {
+                String testLine = line.length() == 0 ? word : line + " " + word;
+                g2.setFont(g2.getFont().deriveFont(Font.PLAIN, (float)fontSize));
+                int lineWidth = g2.getFontMetrics().stringWidth(testLine);
+                if (lineWidth > maxWidth && line.length() > 0) {
+                    lines.add(line.toString());
+                    line = new StringBuilder(word);
+                } else {
+                    if (line.length() > 0) line.append(" ");
+                    line.append(word);
+                }
+            }
+            if (line.length() > 0) lines.add(line.toString());
+
+            // If still too wide, reduce font size
+            while (true) {
+                boolean fits = true;
+                for (String l : lines) {
+                    g2.setFont(g2.getFont().deriveFont(Font.BOLD, (float)fontSize));
+                    if (g2.getFontMetrics().stringWidth(l) > maxWidth) {
+                        fits = false;
+                        break;
+                    }
+                }
+                if (fits || fontSize <= 8) break;
+                fontSize--;
+            }
+
+            int textHeight = g2.getFontMetrics().getAscent();
+            int totalHeight = lines.size() * textHeight + (lines.size() - 1) * 2;
+            int startY = quickY + (quickSize - totalHeight) / 2 + textHeight - 2;
+
+            for (String l : lines) {
+                int textWidth = g2.getFontMetrics().stringWidth(l);
+                g2.drawString(l, quickX + (quickSize - textWidth) / 2, startY);
+                startY += textHeight + 2;
+            }
+		}
+
+		// Draw assigned key for quick-use
+		String quickKey = gp.keyConfig.getKeyName(main.KeyConfig.QUICK_USE);
+		g2.setFont(g2.getFont().deriveFont(Font.BOLD, 22F));
+		g2.setColor(Color.WHITE);
+		int quickKeyWidth = g2.getFontMetrics().stringWidth(quickKey);
+		g2.drawString(quickKey, quickX + quickSize - quickKeyWidth - 4, quickY + quickSize - 4);
+
+		// --- Draw flash icon box to the right ---
+		int flashX = quickX + quickSize + gp.tileSize / 2;
+		int flashY = y;
+
+		g2.setColor(Color.WHITE);
+		g2.setStroke(new BasicStroke(4));
+		g2.drawRect(flashX - 2, flashY - 2, iconSize + 4, iconSize + 4); // Frame around icon
+		g2.setStroke(new BasicStroke(1)); // Reset stroke
 
 		// Draw icon
 		if (flash != null) {
-			g2.drawImage(flash, x, y, iconSize, iconSize, null);
+			g2.drawImage(flash, flashX, flashY, iconSize, iconSize, null);
 		} else {
-			// Draw placeholder if icon missing
 			g2.setColor(Color.YELLOW);
-			g2.fillOval(x, y, iconSize, iconSize);
+			g2.fillRect(flashX, flashY, iconSize, iconSize);
 		}
 
 		// Draw cooldown overlay if on cooldown
@@ -1722,14 +1811,21 @@ public class UI {
 			float percent = (float)gp.player.flashCooldown / gp.player.FLASH_COOLDOWN_MAX;
 			int overlayHeight = (int)(iconSize * percent);
 			g2.setColor(new Color(0, 0, 0, 120));
-			g2.fillRect(x, y, iconSize, overlayHeight);
+			g2.fillRect(flashX, flashY, iconSize, overlayHeight);
 
 			// Draw cooldown seconds
 			g2.setColor(Color.WHITE);
-			g2.setFont(g2.getFont().deriveFont(Font.BOLD, 32F));
+			g2.setFont(g2.getFont().deriveFont(Font.BOLD, 32f));
 			String cdText = String.format("%.1f", gp.player.flashCooldown / 60.0);
 			int textWidth = g2.getFontMetrics().stringWidth(cdText);
-			g2.drawString(cdText, x + (iconSize - textWidth) / 2, y + iconSize / 2 + 12);
+			g2.drawString(cdText, flashX + (iconSize - textWidth) / 2, flashY + iconSize / 2 + 12);
 		}
+
+		// Draw assigned key at bottom right corner
+		String keyName = gp.keyConfig.getKeyName(main.KeyConfig.FLASH);
+		g2.setFont(g2.getFont().deriveFont(Font.BOLD, 22F));
+		g2.setColor(Color.WHITE);
+		int keyTextWidth = g2.getFontMetrics().stringWidth(keyName);
+		g2.drawString(keyName, flashX + iconSize - keyTextWidth - 4, flashY + iconSize - 4);
 	}
 }

@@ -63,7 +63,6 @@ public class EventHandler {
             // }
             if (hit(0, 50, 57, "any")) {
                 teleport(1, 50, 50); // Teleport to map 1 at coordinates (50, 50)
-                System.out.println("Teleported to map");
             }
         }
     }

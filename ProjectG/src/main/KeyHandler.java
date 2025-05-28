@@ -254,6 +254,8 @@ public class KeyHandler implements KeyListener{
 	}
 
 	public void playState(int code){
+		
+		boolean canOpenMenus = !gp.player.monsterNearby && !gp.player.attacking && gp.player.health > 0;
 		if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
 			upPressed = true;
 		}
@@ -271,7 +273,10 @@ public class KeyHandler implements KeyListener{
 		}
 	
 		if (code == gp.keyConfig.getKey(KeyConfig.ESCAPE)) {
-			gp.gameState = gp.pauseState;
+			if (canOpenMenus) gp.gameState = gp.pauseState;
+			else {
+				gp.ui.addMessage(gp.ui.tr("cant_open_menu"));
+			}
 		}
 
 		if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
@@ -284,11 +289,27 @@ public class KeyHandler implements KeyListener{
 			flashPressed = true;
 		}
 		if (code == gp.keyConfig.getKey(KeyConfig.CHARACTER)) {
-			gp.gameState = gp.characterState;
+			if (canOpenMenus) gp.gameState = gp.characterState;
+			else {
+				gp.ui.addMessage(gp.ui.tr("cant_open_menu"));
+			}
 		}
 
-		if (code == gp.keyConfig.getKey(KeyConfig.INVENTORY)){
-			gp.gameState = gp.inventoryState;
+		if (code == gp.keyConfig.getKey(KeyConfig.INVENTORY)) {
+			if (canOpenMenus) gp.gameState = gp.inventoryState;
+			else {
+				gp.ui.addMessage(gp.ui.tr("cant_open_menu"));
+			}
+		}
+
+		if (code == gp.keyConfig.getKey(KeyConfig.QUICK_USE)) {
+			if (gp.player.quickUseItem != null) {
+				gp.player.quickUseItem.use(gp.player);
+				gp.player.quickUseItem.quantity--;
+				if (gp.player.quickUseItem.quantity <= 0) {
+					gp.player.quickUseItem = null;
+				}
+			}
 		}
 
 		if (code == KeyEvent.VK_F3) {
@@ -568,6 +589,20 @@ public class KeyHandler implements KeyListener{
 				}
 			}
 		}
+
+			if (code == gp.keyConfig.getKey(KeyConfig.ASSIGN_QUICK_USE)) {
+			int itemIndex = gp.ui.getItemIndexOnSlot();
+			if (itemIndex < gp.player.inventory.size()) {
+				Entity selectedItem = gp.player.inventory.get(itemIndex);
+				if (selectedItem != null && selectedItem.itemType == 6) { // Only allow potions/consumables
+					gp.player.quickUseItem = selectedItem;
+					gp.ui.addMessage(gp.ui.tr("message.quick_use_assigned", selectedItem.name));
+				} else {
+					gp.ui.addMessage(gp.ui.tr("message.quick_use_invalid"));
+				}
+			}
+		}
+
 		if (code == gp.keyConfig.getKey(KeyConfig.RESET)){
 			gp.player.disposeSelectedItem();
 		}
