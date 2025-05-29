@@ -345,14 +345,5 @@ public class GamePanel extends JPanel implements Runnable{
 	    }
 	}
 
-	public Entity createEntityByClassName(String className, GamePanel gp) {
-		try {
-			Class<?> clazz = Class.forName(className);
-			return (Entity) clazz.getConstructor(GamePanel.class).newInstance(gp);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
 
 }

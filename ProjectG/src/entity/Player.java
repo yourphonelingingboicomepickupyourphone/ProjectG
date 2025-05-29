@@ -7,7 +7,6 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import data.DataStorage;
 import main.GamePanel;
@@ -142,29 +141,6 @@ public class Player extends Entity{
 		// Save quick use info if needed
 		data.quickUseItemClass = this.quickUseItemClass != null ? this.quickUseItemClass.getName() : null;
 		data.quickUseItemName = this.quickUseItemName;
-		data.playerWorldX = this.worldX;
-		data.playerWorldY = this.worldY;
-		data.currentMap = gp.currentMap;
-
-		for (int map = 0; map < gp.maxMap; map++) {
-			ArrayList<Entity> objList = new ArrayList<>();
-			for (Entity e : gp.obj[map]) {
-				if (e != null) objList.add(e);
-			}
-			data.savedObjects.add(objList);
-
-			ArrayList<Entity> monsterList = new ArrayList<>();
-			for (Entity e : gp.monster[map]) {
-				if (e != null) monsterList.add(e);
-			}
-			data.savedMonsters.add(monsterList);
-
-			ArrayList<Entity> npcList = new ArrayList<>();
-			for (Entity e : gp.npc[map]) {
-				if (e != null) npcList.add(e);
-			}
-			data.savedNpcs.add(npcList);
-		}
 		return data;
 	}
 
@@ -197,61 +173,6 @@ public class Player extends Entity{
 			this.quickUseItemClass = null;
 		}
 		this.quickUseItemName = data.quickUseItemName;
-		this.worldX = data.playerWorldX;
-		this.worldY = data.playerWorldY;
-		gp.currentMap = data.currentMap;
-
-		for (int map = 0; map < gp.maxMap; map++) {
-			// Clear arrays first
-			Arrays.fill(gp.obj[map], null);
-			Arrays.fill(gp.monster[map], null);
-			Arrays.fill(gp.npc[map], null);
-
-			// Restore objects
-			if (data.savedObjects.size() > map) {
-				int i = 0;
-				for (Entity e : data.savedObjects.get(map)) {
-					if (i < gp.obj[map].length) {
-						gp.obj[map][i++] = e;
-						if (e != null) e.restoreTransientFields(gp);
-					}
-				}
-			}
-			// Restore monsters
-			if (data.savedMonsters.size() > map) {
-				int i = 0;
-				for (Entity e : data.savedMonsters.get(map)) {
-					if (i < gp.monster[map].length) {
-						gp.monster[map][i++] = e;
-						if (e != null) e.restoreTransientFields(gp);
-					}
-				}
-			}
-			// Restore NPCs
-			if (data.savedNpcs.size() > map) {
-				int i = 0;
-				for (Entity e : data.savedNpcs.get(map)) {
-					if (i < gp.npc[map].length) {
-						gp.npc[map][i++] = e;
-						if (e != null) e.restoreTransientFields(gp);
-					}
-				}
-			}
-		}
-		this.gp = gp;
-		getPlayerImage();
-		if (this.currentWeapon != null) getPlayerAttackImage();
-
-		// Restore images and gp for equipped items
-		if (currentWeapon != null) currentWeapon.restoreTransientFields(gp);
-		if (currentArmor != null) currentArmor.restoreTransientFields(gp);
-		if (currentHat != null) currentHat.restoreTransientFields(gp);
-		if (currentBoots != null) currentBoots.restoreTransientFields(gp);
-
-		// Restore images and gp for inventory items
-		for (Entity item : inventory) {
-			if (item != null) item.restoreTransientFields(gp);
-		}
 	}
 
 	public void setItems(){
@@ -1016,11 +937,6 @@ public class Player extends Entity{
 		spriteNum = 1;
 		spriteCounter = 0;
 		direction = "down";
-		// Delete old save file
-		java.io.File saveFile = new java.io.File("save.dat");
-		if (saveFile.exists()) {
-			saveFile.delete();
-		}
 		setItems();
 		gp.resetToFirstMap();
 	}

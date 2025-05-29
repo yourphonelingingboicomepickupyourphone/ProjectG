@@ -15,8 +15,6 @@ import main.GamePanel;
 import main.UtilityTool;
 
 public class Entity implements Serializable{
-
-	private static final long serialVersionUID = 1L;
 	
 	public transient GamePanel gp;
 
@@ -63,7 +61,7 @@ public class Entity implements Serializable{
 	public boolean dying = false;
 	public int dyingCounter = 0;
 	public boolean onPath = false; //to check if the entity is on a path
-	public transient ArrayList<ai.Node> pathList = new ArrayList<>();
+	public ArrayList<ai.Node> pathList = new ArrayList<>();
 	
 	//Attributes
 	public float maxHealth;
@@ -461,36 +459,4 @@ public class Entity implements Serializable{
 			} 
 		}
 	}
-
-	public void restoreTransientFields(GamePanel gp) {
-    this.gp = gp;
-    try {
-        if (this.type == 0 && this instanceof Player) {
-            ((Player)this).getPlayerImage();
-            if (((Player)this).currentWeapon != null) {
-                ((Player)this).getPlayerAttackImage();
-            }
-        } else {
-            // Try all common image-loading methods in order
-            boolean loaded = false;
-            String[] methodNames = {
-                "getImage",         // Most of your entities use this
-                "getMonsterImage",  // Some monsters
-                "getNPCImage",      // Some NPCs
-                "getObjectImage",   // Some objects
-                "setup"             // Some items/objects
-            };
-            for (String method : methodNames) {
-                try {
-                    this.getClass().getMethod(method).invoke(this);
-                    loaded = true;
-                    break;
-                } catch (NoSuchMethodException ignored) {
-                    // Try next method
-                }
-            }
-            // If none of the above methods exist, do nothing
-        }
-    } catch (Exception ignored) {}
-}
 }
