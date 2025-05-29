@@ -141,6 +141,13 @@ public class Player extends Entity{
 		// Save quick use info if needed
 		data.quickUseItemClass = this.quickUseItemClass != null ? this.quickUseItemClass.getName() : null;
 		data.quickUseItemName = this.quickUseItemName;
+		data.playerWorldX = this.worldX;
+		data.playerWorldY = this.worldY;
+		data.currentMap = gp.currentMap;
+
+		// Save objects, monsters, and NPCs
+		
+
 		return data;
 	}
 
@@ -165,7 +172,9 @@ public class Player extends Entity{
 		this.currentArmor = data.currentArmor;
 		this.currentHat = data.currentHat;
 		this.currentBoots = data.currentBoots;
-		this.inventory = new ArrayList<>(data.inventory); // Load inventory
+		// Convert inventory from EntitySaveData to Entity
+		this.inventory = new ArrayList<>();
+
 		// Restore quick use info if needed
 		try {
 			this.quickUseItemClass = data.quickUseItemClass != null ? Class.forName(data.quickUseItemClass) : null;
@@ -173,6 +182,10 @@ public class Player extends Entity{
 			this.quickUseItemClass = null;
 		}
 		this.quickUseItemName = data.quickUseItemName;
+		this.worldX = data.playerWorldX;
+		this.worldY = data.playerWorldY;
+		gp.currentMap = data.currentMap;
+
 	}
 
 	public void setItems(){
@@ -937,6 +950,11 @@ public class Player extends Entity{
 		spriteNum = 1;
 		spriteCounter = 0;
 		direction = "down";
+		// Delete old save file
+		java.io.File saveFile = new java.io.File("save.dat");
+		if (saveFile.exists()) {
+			saveFile.delete();
+		}
 		setItems();
 		gp.resetToFirstMap();
 	}

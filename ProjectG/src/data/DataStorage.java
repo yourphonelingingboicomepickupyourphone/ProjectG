@@ -11,6 +11,7 @@ import entity.Entity;
 
 public class DataStorage implements Serializable{
 
+    private static final long serialVersionUID = 1L;
     //Player Stats
     public String name;
 	public float maxHealth;
@@ -39,6 +40,11 @@ public class DataStorage implements Serializable{
     public String quickUseItemClass;
     public String quickUseItemName;
 
+    public int playerWorldX;
+    public int playerWorldY;
+    public int currentMap;
+
+    
     public void savePlayerData(DataStorage data) {
         try (FileOutputStream fos = new FileOutputStream("save.dat");
             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
