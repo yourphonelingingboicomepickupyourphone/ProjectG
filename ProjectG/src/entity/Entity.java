@@ -475,10 +475,10 @@ public class Entity implements Serializable{
             boolean loaded = false;
             String[] methodNames = {
                 "getImage",         // Most of your entities use this
-                "getMonsterImage",  // Some monsters
+				"getMonsterImage",  // Some monsters
                 "getNPCImage",      // Some NPCs
                 "getObjectImage",   // Some objects
-                "setup"             // Some items/objects
+                "setup",             // Some items/objects
             };
             for (String method : methodNames) {
                 try {
@@ -491,6 +491,6 @@ public class Entity implements Serializable{
             }
             // If none of the above methods exist, do nothing
         }
-    } catch (Exception ignored) {}
-}
+		} catch (Exception ignored) {}
+	}
 }

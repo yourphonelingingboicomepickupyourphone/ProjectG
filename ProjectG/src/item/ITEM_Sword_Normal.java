@@ -34,5 +34,9 @@ public class ITEM_Sword_Normal extends Entity{
         pickable = true;
         stackable = false;
     }
-
+    
+    public void getImage() {
+        down1 = setup("/items/normal_sword");
+        // ... set up other images as in the constructor ...
+    }
 }
