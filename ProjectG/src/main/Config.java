@@ -15,7 +15,7 @@ public class Config {
     }
 
     public void saveConfig() {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter("config.txt"))) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("config.cfg"))) {
             // UI settings
             bw.write("fullscreen=" + gp.ui.fullscreenOn); bw.newLine();
             bw.write("resolution=" + gp.ui.resolutionIndex); bw.newLine();

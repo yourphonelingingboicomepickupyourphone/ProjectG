@@ -15,18 +15,25 @@ import main.GamePanel;
 
 public class MON_rSlime extends Entity{
 
-    public MON_rSlime(GamePanel gp) {
+    int baseEXP = 400; // Base experience points for the monster
+    int baseHeath = 200; // Base health for the monster
+    int baseAttack = 100; // Base mana for the monster
+    public MON_rSlime(GamePanel gp, int lv) {
         super(gp);
         name = "Red Slime";
         type = 1;
         
-        level = 1;
+        level = lv; // Set the level of the monster
         speed = 1;
-        maxHealth = 70;
+        maxHealth = baseHeath * level;  // Base health + scaling with level
         health = maxHealth;
-        attack = 700;
-        defense = 0;
-        expReward = 10;
+        attack = baseAttack + (level * 20); // Base attack + scaling with level
+        if (level > 10) {
+            defense = 20 + (level * 10); // Base defense + scaling with level
+        } else {
+            defense = 0; // No defense for level 1
+        }
+        expReward = baseEXP * (this.level + 10) / (gp.player.level + 10); // Base exp + scaling with level
 
         collision = true;
         renderLayer = 1; 

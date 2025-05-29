@@ -16,22 +16,21 @@ public class DataStorage implements Serializable{
     public String name;
 	public float maxHealth;
 	public float health;
-	public int maxMana = 400;
+	public int maxMana;
 	public int mana = maxMana;
-	public int level = 1;
-	public int attack = 50;
-	public int defense = 10;
-	public int exp = 0;
-	public int speed = 5;
-	public int totalProgressionPoints = 0;
-	public int progressionPoints = 0;
-	public int progressionHealthUpgrades = 0;
-	public int progressionManaUpgrades = 0;
-	public int progressionAttackUpgrades = 0;
-	public int progressionDefenseUpgrades = 0;
-	public int ATTACK_COOLDOWN_MAX = 30; // 30 frames = 0.5s at 60fps
-	public int FLASH_COOLDOWN_MAX = 3600; // 60 seconds at 60fps
-
+	public int level;
+	public int attack;
+	public int defense;
+	public int exp;
+	public int speed;
+	public int totalProgressionPoints;
+	public int progressionPoints;
+	public int progressionHealthUpgrades;
+	public int progressionManaUpgrades;
+	public int progressionAttackUpgrades;
+	public int progressionDefenseUpgrades;
+	public int ATTACK_COOLDOWN_MAX;
+	public int FLASH_COOLDOWN_MAX;
 
     public ArrayList<EntitySaveData> inventory = new ArrayList<>();
     public String quickUseItemClass;

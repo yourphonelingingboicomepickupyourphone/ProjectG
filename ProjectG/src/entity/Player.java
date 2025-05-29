@@ -18,6 +18,7 @@ import projectile.PROJECTILE_Fire_Ball;
 public class Player extends Entity{
 	
 	KeyHandler keyH;
+	int MAX_LEVEL = 100;
 	
 	public final int screenX;
 	public final int screenY;
@@ -96,7 +97,7 @@ public class Player extends Entity{
 		this.defense = 10;
 		this.exp = 0;
 		this.speed = 5;
-		this.nextLevelExp = 10;
+		this.nextLevelExp = (int)(100 * (1 - ((4 - level * 30) / (0.1 * level + 4))));
 		this.totalProgressionPoints = 0;
 		this.progressionPoints = 0;
 		this.progressionHealthUpgrades = 0;
@@ -822,9 +823,17 @@ public class Player extends Entity{
 		if (exp >= nextLevelExp) {
 			level++;
 			exp -= nextLevelExp;
-			nextLevelExp += 10; // Increase the required experience for the next level
-			totalProgressionPoints += 5;
-			progressionPoints += 5;
+			if (level < MAX_LEVEL){
+				totalProgressionPoints += 10;
+				progressionPoints += 10;
+			} else {
+				if (exp > 17500){
+					totalProgressionPoints += 10;
+					progressionPoints += 10;
+					exp -= 17500; 
+				}
+			}
+			
 			gp.ui.addMessage(gp.ui.tr("message.level_up", level));
 		}
 	}

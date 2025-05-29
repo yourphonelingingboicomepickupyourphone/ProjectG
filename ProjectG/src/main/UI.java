@@ -46,7 +46,7 @@ public class UI {
 	public String waitingAction = null;
 	public final String[] controlActions = {
 		KeyConfig.UP, KeyConfig.DOWN, KeyConfig.LEFT, KeyConfig.RIGHT,
-		KeyConfig.ATTACK, KeyConfig.CHOOSE, KeyConfig.ESCAPE, KeyConfig.INVENTORY, KeyConfig.CHARACTER, KeyConfig.RESET, KeyConfig.FLASH
+		KeyConfig.ATTACK, KeyConfig.CHOOSE, KeyConfig.ESCAPE, KeyConfig.INVENTORY, KeyConfig.CHARACTER, KeyConfig.RESET, KeyConfig.FLASH, KeyConfig.QUICK_USE, KeyConfig.ASSIGN_QUICK_USE
 	};
 	public boolean keyBindWarning = false;
 	public long keyBindWarningTime = 0;
@@ -544,28 +544,59 @@ public class UI {
 		g2.drawString(text, xText, yText);
 	}
 
-	public void drawPlayerIcon(){
+	public void drawPlayerIcon() {
 		BufferedImage image = null;
 		int x = gp.tileSize / 2;
 		int y = gp.tileSize / 2;
-		int width = gp.tileSize * 2;
-		int height = gp.tileSize * 2;
+		int diameter = gp.tileSize * 2;
+		int centerX = x + diameter / 2;
+		int centerY = y + diameter / 2;
 
-		UtilityTool uTool = new UtilityTool();
-		try {
-			InputStream is = getClass().getResourceAsStream("/player/player_icon.png");
-			if (is == null) {
-				System.err.println("ERROR: /player/player_icon.png not found in resources!");
-			} else {
-				image = ImageIO.read(is);
-				image = uTool.scaleImage(image, width, height);
-			}
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
-		if (image != null) {
-			g2.drawImage(image, x, y, width, height, null);
-		}
+		// Draw circular background
+		g2.setColor(new Color(40, 40, 40, 220));
+		g2.fillOval(x, y, diameter, diameter);
+
+		// --- Draw EXP "liquid" fill ---
+		float expPercent = (float)gp.player.exp / Math.max(1, gp.player.nextLevelExp);
+		int fillHeight = (int)((diameter - 10) * expPercent); // -10 for padding
+		int fillY = y + diameter - 5 - fillHeight; // -5 for bottom padding
+
+		// Save old clip
+		java.awt.Shape oldClip = g2.getClip();
+		// Clip to the inside of the circle
+		g2.setClip(new java.awt.geom.Ellipse2D.Float(x + 5, y + 5, diameter - 10, diameter - 10));
+		// Draw the "liquid" fill (blue)
+		g2.setColor(new Color(41, 107, 167, 180));
+		g2.fillRect(x + 5, fillY, diameter - 10, fillHeight);
+		// Restore clip
+		g2.setClip(oldClip);
+
+		// Draw the circle border again for clarity
+		g2.setColor(new Color(41, 107, 167, 220));
+		g2.setStroke(new BasicStroke(4));
+		g2.drawOval(x + 5, y + 5, diameter - 10, diameter - 10);
+
+		// Draw level number in the center
+		g2.setFont(g2.getFont().deriveFont(Font.BOLD, 24F));
+		String level = tr("character.level");
+		int levelWidth = g2.getFontMetrics().stringWidth(level);
+		int levelHeight = g2.getFontMetrics().getAscent();
+		g2.setColor(Color.WHITE);
+		g2.drawString(level, centerX - levelWidth / 2, centerY - levelHeight);
+		g2.setFont(g2.getFont().deriveFont(Font.BOLD, 48F));
+		String levelText = String.valueOf(gp.player.level);
+		levelWidth = g2.getFontMetrics().stringWidth(levelText);
+		g2.drawString(levelText, centerX - levelWidth / 2, centerY + 5 * levelHeight / 3);
+
+		// Draw EXP text below the circle
+		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 18F));
+		String expText = gp.player.exp + " / " + gp.player.nextLevelExp + " EXP";
+		int expWidth = g2.getFontMetrics().stringWidth(expText);
+		g2.setColor(Color.YELLOW);
+		g2.drawString(expText, centerX - expWidth / 2, y + diameter + 22);
+
+		// Reset stroke
+		g2.setStroke(new BasicStroke(1f));
 	}
 
 	public void drawMessages() {
@@ -897,8 +928,9 @@ public class UI {
 		g2.setColor(new Color(40, 40, 40, 220));
 		g2.fillRoundRect(infoX, infoY, infoWidth, infoHeight, 20, 20);
 
+		// Draw selected item's name and info below the grid
 		if (selectedItem != null) {
-		    // Draw selected item's name and info below the grid
+		    // Draw selected item's name
 		    g2.setColor(Color.WHITE);
 		    g2.setFont(g2.getFont().deriveFont(Font.BOLD, 32F));
 		    g2.drawString(selectedItem.name, infoX + 24, infoY + 40);
@@ -909,7 +941,7 @@ public class UI {
 		    int descY = infoY + 80;
 		    int maxDescWidth = infoWidth - 48;
 
-		    // Reserve more space for stats (e.g., 5 lines of stats)
+		    // Reserve space for stats (e.g., 5 lines of stats)
 		    int reservedStatLines = 5;
 		    int statLineHeight = 22; // Approximate, matches your stat font size
 		    int maxDescHeight = infoHeight - 40 - reservedStatLines * statLineHeight; // 40 for name/title
@@ -1120,7 +1152,7 @@ public class UI {
 		    int descY = infoY + 80;
 		    int maxDescWidth = infoWidth - 48;
 
-		    // Reserve more space for stats (e.g., 5 lines of stats)
+		    // Reserve space for stats (e.g., 5 lines of stats)
 		    int reservedStatLines = 5;
 		    int statLineHeight = 22; // Approximate, matches your stat font size
 		    int maxDescHeight = infoHeight - 40 - reservedStatLines * statLineHeight; // 40 for name/title
@@ -1254,72 +1286,74 @@ public class UI {
 	}
 
 	public void drawControlsScreen(int frameX, int frameY) {
-	    int total = controlActions.length;
-	    int half = (total + 1) / 2; // left column gets the extra if odd
+		int total = controlActions.length;
 
-	    int textX1 = frameX + gp.tileSize;
-	    int textX2 = frameX + gp.tileSize * 9; // adjust as needed for your box width
-	    int textYStart = frameY + gp.tileSize * 2;
-	    int lineHeight = gp.tileSize;
+		int windowWidth = gp.tileSize * 18;
+		int innerWidth = windowWidth - 7 * 6; // borderInset * 6
+		int colGap = gp.tileSize; // Gap between columns
 
-	    g2.setFont(currentFontBold.deriveFont(Font.BOLD, 48F));
-	    g2.setColor(Color.WHITE);
+		// Dynamically calculate number of columns based on total controls and max rows you want
+		int maxRows = 8; // You can adjust this for your preferred max height
+		int cols = (int) Math.ceil((double) total / maxRows);
+		int rows = (int) Math.ceil((double) total / cols);
+
+		int colWidth = (innerWidth - (cols - 1) * colGap) / cols;
+		int textYStart = frameY + gp.tileSize * 2;
+		int lineHeight = gp.tileSize;
+
+		g2.setFont(currentFontBold.deriveFont(Font.BOLD, 48F));
+		g2.setColor(Color.WHITE);
 		String cText = tr("controls.title");
-	    g2.drawString(cText, getXForCenteredText(cText), textYStart - gp.tileSize / 2);
-	    int textY1 = textYStart + lineHeight;
-	    int textY2 = textY1;
+		g2.drawString(cText, getXForCenteredText(cText), textYStart - gp.tileSize / 2);
 
 		g2.setFont(currentFont.deriveFont(Font.PLAIN, 36F));
-	    // Draw left column
-	    for (int i = 0; i < total; i += 2) {
-	        String action = controlActions[i];
-	        String keyName = tr("controls." + action.toLowerCase());
-	        if (controlsCommandNum == i && !waitingForKey) {
-	            g2.setColor(Color.YELLOW);
-	            g2.drawString(">", textX1 - gp.tileSize / 2, textY1);
-	        }
-	        g2.setColor(Color.WHITE);
-			g2.drawString(keyName + ": " + gp.keyConfig.getKeyName(action), textX1, textY1);
-	        textY1 += lineHeight;
-	    }
+		int startY = textYStart + lineHeight;
+		int[] colXs = new int[cols];
+		for (int c = 0; c < cols; c++) {
+			colXs[c] = frameX + gp.tileSize + c * (colWidth + colGap);
+		}
 
-	    // Draw right column
-	    for (int i = 1; i < total; i += 2) {
-	        String action = controlActions[i];
-	        String keyName = tr("controls." + action.toLowerCase());
-	        if (controlsCommandNum == i && !waitingForKey) {
-	            g2.setColor(Color.YELLOW);
-	            g2.drawString(">", textX2 - gp.tileSize / 2, textY2);
-	        }
-	        g2.setColor(Color.WHITE);
-	        g2.drawString(keyName + ": " + gp.keyConfig.getKeyName(action), textX2, textY2);
-	        textY2 += lineHeight;
-	    }
+		// Draw controls in columns
+		for (int i = 0; i < total; i++) {
+			int col = i / rows;
+			int row = i % rows;
+			int x = colXs[col];
+			int y = startY + row * lineHeight;
 
-	    // Draw "Back" option at the bottom center
-	    int backY = Math.max(textY1, textY2) + lineHeight / 4;
-	    if (controlsCommandNum == controlActions.length && !waitingForKey) {
-	        g2.setColor(Color.YELLOW);
-	        g2.drawString(">", getXForCenteredText(tr("controls.back")) - gp.tileSize, backY);
-	    }
-	    g2.setColor(Color.WHITE);
-	    g2.drawString(tr("controls.back"), getXForCenteredText(tr("controls.back")), backY);
+			String action = controlActions[i];
+			String keyName = tr("controls." + action.toLowerCase());
+			if (controlsCommandNum == i && !waitingForKey) {
+				g2.setColor(Color.YELLOW);
+				g2.drawString(">", x - gp.tileSize / 2, y);
+			}
+			g2.setColor(Color.WHITE);
+			g2.drawString(keyName + ": " + gp.keyConfig.getKeyName(action), x, y);
+		}
 
-	    if (waitingForKey) {
-	        g2.setColor(Color.CYAN);
+		// Draw "Back" option at the bottom center
+		int backY = startY + rows * lineHeight + lineHeight / 4;
+		if (controlsCommandNum == total && !waitingForKey) {
+			g2.setColor(Color.YELLOW);
+			g2.drawString(">", getXForCenteredText(tr("controls.back")) - gp.tileSize, backY);
+		}
+		g2.setColor(Color.WHITE);
+		g2.drawString(tr("controls.back"), getXForCenteredText(tr("controls.back")), backY);
+
+		if (waitingForKey) {
+			g2.setColor(Color.CYAN);
 			String kText = tr("message.press_key");
-	        g2.drawString(kText, getXForCenteredText(kText), backY + 3 * lineHeight / 4);
-	    }
+			g2.drawString(kText, getXForCenteredText(kText), backY + 3 * lineHeight / 4);
+		}
 
-	    if (keyBindWarning) {
-	        g2.setColor(Color.RED);
-	        String warn = tr("message.key_already_assigned");
-	        g2.drawString(warn, getXForCenteredText(warn), backY + 3 * lineHeight / 4);
-	        // Hide warning after 2 seconds
-	        if (System.currentTimeMillis() - keyBindWarningTime > 2000) {
-	            keyBindWarning = false;
-	        }
-	    }
+		if (keyBindWarning) {
+			g2.setColor(Color.RED);
+			String warn = tr("message.key_already_assigned");
+			g2.drawString(warn, getXForCenteredText(warn), backY + 3 * lineHeight / 4);
+			// Hide warning after 2 seconds
+			if (System.currentTimeMillis() - keyBindWarningTime > 2000) {
+				keyBindWarning = false;
+			}
+		}
 	}
 
 	public void drawLanguageScreen(){
@@ -1382,7 +1416,7 @@ public class UI {
 
 	    g2.setFont(currentFont.deriveFont(Font.PLAIN, 36F));
 	    int lineHeight = gp.tileSize;
-	    int colGap = gp.tileSize * 2; // space between columns
+	    int colGap = gp.tileSize * 4; // space between columns
 	    int colWidth = (frameWidth - colGap) / 2;
 	    // Center columns horizontally within the screen
 	    int totalColsWidth = colWidth * 2 + colGap;
@@ -1510,7 +1544,7 @@ public class UI {
 
 	public int getXForCenteredText(String text) {
 		int length = (int)g2.getFontMetrics().getStringBounds(text, g2).getWidth();
-		int x = gp.baseWidth/2 - length/2;
+		int x = (gp.baseWidth - length) / 2;
 		return x;
 	}
 
