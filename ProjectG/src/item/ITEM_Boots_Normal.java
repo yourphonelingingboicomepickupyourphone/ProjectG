@@ -19,4 +19,8 @@ public class ITEM_Boots_Normal extends Entity{
         stackable = false;
     }
 
+    public void getImage() {
+        down1 = setup("/items/normal_boots");
+    }
+
 }

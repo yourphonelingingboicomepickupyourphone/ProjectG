@@ -17,4 +17,9 @@ public class ITEM_Better_Armor extends ITEM_Armor_Normal{
 
     }
 
+    public void getImage() {
+        down1 = setup("/items/normal_armor");
+        // ... set up other images as in the constructor ...
+    }
+
 }

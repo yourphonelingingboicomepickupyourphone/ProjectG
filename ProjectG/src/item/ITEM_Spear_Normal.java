@@ -30,10 +30,15 @@ public class ITEM_Spear_Normal extends Entity {
         levelRequirement = 1; //level requirement to use the item
         attackRange = 2; //attack range of the item
         weaponType = 2; //0 = sword, 1 = axe, 2 = spear, 3 = bow, 4 = wand
-        description = "A normal spear. It is not very powerful, but it is better than nothing." ;
+        description = gp.ui.tr("item.spear_normal.description");
 
         pickable = true;
         stackable = false;
+    }
+
+    public void getImage() {
+        down1 = setup("/items/normal_spear");
+        // ... set up other images as in the constructor ...
     }
 
 }

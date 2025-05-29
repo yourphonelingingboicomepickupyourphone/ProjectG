@@ -131,6 +131,7 @@ public class UI {
 			drawFlashCooldown();
 			//Draw messages
 			drawMessages();
+			drawMiniMap(g2);
 		}
 
 		//Pause State
@@ -1555,23 +1556,45 @@ public class UI {
 	}
 	
 	private java.util.List<String> wrapText(String text, int maxWidth, Graphics2D g2) {
-	    java.util.List<String> lines = new java.util.ArrayList<>();
-	    String[] words = text.split(" ");
-	    StringBuilder line = new StringBuilder();
-	    for (String word : words) {
-	        String testLine = line.length() == 0 ? word : line + " " + word;
-	        int lineWidth = g2.getFontMetrics().stringWidth(testLine);
-	        if (lineWidth > maxWidth && line.length() > 0) {
-	            lines.add(line.toString());
-	            line = new StringBuilder(word);
-	        } else {
-	            if (line.length() > 0) line.append(" ");
-	            line.append(word);
-	        }
-	    }
-	    if (line.length() > 0) lines.add(line.toString());
-	    return lines;
-	}
+    java.util.List<String> lines = new java.util.ArrayList<>();
+    if (text == null || text.isEmpty()) return lines;
+
+    // If the text contains spaces, wrap by word; otherwise, wrap by character
+    boolean hasSpace = text.contains(" ");
+    if (hasSpace) {
+        String[] words = text.split(" ");
+        StringBuilder line = new StringBuilder();
+        for (String word : words) {
+            String testLine = line.length() == 0 ? word : line + " " + word;
+            int lineWidth = g2.getFontMetrics().stringWidth(testLine);
+            if (lineWidth > maxWidth && line.length() > 0) {
+                lines.add(line.toString());
+                line = new StringBuilder(word);
+            } else {
+                if (line.length() > 0) line.append(" ");
+                line.append(word);
+            }
+        }
+        if (line.length() > 0) lines.add(line.toString());
+    } else {
+        // No spaces: wrap by character
+        StringBuilder line = new StringBuilder();
+        for (int i = 0; i < text.length(); i++) {
+            line.append(text.charAt(i));
+            int lineWidth = g2.getFontMetrics().stringWidth(line.toString());
+            if (lineWidth > maxWidth && line.length() > 1) {
+                // Remove last char, start new line with it
+                char lastChar = line.charAt(line.length() - 1);
+                line.deleteCharAt(line.length() - 1);
+                lines.add(line.toString());
+                line = new StringBuilder();
+                line.append(lastChar);
+            }
+        }
+        if (line.length() > 0) lines.add(line.toString());
+    }
+    return lines;
+}
 	
 	final String[][] keyboard = {
 		{"1","2","3","4","5","6","7","8","9","0"},
@@ -1783,5 +1806,57 @@ public class UI {
 		g2.setColor(Color.WHITE);
 		int keyTextWidth = g2.getFontMetrics().stringWidth(keyName);
 		g2.drawString(keyName, flashX + 4, flashY + iconSize - 4);
+	}
+
+	public void drawMiniMap(Graphics2D g2) {
+		// Mini map size and position
+		int mapWidth = gp.tileSize * 4;
+		int mapHeight = gp.tileSize * 4;
+		int mapX = gp.baseWidth - mapWidth - 24; // 24px from right
+		int mapY = 24; // 24px from top
+
+		// Draw background
+		g2.setColor(new Color(0, 0, 0, 180));
+		g2.fillRoundRect(mapX, mapY, mapWidth, mapHeight, 16, 16);
+
+		// Calculate scale
+		int worldWidth = gp.maxWorldCol * gp.tileSize;
+		int worldHeight = gp.maxWorldRow * gp.tileSize;
+		float scaleX = (float) mapWidth / worldWidth;
+		float scaleY = (float) mapHeight / worldHeight;
+
+		// --- Draw map tiles as pixels ---
+		for (int col = 0; col < gp.maxWorldCol; col++) {
+			for (int row = 0; row < gp.maxWorldRow; row++) {
+				int tileNum = gp.tileM.mapTileNum[gp.currentMap][col][row];
+				// Choose a color for the tile (customize as needed)
+				if (gp.tileM.tile[tileNum].collision) {
+					g2.setColor(new Color(80, 80, 80)); // Wall/blocked
+				} else {
+					g2.setColor(new Color(120, 180, 120)); // Floor/grass
+				}
+				int miniX = mapX + (int)(col * gp.tileSize * scaleX);
+				int miniY = mapY + (int)(row * gp.tileSize * scaleY);
+				int miniTile = Math.max(1, (int)(gp.tileSize * scaleX));
+				g2.fillRect(miniX, miniY, miniTile, miniTile);
+			}
+		}
+
+		// --- Draw objects (optional) ---
+		for (Entity obj : gp.obj[gp.currentMap]) {
+			if (obj != null) {
+				int objMiniX = mapX + (int)(obj.worldX * scaleX);
+				int objMiniY = mapY + (int)(obj.worldY * scaleY);
+				g2.setColor(Color.YELLOW);
+				g2.fillRect(objMiniX, objMiniY, 3, 3);
+			}
+		}
+
+		// --- Draw player position ---
+		int playerMiniX = mapX + (int)(gp.player.worldX * scaleX);
+		int playerMiniY = mapY + (int)(gp.player.worldY * scaleY);
+		int playerDotSize = 8;
+		g2.setColor(Color.RED);
+		g2.fillOval(playerMiniX - playerDotSize/2, playerMiniY - playerDotSize/2, playerDotSize, playerDotSize);
 	}
 }

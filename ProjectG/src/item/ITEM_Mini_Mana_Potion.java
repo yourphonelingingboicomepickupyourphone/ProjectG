@@ -25,6 +25,10 @@ public class ITEM_Mini_Mana_Potion extends Entity{
         stackable = true;
     }
 
+    public void getImage() {
+        down1 = setup("/items/mana_potion");
+    }
+
     public void use(Entity user) {
         if (user.mana < user.maxMana) {
             user.mana += manaHeal;

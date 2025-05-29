@@ -23,6 +23,10 @@ public class ITEM_Mini_Health_Potion  extends Entity {
         stackable = true;
     }
 
+    public void getImage() {
+        down1 = setup("/items/heal_potion");
+    }
+
     public void use(Entity user) {
         if (user.health < user.maxHealth) {
             user.health += healthHeal;

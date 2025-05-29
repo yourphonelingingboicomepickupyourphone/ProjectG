@@ -27,5 +27,9 @@ public class ITEM_Chest_Key extends Entity{
 
 		collision = true;
 	}
+
+	public void getImage() {
+		down1 = setup("/objects/key");
+	}
 	
 }

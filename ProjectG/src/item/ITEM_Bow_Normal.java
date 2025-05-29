@@ -25,4 +25,9 @@ public class ITEM_Bow_Normal extends Entity {
         stackable = false;
     }
 
+    public void getImage() {
+        down1 = setup("/items/normal_bow");
+        // ... set up other images as in the constructor ...
+    }
+
 }

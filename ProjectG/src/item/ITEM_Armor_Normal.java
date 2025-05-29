@@ -22,4 +22,10 @@ public class ITEM_Armor_Normal extends Entity{
         stackable = false;
     }
 
+    public void getImage() {
+        down1 = setup("/items/normal_armor");
+        // ... set up other images as in the constructor ...
+    }
+    
+
 }

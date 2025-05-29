@@ -36,4 +36,8 @@ public class ITEM_Staff_Normal extends Entity {
         stackable = false;
     }
 
+    public void getImage() {
+        down1 = setup("/items/normal_staff");
+        // ... set up other images as in the constructor ...
+    }
 }

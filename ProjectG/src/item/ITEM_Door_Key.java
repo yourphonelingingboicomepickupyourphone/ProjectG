@@ -29,5 +29,9 @@ public class ITEM_Door_Key extends Entity{
 
 		description = "A key to open every door.";
 	}
+
+	public void getImage() {
+		down1 = setup("/objects/door_key");
+	}
 	
 }

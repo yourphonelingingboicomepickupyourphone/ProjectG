@@ -20,4 +20,7 @@ public class ITEM_Hat_Normal extends Entity{
         stackable = false;
     }
 
+    public void getImage() {
+        down1 = setup("/items/normal_hat");
+    }
 }

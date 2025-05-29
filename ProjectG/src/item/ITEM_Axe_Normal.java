@@ -35,4 +35,8 @@ public class ITEM_Axe_Normal extends Entity {
         pickable = true;
         stackable = false;
     }
+    public void getImage() {
+        down1 = setup("/items/normal_axe");
+        // ... set up other images as in the constructor ...
+    }
 }
