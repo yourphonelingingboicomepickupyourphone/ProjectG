@@ -32,17 +32,26 @@ public class DataStorage implements Serializable{
 	public int ATTACK_COOLDOWN_MAX = 30; // 30 frames = 0.5s at 60fps
 	public int FLASH_COOLDOWN_MAX = 3600; // 60 seconds at 60fps
 
-	public Entity currentWeapon;
-	public Entity currentArmor = null;
-	public Entity currentHat = null;
-	public Entity currentBoots = null;
-    public ArrayList<Entity> inventory = new ArrayList<>();
+
+    public ArrayList<EntitySaveData> inventory = new ArrayList<>();
     public String quickUseItemClass;
     public String quickUseItemName;
 
     public int playerWorldX;
     public int playerWorldY;
     public int currentMap;
+
+    // Add these fields for saving map entities and inventory
+    public ArrayList<ArrayList<EntitySaveData>> savedObjects = new ArrayList<>();
+    public ArrayList<ArrayList<EntitySaveData>> savedMonsters = new ArrayList<>();
+    public ArrayList<ArrayList<EntitySaveData>> savedNpcs = new ArrayList<>();
+
+
+    // If you want to save equipped items as EntitySaveData:
+    public EntitySaveData currentWeapon;
+    public EntitySaveData currentArmor;
+    public EntitySaveData currentHat;
+    public EntitySaveData currentBoots;
 
     
     public void savePlayerData(DataStorage data) {

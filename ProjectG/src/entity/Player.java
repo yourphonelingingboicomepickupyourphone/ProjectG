@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import data.DataStorage;
+import data.EntitySaveData;
 import main.GamePanel;
 import main.KeyHandler;
 import object.OBJ_Chest;
@@ -133,11 +134,10 @@ public class Player extends Entity{
 		data.progressionManaUpgrades = this.progressionManaUpgrades;
 		data.progressionAttackUpgrades = this.progressionAttackUpgrades;
 		data.progressionDefenseUpgrades = this.progressionDefenseUpgrades;
-		data.currentWeapon = this.currentWeapon;
-		data.currentArmor = this.currentArmor;
-		data.currentHat = this.currentHat;
-		data.currentBoots = this.currentBoots;
-		data.inventory = new ArrayList<>(this.inventory); // Save inventory
+		data.currentWeapon = (this.currentWeapon != null) ? this.currentWeapon.toEntitySaveData() : null;
+		data.currentArmor = (this.currentArmor != null) ? this.currentArmor.toEntitySaveData() : null;
+		data.currentHat = (this.currentHat != null) ? this.currentHat.toEntitySaveData() : null;
+		data.currentBoots = (this.currentBoots != null) ? this.currentBoots.toEntitySaveData() : null;
 		// Save quick use info if needed
 		data.quickUseItemClass = this.quickUseItemClass != null ? this.quickUseItemClass.getName() : null;
 		data.quickUseItemName = this.quickUseItemName;
@@ -146,7 +146,31 @@ public class Player extends Entity{
 		data.currentMap = gp.currentMap;
 
 		// Save objects, monsters, and NPCs
-		
+		for (int map = 0; map < gp.maxMap; map++) {
+		    ArrayList<EntitySaveData> objList = new ArrayList<>();
+		    for (Entity e : gp.obj[map]) {
+		        if (e != null) objList.add(e.toEntitySaveData());
+		    }
+		    data.savedObjects.add(objList);
+
+		    ArrayList<EntitySaveData> monsterList = new ArrayList<>();
+		    for (Entity e : gp.monster[map]) {
+		        if (e != null) monsterList.add(e.toEntitySaveData());
+		    }
+		    data.savedMonsters.add(monsterList);
+
+		    ArrayList<EntitySaveData> npcList = new ArrayList<>();
+		    for (Entity e : gp.npc[map]) {
+		        if (e != null) npcList.add(e.toEntitySaveData());
+		    }
+		    data.savedNpcs.add(npcList);
+		}
+
+		// Saving inventory
+		data.inventory = new ArrayList<>();
+		for (Entity item : this.inventory) {
+		    if (item != null) data.inventory.add(item.toEntitySaveData());
+		}
 
 		return data;
 	}
@@ -168,12 +192,18 @@ public class Player extends Entity{
 		this.progressionManaUpgrades = data.progressionManaUpgrades;
 		this.progressionAttackUpgrades = data.progressionAttackUpgrades;
 		this.progressionDefenseUpgrades = data.progressionDefenseUpgrades;
-		this.currentWeapon = data.currentWeapon;
-		this.currentArmor = data.currentArmor;
-		this.currentHat = data.currentHat;
-		this.currentBoots = data.currentBoots;
+		this.currentWeapon = data.currentWeapon != null ? Entity.fromEntitySaveData(data.currentWeapon, gp) : null;
+		this.currentArmor = data.currentArmor != null ? Entity.fromEntitySaveData(data.currentArmor, gp) : null;
+		this.currentHat = data.currentHat != null ? Entity.fromEntitySaveData(data.currentHat, gp) : null;
+		this.currentBoots = data.currentBoots != null ? Entity.fromEntitySaveData(data.currentBoots, gp) : null;
 		// Convert inventory from EntitySaveData to Entity
 		this.inventory = new ArrayList<>();
+		if (data.inventory != null) {
+			for (EntitySaveData esd : data.inventory) {
+				Entity item = Entity.fromEntitySaveData(esd, gp);
+				if (item != null) this.inventory.add(item);
+			}
+		}
 
 		// Restore quick use info if needed
 		try {
@@ -186,6 +216,58 @@ public class Player extends Entity{
 		this.worldY = data.playerWorldY;
 		gp.currentMap = data.currentMap;
 
+		// Restore objects on map
+		for (int map = 0; map < gp.maxMap; map++) {
+			// Clear current objects
+			for (int i = 0; i < gp.obj[map].length; i++) {
+				gp.obj[map][i] = null;
+			}
+			// Restore from save
+			if (data.savedObjects.size() > map) {
+				int i = 0;
+				for (EntitySaveData esd : data.savedObjects.get(map)) {
+					if (i < gp.obj[map].length) {
+						Entity e = Entity.fromEntitySaveData(esd, gp);
+						gp.obj[map][i++] = e;
+					}
+				}
+			}
+		}
+		// Restore monsters on map
+		for (int map = 0; map < gp.maxMap; map++) {
+			// Clear current monsters
+			for (int i = 0; i < gp.monster[map].length; i++) {
+				gp.monster[map][i] = null;
+			}
+			// Restore from save
+			if (data.savedMonsters.size() > map) {
+				int i = 0;
+				for (EntitySaveData esd : data.savedMonsters.get(map)) {
+					if (i < gp.monster[map].length) {
+						Entity e = Entity.fromEntitySaveData(esd, gp);
+						gp.monster[map][i++] = e;
+					}
+				}
+			}
+		}
+
+		// Restore NPCs on map
+		for (int map = 0; map < gp.maxMap; map++) {
+			// Clear current NPCs
+			for (int i = 0; i < gp.npc[map].length; i++) {
+				gp.npc[map][i] = null;
+			}
+			// Restore from save
+			if (data.savedNpcs.size() > map) {
+				int i = 0;
+				for (EntitySaveData esd : data.savedNpcs.get(map)) {
+					if (i < gp.npc[map].length) {
+						Entity e = Entity.fromEntitySaveData(esd, gp);
+						gp.npc[map][i++] = e;
+					}
+				}
+			}
+		}
 	}
 
 	public void setItems(){
@@ -1102,5 +1184,4 @@ public class Player extends Entity{
 		worldX += dx * gp.tileSize * FLASH_RANGE;
 		worldY += dy * gp.tileSize * FLASH_RANGE;
 	}
-
 }

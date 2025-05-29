@@ -8,7 +8,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-
+import data.EntitySaveData;
 import javax.imageio.ImageIO;
 
 import main.GamePanel;
@@ -91,6 +91,8 @@ public class Entity implements Serializable{
 	public Entity currentBoots;
 	public Projectile projectile;
 
+	// Inventory for items held by this entity (if any)
+	public ArrayList<Entity> inventory = null;
 
 	//Item attributes
 	public int itemType; //0 = weapon, 1 = hat, 2 = armor, 3 = boots, 4 = interactable, 5 = potion, 6 = food
@@ -494,6 +496,171 @@ public class Entity implements Serializable{
 		} catch (Exception ignored) {}
     }
 
+	public EntitySaveData toEntitySaveData() {
+		EntitySaveData data = new EntitySaveData();
+		data.className = this.getClass().getName();
+		data.name = this.name;
+		data.type = this.type;
+		data.itemType = this.itemType;
+		data.worldX = this.worldX;
+		data.worldY = this.worldY;
+		data.renderLayer = this.renderLayer;
+		data.speed = this.speed;
+		data.direction = this.direction;
+		data.spriteCounter = this.spriteCounter;
+		data.spriteNum = this.spriteNum;
+		data.collision = this.collision;
+		data.attacking = this.attacking;
+		data.alive = this.alive;
+		data.dying = this.dying;
+		data.dyingCounter = this.dyingCounter;
+		data.onPath = this.onPath;
+		data.invincible = this.invincible;
+		data.invincibleCounter = this.invincibleCounter;
+		data.showHpBar = this.showHpBar;
+		data.hpBarDisplayCounter = this.hpBarDisplayCounter;
+		data.knockbackCounter = this.knockbackCounter;
+		data.knockbackDuration = this.knockbackDuration;
+		data.knockbackDX = this.knockbackDX;
+		data.knockbackDY = this.knockbackDY;
+		data.actionLockCounter = this.actionLockCounter;
+		data.dialogIndex = this.dialogIndex;
+		data.attackAreaDefaultX = this.attackAreaDefaultX;
+		data.attackAreaDefaultY = this.attackAreaDefaultY;
+		data.collisionOn = this.collisionOn;
+		data.quantity = this.quantity;
+		data.pickable = this.pickable;
+		data.stackable = this.stackable;
 
+		// Stats
+		data.maxHealth = this.maxHealth;
+		data.health = this.health;
+		data.maxMana = this.maxMana;
+		data.mana = this.mana;
+		data.level = this.level;
+		data.attack = this.attack;
+		data.defense = this.defense;
+		data.progressionHealthUpgrades = this.progressionHealthUpgrades;
+		data.progressionManaUpgrades = this.progressionManaUpgrades;
+		data.progressionAttackUpgrades = this.progressionAttackUpgrades;
+		data.progressionDefenseUpgrades = this.progressionDefenseUpgrades;
+		data.exp = this.exp;
+		data.nextLevelExp = this.nextLevelExp;
+		data.totalProgressionPoints = this.totalProgressionPoints;
+		data.progressionPoints = this.progressionPoints;
+		data.expReward = this.expReward;
+		data.timeSinceLastHit = this.timeSinceLastHit;
+		data.healDelay = this.healDelay;
+
+		// Equipment/Bonuses
+		data.healthBonus = this.healthBonus;
+		data.manaBonus = this.manaBonus;
+		data.attackBonus = this.attackBonus;
+		data.defenseBonus = this.defenseBonus;
+		data.speedBonus = this.speedBonus;
+		data.attackRange = this.attackRange;
+		data.weaponType = this.weaponType;
+		data.rarity = this.rarity;
+		data.levelRequirement = this.levelRequirement;
+		data.description = this.description;
+		data.cooldownBonus = this.cooldownBonus;
+
+		// Item-specific
+		data.healthHeal = this.healthHeal;
+		data.manaHeal = this.manaHeal;
+		data.healthCost = this.healthCost;
+		data.manaCost = this.manaCost;
+
+		// Inventory (recursive, if needed)
+		if (this.inventory != null) {
+			for (Entity item : this.inventory) {
+				if (item != null) {
+					data.inventory.add(item.toEntitySaveData());
+				}
+			}
+		}
+
+		return data;
+	}
+	
+	public static Entity fromEntitySaveData(EntitySaveData esd, GamePanel gp) {
+		try {
+			Class<?> clazz = Class.forName(esd.className);
+			Entity e = (Entity) clazz.getConstructor(GamePanel.class).newInstance(gp);
+			// Copy fields from esd to e
+			e.name = esd.name;
+			e.type = esd.type;
+			e.itemType = esd.itemType;
+			e.worldX = esd.worldX;
+			e.worldY = esd.worldY;
+			e.renderLayer = esd.renderLayer;
+			e.speed = esd.speed;
+			e.direction = esd.direction;
+			e.spriteCounter = esd.spriteCounter;
+			e.spriteNum = esd.spriteNum;
+			e.collision = esd.collision;
+			e.attacking = esd.attacking;
+			e.alive = esd.alive;
+			e.dying = esd.dying;
+			e.dyingCounter = esd.dyingCounter;
+			e.onPath = esd.onPath;
+			e.invincible = esd.invincible;
+			e.invincibleCounter = esd.invincibleCounter;
+			e.showHpBar = esd.showHpBar;
+			e.hpBarDisplayCounter = esd.hpBarDisplayCounter;
+			e.knockbackCounter = esd.knockbackCounter;
+			e.knockbackDuration = esd.knockbackDuration;
+			e.knockbackDX = esd.knockbackDX;
+			e.knockbackDY = esd.knockbackDY;
+			e.actionLockCounter = esd.actionLockCounter;
+			e.dialogIndex = esd.dialogIndex;
+			e.attackAreaDefaultX = esd.attackAreaDefaultX;
+			e.attackAreaDefaultY = esd.attackAreaDefaultY;
+			e.collisionOn = esd.collisionOn;
+			e.quantity = esd.quantity;
+			e.pickable = esd.pickable;
+			e.stackable = esd.stackable;
+			e.maxHealth = esd.maxHealth;
+			e.health = esd.health;
+			e.maxMana = esd.maxMana;
+			e.mana = esd.mana;
+			e.level = esd.level;
+			e.attack = esd.attack;
+			e.defense = esd.defense;
+			e.progressionHealthUpgrades = esd.progressionHealthUpgrades;
+			e.progressionManaUpgrades = esd.progressionManaUpgrades;
+			e.progressionAttackUpgrades = esd.progressionAttackUpgrades;
+			e.progressionDefenseUpgrades = esd.progressionDefenseUpgrades;
+			e.exp = esd.exp;
+			e.nextLevelExp = esd.nextLevelExp;
+			e.totalProgressionPoints = esd.totalProgressionPoints;
+			e.progressionPoints = esd.progressionPoints;
+			e.expReward = esd.expReward;
+			e.timeSinceLastHit = esd.timeSinceLastHit;
+			e.healDelay = esd.healDelay;
+			e.healthBonus = esd.healthBonus;
+			e.manaBonus = esd.manaBonus;
+			e.attackBonus = esd.attackBonus;
+			e.defenseBonus = esd.defenseBonus;
+			e.speedBonus = esd.speedBonus;
+			e.attackRange = esd.attackRange;
+			e.weaponType = esd.weaponType;
+			e.rarity = esd.rarity;
+			e.levelRequirement = esd.levelRequirement;
+			e.description = esd.description;
+			e.cooldownBonus = esd.cooldownBonus;
+			e.healthHeal = esd.healthHeal;
+			e.manaHeal = esd.manaHeal;
+			e.healthCost = esd.healthCost;
+			e.manaCost = esd.manaCost;
+			// ...add more fields as needed...
+
+			e.restoreTransientFields(gp);
+			return e;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			return null;
+		}
+	}
 }
 
