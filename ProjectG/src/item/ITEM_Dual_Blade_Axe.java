@@ -18,4 +18,8 @@ public class ITEM_Dual_Blade_Axe extends ITEM_Axe_Normal {
 
     }
 
+    public void getImage() {
+        down1 = setup("/items/dual_blade_axe");
+        // ... set up other images as in the constructor ...
+    }
 }

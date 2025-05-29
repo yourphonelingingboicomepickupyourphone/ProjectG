@@ -103,6 +103,9 @@ public class Config {
                 return newItem;
             } catch (Exception e) {
                 e.printStackTrace();
+                // if (oldItem != null) {
+                //     oldItem.restoreTransientFields(player.gp);
+                // }
                 return oldItem; // fallback: use the old item (will have no image)
             }
         };
