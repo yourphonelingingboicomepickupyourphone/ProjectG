@@ -66,6 +66,11 @@ public class Config {
 	}
 
     public void loadPlayer(Player player) {
+        File saveFile = new File("save.dat");
+        if (!saveFile.exists()) {
+            System.out.println("No save file found, skipping load.");
+            return;
+        }
         DataStorage data = new DataStorage().loadPlayerData();
         if (data != null) {
             player.fromDataStorage(data);

@@ -11,7 +11,7 @@ public class PathFinder {
     Node[][] node;
     ArrayList<Node> openList = new ArrayList<Node>();
     public ArrayList<Node> pathList = new ArrayList<Node>();
-    Node startNode, goalNode, currentNode;
+    transient Node startNode, goalNode, currentNode;
     boolean goalReached = false;
     int step = 0;
 
