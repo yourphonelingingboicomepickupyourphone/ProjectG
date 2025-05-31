@@ -47,7 +47,7 @@ public class UI {
 	public String waitingAction = null;
 	public final String[] controlActions = {
 		KeyConfig.UP, KeyConfig.DOWN, KeyConfig.LEFT, KeyConfig.RIGHT,
-		KeyConfig.ATTACK, KeyConfig.CHOOSE, KeyConfig.ESCAPE, KeyConfig.INVENTORY, KeyConfig.CHARACTER, KeyConfig.RESET, KeyConfig.FLASH, KeyConfig.QUICK_USE, KeyConfig.ASSIGN_QUICK_USE
+		KeyConfig.ATTACK, KeyConfig.CHOOSE, KeyConfig.ESCAPE, KeyConfig.INVENTORY, KeyConfig.CHARACTER, KeyConfig.RESET, KeyConfig.FLASH, KeyConfig.QUICK_USE, KeyConfig.SKILL1, KeyConfig.SKILL2, KeyConfig.SKILL3, KeyConfig.SKILL4
 	};
 	public boolean keyBindWarning = false;
 	public long keyBindWarningTime = 0;
@@ -1299,9 +1299,8 @@ public class UI {
 		int innerWidth = windowWidth - 7 * 6; // borderInset * 6
 		int colGap = gp.tileSize; // Gap between columns
 
-		// Dynamically calculate number of columns based on total controls and max rows you want
-		int maxRows = 8; // You can adjust this for your preferred max height
-		int cols = (int) Math.ceil((double) total / maxRows);
+		// --- 3 columns ---
+		int cols = 3;
 		int rows = (int) Math.ceil((double) total / cols);
 
 		int colWidth = (innerWidth - (cols - 1) * colGap) / cols;
@@ -1328,13 +1327,20 @@ public class UI {
 			int y = startY + row * lineHeight;
 
 			String action = controlActions[i];
-			String keyName = tr("controls." + action.toLowerCase());
+			String keyName = gp.keyConfig.getKeyName(action);
+
+			// Show Q/W/E/R for skill keys
+			if (action.equals(main.KeyConfig.SKILLS)) {
+				keyName = "Q/W/E/R";
+			}
+
+			String actionLabel = tr("controls." + action.toLowerCase());
 			if (controlsCommandNum == i && !waitingForKey) {
 				g2.setColor(Color.YELLOW);
 				g2.drawString(">", x - gp.tileSize / 2, y);
 			}
 			g2.setColor(Color.WHITE);
-			g2.drawString(keyName + ": " + gp.keyConfig.getKeyName(action), x, y);
+			g2.drawString(actionLabel + ": " + keyName, x, y);
 		}
 
 		// Draw "Back" option at the bottom center
@@ -1405,92 +1411,100 @@ public class UI {
 	}
 
 	public void drawMenuControlsScreen() {
-	    g2.setColor(new Color(243, 193, 8));
-	    g2.fillRect(0, 0, gp.baseWidth, gp.baseHeight);
+		g2.setColor(new Color(243, 193, 8));
+		g2.fillRect(0, 0, gp.baseWidth, gp.baseHeight);
 
-	    int frameWidth = gp.tileSize * 10;
-	    int frameHeight = gp.tileSize * (controlActions.length / 2 + 5);
-	    int frameX = (gp.baseWidth - frameWidth) / 2;
-	    int frameY = gp.tileSize * 2;
+		int cols = 3;
+		int colGap = gp.tileSize * 2; // Change this to adjust gap
+		int total = controlActions.length;
+		int rows = (int) Math.ceil((double) total / cols);
 
-	    g2.setFont(currentFontBold.deriveFont(Font.BOLD, 100F));
-	    String title = tr("controls.title");
-	    int titleX = getXForCenteredText(title);
-	    int titleY = frameY;
-	    g2.setColor(Color.WHITE);
-	    g2.drawString(title, titleX, titleY);
+		int usableWidth = gp.baseWidth - gp.tileSize * 4; // 2 tile margin on each side
+		int colWidth = (usableWidth - colGap * (cols - 1)) / cols;
+		int col1X = gp.tileSize * 2;
+		int col2X = col1X + colWidth + colGap;
+		int col3X = col2X + colWidth + colGap;
+		int startY = gp.tileSize * 4;
 
+		g2.setFont(currentFontBold.deriveFont(Font.BOLD, 100F));
+		String title = tr("controls.title");
+		int titleX = getXForCenteredText(title);
+		int titleY = gp.tileSize * 2;
+		g2.setColor(Color.WHITE);
+		g2.drawString(title, titleX, titleY);
 
-	    g2.setFont(currentFont.deriveFont(Font.PLAIN, 36F));
-	    int lineHeight = gp.tileSize;
-	    int colGap = gp.tileSize * 4; // space between columns
-	    int colWidth = (frameWidth - colGap) / 2;
-	    // Center columns horizontally within the screen
-	    int totalColsWidth = colWidth * 2 + colGap;
-	    int col1X = (gp.baseWidth - totalColsWidth) / 2;
-	    int col2X = col1X + colWidth + colGap;
-	    int startY = titleY + gp.tileSize * 5 / 2;
+		g2.setFont(currentFont.deriveFont(Font.PLAIN, 36F));
+		int lineHeight = gp.tileSize;
 
-	    // Draw left and right columns
-	    int total = controlActions.length;
-	    int rows = (total + 1) / 2;
-	    for (int row = 0; row < rows; row++) {
-	        // Left column
-	        int i = row * 2;
-	        if (i < total) {
-	            String action = controlActions[i];
-	            String actionName = tr("controls." + action.toLowerCase());
-	            String keyName = gp.keyConfig.getKeyName(action);
-	            if (menuControlsCommandNum == i && !waitingForKey) {
-	                g2.setColor(Color.YELLOW);
-	                g2.drawString(">", col1X - gp.tileSize / 2, startY + row * lineHeight);
-	            }
-	            g2.setColor(Color.WHITE);
-	            g2.drawString(actionName + ": " + keyName, col1X, startY + row * lineHeight);
-	        }
-	        // Right column
-	        int j = i + 1;
-	        if (j < total) {
-	            String action = controlActions[j];
-	            String actionName = tr("controls." + action.toLowerCase());
-	            String keyName = gp.keyConfig.getKeyName(action);
-	            if (menuControlsCommandNum == j && !waitingForKey) {
-	                g2.setColor(Color.YELLOW);
-	                g2.drawString(">", col2X - gp.tileSize / 2, startY + row * lineHeight);
-	            }
-	            g2.setColor(Color.WHITE);
-	            g2.drawString(actionName + ": " + keyName, col2X, startY + row * lineHeight);
-	        }
-	    }
+		for (int row = 0; row < rows; row++) {
+			// Left column
+			int i = row;
+			if (i < total) {
+				String action = controlActions[i];
+				String actionName = tr("controls." + action.toLowerCase());
+				String keyName = gp.keyConfig.getKeyName(action);
+				if (menuControlsCommandNum == i && !waitingForKey) {
+					g2.setColor(Color.YELLOW);
+					g2.drawString(">", col1X - gp.tileSize / 2, startY + row * lineHeight);
+				}
+				g2.setColor(Color.WHITE);
+				g2.drawString(actionName + ": " + keyName, col1X, startY + row * lineHeight);
+			}
+			// Middle column
+			int j = row + rows;
+			if (j < total) {
+				String action = controlActions[j];
+				String actionName = tr("controls." + action.toLowerCase());
+				String keyName = gp.keyConfig.getKeyName(action);
+				if (menuControlsCommandNum == j && !waitingForKey) {
+					g2.setColor(Color.YELLOW);
+					g2.drawString(">", col2X - gp.tileSize / 2, startY + row * lineHeight);
+				}
+				g2.setColor(Color.WHITE);
+				g2.drawString(actionName + ": " + keyName, col2X, startY + row * lineHeight);
+			}
+			// Right column
+			int k = row + rows * 2;
+			if (k < total) {
+				String action = controlActions[k];
+				String actionName = tr("controls." + action.toLowerCase());
+				String keyName = gp.keyConfig.getKeyName(action);
+				if (menuControlsCommandNum == k && !waitingForKey) {
+					g2.setColor(Color.YELLOW);
+					g2.drawString(">", col3X - gp.tileSize / 2, startY + row * lineHeight);
+				}
+				g2.setColor(Color.WHITE);
+				g2.drawString(actionName + ": " + keyName, col3X, startY + row * lineHeight);
+			}
+		}
 
-	    // Draw "Back" option at the bottom center
-	    int backY = startY + rows * lineHeight;
-	    String back = tr("controls.back");
-	    int backX = getXForCenteredText(back);
-	    if (menuControlsCommandNum == controlActions.length && !waitingForKey) {
-	        g2.setColor(Color.YELLOW);
-	        g2.drawString(">", backX - gp.tileSize, backY);
-	    }
-	    g2.setColor(Color.WHITE);
-	    g2.drawString(back, backX, backY);
+		// Draw "Back" option at the bottom center
+		int backY = startY + rows * lineHeight;
+		String back = tr("controls.back");
+		int backX = getXForCenteredText(back);
+		if (menuControlsCommandNum == controlActions.length && !waitingForKey) {
+			g2.setColor(Color.YELLOW);
+			g2.drawString(">", backX - gp.tileSize, backY + 3 * lineHeight / 4);
+		}
+		g2.setColor(Color.WHITE);
+		g2.drawString(back, backX, backY + 3 * lineHeight / 4);
 
-	    // Show waiting for key message
-	    if (waitingForKey) {
-	        g2.setColor(Color.CYAN);
-	        String kText = tr("message.press_key");
-	        g2.drawString(kText, getXForCenteredText(kText), backY + lineHeight);
-	    }
+		// Show waiting for key message
+		if (waitingForKey) {
+			g2.setColor(Color.CYAN);
+			String kText = tr("message.press_key");
+			g2.drawString(kText, getXForCenteredText(kText), backY + 3 * lineHeight / 2);
+		}
 
-	    // Show duplicate key warning
-	    if (keyBindWarning) {
-	        g2.setColor(Color.RED);
-	        String warn = tr("message.key_already_assigned");
-	        g2.drawString(warn, getXForCenteredText(warn), backY + lineHeight);
-	        // Hide warning after 2 seconds
-	        if (System.currentTimeMillis() - keyBindWarningTime > 2000) {
-	            keyBindWarning = false;
-	        }
-	    }
+		// Show duplicate key warning
+		if (keyBindWarning) {
+			g2.setColor(Color.RED);
+			String warn = tr("message.key_already_assigned");
+			g2.drawString(warn, getXForCenteredText(warn), backY + 3 * lineHeight / 2);
+			if (System.currentTimeMillis() - keyBindWarningTime > 2000) {
+				keyBindWarning = false;
+			}
+		}
 	}
 
 	public void drawGameOverScreen() {
@@ -1750,7 +1764,7 @@ public class UI {
 		g2.drawString(title, titleX, titleY);
 
 		// Assigned skills (Q/W/E/R)
-		String[] keys = {"Q", "W", "E", "R"};
+		String[] keys = {gp.keyConfig.getKeyName(KeyConfig.SKILL1), gp.keyConfig.getKeyName(KeyConfig.SKILL2), gp.keyConfig.getKeyName(KeyConfig.SKILL3), gp.keyConfig.getKeyName(KeyConfig.SKILL4)};
 		int slotSize = gp.tileSize;
 		int slotGap = gp.tileSize / 2;
 		int slotsStartX = titleX - gp.tileSize / 2 - slotGap / 2;
@@ -1843,7 +1857,7 @@ public class UI {
 		g2.setStroke(new BasicStroke(4));
 		g2.drawRoundRect(barX - 6, barY - 6, barWidth, barHeight, 16, 16);
 
-		String[] keys = {"Q", "W", "E", "R"};
+		String[] keys = {gp.keyConfig.getKeyName(KeyConfig.SKILL1), gp.keyConfig.getKeyName(KeyConfig.SKILL2), gp.keyConfig.getKeyName(KeyConfig.SKILL3), gp.keyConfig.getKeyName(KeyConfig.SKILL4)};
 
 		// --- Draw skill slots ---
 		for (int i = 0; i < 4; i++) {
@@ -1879,12 +1893,12 @@ public class UI {
 				g2.drawString(cdText, slotX + (slotSize - textWidth) / 2, slotY + slotSize / 2 + 10);
 			}
 
-			// Draw key label at bottom right
-			g2.setFont(currentFontBold.deriveFont(Font.BOLD, 18F));
+			// Draw key label at bottom left
+			g2.setFont(currentFontBold.deriveFont(Font.BOLD, 22F));
 			String keyLabel = keys[i];
 			int labelWidth = g2.getFontMetrics().stringWidth(keyLabel);
 			g2.setColor(Color.WHITE);
-			g2.drawString(keyLabel, slotX + slotSize - labelWidth - 4, slotY + slotSize - 6);
+			g2.drawString(keyLabel, slotX + 4, slotY + slotSize - 6);
 		}
 
 		// --- Draw quick-use item slot (slot 4) ---
@@ -2000,7 +2014,7 @@ public class UI {
 
 			// Draw cooldown seconds
 			g2.setColor(Color.WHITE);
-			g2.setFont(g2.getFont().deriveFont(Font.BOLD, 32f));
+			g2.setFont(g2.getFont().deriveFont(Font.BOLD, 22f));
 			String cdText = String.format("%.1f", gp.player.flashCooldown / 60.0);
 			int textWidth = g2.getFontMetrics().stringWidth(cdText);
 			g2.drawString(cdText, flashX + (slotSize - textWidth) / 2, flashY + slotSize / 2 + 12);

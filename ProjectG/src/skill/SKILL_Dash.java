@@ -11,8 +11,8 @@ public class SKILL_Dash implements Skill{
 
     private String name;
     private String description;
-    private int manaCost = 20;
-    private int cooldownMax = 180;
+    private int manaCost = 50;
+    private int cooldownMax = 3000;
     private int cooldown = 0;
     private int levelRequirement = 1;
 

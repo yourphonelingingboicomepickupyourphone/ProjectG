@@ -345,17 +345,17 @@ public class KeyHandler implements KeyListener{
 		if (code == KeyEvent.VK_F3) {
 			gp.debugMode = !gp.debugMode; // Toggle debug mode
 		}
-		if (code == KeyEvent.VK_Q) {
-		    gp.player.useAssignedSkill(0); // Q = skill 0
+		if (code == gp.keyConfig.getKey(KeyConfig.SKILL1)) {
+		    gp.player.useAssignedSkill(0); 
 		}
-		if (code == KeyEvent.VK_W) {
-		    gp.player.useAssignedSkill(1); // W = skill 1
+		if (code == gp.keyConfig.getKey(KeyConfig.SKILL2)) {
+		    gp.player.useAssignedSkill(1);
 		}
-		if (code == KeyEvent.VK_E) {
-		    gp.player.useAssignedSkill(2); // E = skill 2
+		if (code == gp.keyConfig.getKey(KeyConfig.SKILL3)) {
+		    gp.player.useAssignedSkill(2);
 		}
-		if (code == KeyEvent.VK_R) {
-		    gp.player.useAssignedSkill(3); // R = skill 3
+		if (code == gp.keyConfig.getKey(KeyConfig.SKILL4)) {
+		    gp.player.useAssignedSkill(3);
 		}
 		if (code == gp.keyConfig.getKey(KeyConfig.SKILLS)){
 			gp.gameState = gp.skillsState;
@@ -546,28 +546,80 @@ public class KeyHandler implements KeyListener{
 			return;
 		}
 
-		// When in optionsState and controls subState
-		if (gp.gameState == gp.optionsState && gp.ui.subState == 1 && !gp.ui.waitingForKey) {
-		    if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
-		        gp.ui.controlsCommandNum--;
-		        if (gp.ui.controlsCommandNum < 0) gp.ui.controlsCommandNum = gp.ui.controlActions.length; // wrap to "Back"
-		    }
-		    if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
-		        gp.ui.controlsCommandNum++;
-		        if (gp.ui.controlsCommandNum > gp.ui.controlActions.length) gp.ui.controlsCommandNum = 0; // wrap to first
-		    }
-		    // Handle Enter/Choose for rebinding or going back
-		    if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
-		        if (gp.ui.controlsCommandNum == gp.ui.controlActions.length) {
-		            // "Back" selected
-		            gp.ui.subState = 0;
-		        } else {
-		            // Start rebinding
-		            gp.ui.waitingForKey = true;
-		            gp.ui.waitingAction = gp.ui.controlActions[gp.ui.controlsCommandNum];
-		        }
-		    }
-		}
+		int total = gp.ui.controlActions.length;
+		int cols = 3;
+		int rows = (int)Math.ceil((double)total / cols);
+
+		int index = gp.ui.controlsCommandNum;
+		int row = index % rows;
+		int col = index / rows;
+
+	    if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
+	        if (gp.ui.controlsCommandNum == total) {
+	            // From "Back" go to last row, first column
+	            row = rows - 1;
+	            col = 0;
+	        } else {
+	            row--;
+	            if (row < 0) {
+	                // If at top, wrap to "Back"
+	                gp.ui.controlsCommandNum = total;
+	                return;
+	            }
+	        }
+	    }
+	    if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
+	        if (gp.ui.controlsCommandNum == total) {
+	            // From "Back" go to first row, first column
+	            row = 0;
+	            col = 0;
+	        } else {
+	            row++;
+	            if (row >= rows || (col * rows + row) >= total) {
+	                // If at bottom, go to "Back"
+	                gp.ui.controlsCommandNum = total;
+	                return;
+	            }
+	        }
+	    }
+	    if (code == gp.keyConfig.getKey(KeyConfig.LEFT)) {
+	        if (gp.ui.controlsCommandNum == total) {
+	            // Stay on "Back"
+	            return;
+	        }
+	        col--;
+	        if (col < 0) col = cols - 1;
+	        if (col * rows + row >= total) col = (total - 1) / rows;
+	    }
+	    if (code == gp.keyConfig.getKey(KeyConfig.RIGHT)) {
+	        if (gp.ui.controlsCommandNum == total) {
+	            // Stay on "Back"
+	            return;
+	        }
+	        col++;
+	        if (col >= cols || (col * rows + row) >= total) col = 0;
+	    }
+
+	    int newIndex = col * rows + row;
+	    if (newIndex >= total) newIndex = total; // If out of bounds, select "Back"
+	    if (code == gp.keyConfig.getKey(KeyConfig.UP) ||
+	        code == gp.keyConfig.getKey(KeyConfig.DOWN) ||
+	        code == gp.keyConfig.getKey(KeyConfig.LEFT) ||
+	        code == gp.keyConfig.getKey(KeyConfig.RIGHT)) {
+	        gp.ui.controlsCommandNum = newIndex;
+	    }
+
+	    // Handle Enter/Choose for rebinding or going back
+	    if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
+	        if (gp.ui.controlsCommandNum == gp.ui.controlActions.length) {
+	            // "Back" selected
+	            gp.ui.subState = 0;
+	        } else {
+	            // Start rebinding
+	            gp.ui.waitingForKey = true;
+	            gp.ui.waitingAction = gp.ui.controlActions[gp.ui.controlsCommandNum];
+	        }
+	    }
 	}
 
 	public void inventoryState(int code){
@@ -644,7 +696,7 @@ public class KeyHandler implements KeyListener{
 			}
 		}
 
-		if (code == gp.keyConfig.getKey(KeyConfig.ASSIGN_QUICK_USE)) {
+		if (code == gp.keyConfig.getKey(KeyConfig.QUICK_USE)) {
 			int itemIndex = gp.ui.getItemIndexOnSlot();
 			if (itemIndex < gp.player.inventory.size()) {
 				Entity selectedItem = gp.player.inventory.get(itemIndex);
@@ -790,45 +842,61 @@ public class KeyHandler implements KeyListener{
 	    }
 
 	    int total = gp.ui.controlActions.length;
-	    int cols = 2;
-	    int rows = (total + 1) / 2;
+		int cols = 3;
+		int rows = (int)Math.ceil((double)total / cols);
 
-	    int index = gp.ui.menuControlsCommandNum;
-	    int row = index / cols;
-	    int col = index % cols;
+		int index = gp.ui.menuControlsCommandNum;
+		int row = index % rows;
+		int col = index / rows;
 
 	    if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
 	        if (gp.ui.menuControlsCommandNum == total) {
+	            // From "Back" go to last row, first column
 	            row = rows - 1;
 	            col = 0;
 	        } else {
 	            row--;
 	            if (row < 0) {
+	                // If at top, wrap to "Back"
 	                gp.ui.menuControlsCommandNum = total;
 	                return;
 	            }
 	        }
 	    }
 	    if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
-	        row++;
-	        if (row >= rows || (row * cols + col) >= total) {
-	            gp.ui.menuControlsCommandNum = total;
-	            return;
+	        if (gp.ui.menuControlsCommandNum == total) {
+	            // From "Back" go to first row, first column
+	            row = 0;
+	            col = 0;
+	        } else {
+	            row++;
+	            if (row >= rows || (col * rows + row) >= total) {
+	                // If at bottom, go to "Back"
+	                gp.ui.menuControlsCommandNum = total;
+	                return;
+	            }
 	        }
 	    }
 	    if (code == gp.keyConfig.getKey(KeyConfig.LEFT)) {
-	        if (gp.ui.menuControlsCommandNum == total) return;
+	        if (gp.ui.menuControlsCommandNum == total) {
+	            // Stay on "Back"
+	            return;
+	        }
 	        col--;
 	        if (col < 0) col = cols - 1;
+	        if (col * rows + row >= total) col = (total - 1) / rows;
 	    }
 	    if (code == gp.keyConfig.getKey(KeyConfig.RIGHT)) {
-	        if (gp.ui.menuControlsCommandNum == total) return;
+	        if (gp.ui.menuControlsCommandNum == total) {
+	            // Stay on "Back"
+	            return;
+	        }
 	        col++;
-	        if (col >= cols) col = 0;
+	        if (col >= cols || (col * rows + row) >= total) col = 0;
 	    }
 
-	    int newIndex = row * cols + col;
-	    if (newIndex >= total) newIndex = row * cols;
+	    int newIndex = col * rows + row;
+	    if (newIndex >= total) newIndex = total; // If out of bounds, select "Back"
 	    if (code == gp.keyConfig.getKey(KeyConfig.UP) ||
 	        code == gp.keyConfig.getKey(KeyConfig.DOWN) ||
 	        code == gp.keyConfig.getKey(KeyConfig.LEFT) ||
