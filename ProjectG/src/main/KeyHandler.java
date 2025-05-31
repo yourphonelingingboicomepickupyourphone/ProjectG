@@ -57,6 +57,10 @@ public class KeyHandler implements KeyListener{
 		else if (gp.gameState == gp.chestState) {
 			chestState(code);
 		}
+		else if (gp.gameState == gp.skillsState) {
+			skillsState(code);
+		}
+		
 
 	}
 
@@ -93,8 +97,8 @@ public class KeyHandler implements KeyListener{
 					gp.ui.titleScreenState = 3; // Show settings menu
 				}	
 				if (gp.ui.commandNum == 3) {
-					System.exit(0);
 					gp.config.saveConfig();
+					System.exit(0);
 				}
 
 			}
@@ -341,6 +345,23 @@ public class KeyHandler implements KeyListener{
 		if (code == KeyEvent.VK_F3) {
 			gp.debugMode = !gp.debugMode; // Toggle debug mode
 		}
+		if (code == KeyEvent.VK_Q) {
+		    gp.player.useAssignedSkill(0); // Q = skill 0
+		}
+		if (code == KeyEvent.VK_W) {
+		    gp.player.useAssignedSkill(1); // W = skill 1
+		}
+		if (code == KeyEvent.VK_E) {
+		    gp.player.useAssignedSkill(2); // E = skill 2
+		}
+		if (code == KeyEvent.VK_R) {
+		    gp.player.useAssignedSkill(3); // R = skill 3
+		}
+		if (code == gp.keyConfig.getKey(KeyConfig.SKILLS)){
+			gp.gameState = gp.skillsState;
+			gp.ui.skillsCommandNum = 0;
+			gp.ui.assigningSkill = false;
+		}
 	}
 
 
@@ -372,7 +393,9 @@ public class KeyHandler implements KeyListener{
 					gp.ui.titleScreenState = 0;
 					gp.ui.commandNum = 0; // Reset command number
 					break;
-				case 4: System.exit(0); break; // Exit
+				case 4: 
+					gp.config.saveConfig();
+					System.exit(0); break; // Exit
 			}
 		}
 	}
@@ -851,4 +874,67 @@ public class KeyHandler implements KeyListener{
 
 	}
 
+	public void skillsState(int code) {
+		int unlockedCount = gp.player.unlockedSkills.size();
+
+		if (!gp.ui.assigningSkill) {
+			// Navigating slots (Q/W/E/R)
+			if (code == gp.keyConfig.getKey(KeyConfig.LEFT)) {
+				gp.ui.skillsCommandNum--;
+				if (gp.ui.skillsCommandNum < 0) gp.ui.skillsCommandNum = 3;
+			}
+			if (code == gp.keyConfig.getKey(KeyConfig.RIGHT)) {
+				gp.ui.skillsCommandNum++;
+				if (gp.ui.skillsCommandNum > 3) gp.ui.skillsCommandNum = 0;
+			}
+			if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
+				gp.ui.skillsCommandNum = 3;
+			}
+			if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
+				if (unlockedCount > 0) {
+					gp.ui.skillAssignSlotIndex = gp.ui.skillsCommandNum; // <--- Save selected slot
+					gp.ui.skillsCommandNum = 4;
+					gp.ui.assigningSkill = true;
+				}
+			}
+			if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
+				if (unlockedCount > 0) {
+					gp.ui.skillAssignSlotIndex = gp.ui.skillsCommandNum; // <--- Save selected slot
+					gp.ui.assigningSkill = true;
+					gp.ui.skillsCommandNum = 4; // First unlocked skill
+				}
+			}
+			if (code == gp.keyConfig.getKey(KeyConfig.ESCAPE)) {
+				gp.gameState = gp.playState;
+			}
+		} else {
+			// Navigating unlocked skills
+			if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
+				gp.ui.skillsCommandNum--;
+				if (gp.ui.skillsCommandNum < 4) gp.ui.skillsCommandNum = 4 + unlockedCount - 1;
+			}
+			if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
+				gp.ui.skillsCommandNum++;
+				if (gp.ui.skillsCommandNum >= 4 + unlockedCount) gp.ui.skillsCommandNum = 4;
+			}
+			if (code == gp.keyConfig.getKey(KeyConfig.LEFT) || code == gp.keyConfig.getKey(KeyConfig.RIGHT)) {
+				gp.ui.assigningSkill = false;
+				gp.ui.skillsCommandNum = gp.ui.skillAssignSlotIndex; // Restore slot selection
+			}
+			if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
+				int skillIndex = gp.ui.skillsCommandNum - 4;
+				if (skillIndex >= 0 && skillIndex < unlockedCount) {
+					int slotIndex = gp.ui.skillAssignSlotIndex; // Use the saved slot index!
+					gp.player.assignSkillToKey(slotIndex, gp.player.unlockedSkills.get(skillIndex));
+					gp.ui.assigningSkill = false;
+					gp.ui.skillsCommandNum = slotIndex;
+					gp.ui.addMessage(gp.ui.tr("skills.assigned", gp.player.unlockedSkills.get(skillIndex).getName(), "QWER".charAt(slotIndex) + ""));
+				}
+			}
+			if (code == gp.keyConfig.getKey(KeyConfig.ESCAPE)) {
+				gp.ui.assigningSkill = false;
+				gp.ui.skillsCommandNum = gp.ui.skillAssignSlotIndex; // Restore slot selection
+			}
+		}
+	}
 }

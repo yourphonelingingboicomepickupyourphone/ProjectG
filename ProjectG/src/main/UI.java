@@ -17,6 +17,7 @@ import javax.imageio.ImageIO;
 
 import entity.Entity;
 import object.OBJ_Chest;
+import skill.Skill;
 
 public class UI {
 	
@@ -128,10 +129,11 @@ public class UI {
 			drawPlayerHealth();
 			drawPlayerMana();
 			drawPlayerIcon();
-			drawFlashCooldown();
+			//drawFlashCooldown();
 			//Draw messages
 			drawMessages();
 			drawMiniMap(g2);
+			drawSkillBar();
 		}
 
 		//Pause State
@@ -172,6 +174,9 @@ public class UI {
 		}
 		else if (gp.gameState == gp.transitionState) {
 			drawTransitionScreen();
+		}
+		else if (gp.gameState == gp.skillsState){
+			drawSkillScreen();
 		}
 	}
 
@@ -1671,143 +1676,6 @@ public class UI {
 		};
 	}
 
-	public void drawFlashCooldown() {
-		int iconSize = gp.tileSize;
-		int x = 5 * gp.tileSize / 2 + gp.tileSize * 6 + gp.tileSize / 2; // Leftmost box (now quick use)
-		int y = gp.tileSize / 2;
-
-		// --- Draw quick-use box on the left ---
-		int quickX = x;
-		int quickY = y;
-		int quickSize = iconSize;
-
-		// Frame for quick-use box
-		g2.setColor(Color.WHITE);
-		g2.setStroke(new BasicStroke(4));
-		g2.drawRect(quickX - 2, quickY - 2, quickSize + 4, quickSize + 4);
-		g2.setStroke(new BasicStroke(1));
-
-		Entity quickItem = null;
-		if (gp.player.quickUseItemClass != null) {
-			for (Entity item : gp.player.inventory) {
-				if (item != null
-					&& item.getClass() == gp.player.quickUseItemClass
-					&& (gp.player.quickUseItemName == null || gp.player.quickUseItemName.equals(item.name))
-					&& item.quantity > 0) {
-					quickItem = item;
-					break;
-				}
-			}
-		}
-		if (quickItem != null && quickItem.down1 != null) {
-			g2.drawImage(quickItem.down1, quickX, quickY, quickSize, quickSize, null);
-			// Draw quantity if stackable
-			if (quickItem.stackable && quickItem.quantity > 1) {
-				g2.setFont(g2.getFont().deriveFont(Font.BOLD, 18F));
-				String qtyText = "x" + quickItem.quantity;
-				int qtyWidth = g2.getFontMetrics().stringWidth(qtyText);
-				g2.setColor(Color.WHITE);
-				g2.drawString(qtyText, quickX + quickSize - qtyWidth - 4, quickY + quickSize - 6);
-			}
-		} else {
-            // Draw placeholder
-            g2.setColor(new Color(200, 200, 200, 200));
-            g2.fillRect(quickX, quickY, quickSize, quickSize);
-            g2.setColor(Color.GRAY);
-
-            // Multi-line fit for placeholder text
-            String text = tr("quick_use.empty");
-            int fontSize = 16;
-            int maxWidth = quickSize - 8;
-            java.util.List<String> lines = new java.util.ArrayList<>();
-            String[] words = text.split(" ");
-            StringBuilder line = new StringBuilder();
-            for (String word : words) {
-                String testLine = line.length() == 0 ? word : line + " " + word;
-                g2.setFont(g2.getFont().deriveFont(Font.PLAIN, (float)fontSize));
-                int lineWidth = g2.getFontMetrics().stringWidth(testLine);
-                if (lineWidth > maxWidth && line.length() > 0) {
-                    lines.add(line.toString());
-                    line = new StringBuilder(word);
-                } else {
-                    if (line.length() > 0) line.append(" ");
-                    line.append(word);
-                }
-            }
-            if (line.length() > 0) lines.add(line.toString());
-
-            // If still too wide, reduce font size
-            while (true) {
-                boolean fits = true;
-                for (String l : lines) {
-                    g2.setFont(g2.getFont().deriveFont(Font.BOLD, (float)fontSize));
-                    if (g2.getFontMetrics().stringWidth(l) > maxWidth) {
-                        fits = false;
-                        break;
-                    }
-                }
-                if (fits || fontSize <= 8) break;
-                fontSize--;
-            }
-
-            int textHeight = g2.getFontMetrics().getAscent();
-            int totalHeight = lines.size() * textHeight + (lines.size() - 1) * 2;
-            int startY = quickY + (quickSize - totalHeight) / 2 + textHeight - 2;
-
-            for (String l : lines) {
-                int textWidth = g2.getFontMetrics().stringWidth(l);
-                g2.drawString(l, quickX + (quickSize - textWidth) / 2, startY);
-                startY += textHeight + 2;
-            }
-		}
-
-		// Draw assigned key for quick-use
-		String quickKey = gp.keyConfig.getKeyName(main.KeyConfig.QUICK_USE);
-		g2.setFont(g2.getFont().deriveFont(Font.BOLD, 22F));
-		g2.setColor(Color.WHITE);
-		int quickKeyWidth = g2.getFontMetrics().stringWidth(quickKey);
-		g2.drawString(quickKey, quickX + 4, quickY + quickSize - 4);
-
-		// --- Draw flash icon box to the right ---
-		int flashX = quickX + quickSize + gp.tileSize / 2;
-		int flashY = y;
-
-		g2.setColor(Color.WHITE);
-		g2.setStroke(new BasicStroke(4));
-		g2.drawRect(flashX - 2, flashY - 2, iconSize + 4, iconSize + 4); // Frame around icon
-		g2.setStroke(new BasicStroke(1)); // Reset stroke
-
-		// Draw icon
-		if (flash != null) {
-			g2.drawImage(flash, flashX, flashY, iconSize, iconSize, null);
-		} else {
-			g2.setColor(Color.YELLOW);
-			g2.fillRect(flashX, flashY, iconSize, iconSize);
-		}
-
-		// Draw cooldown overlay if on cooldown
-		if (gp.player.flashCooldown > 0) {
-			float percent = (float)gp.player.flashCooldown / gp.player.FLASH_COOLDOWN_MAX;
-			int overlayHeight = (int)(iconSize * percent);
-			g2.setColor(new Color(0, 0, 0, 120));
-			g2.fillRect(flashX, flashY, iconSize, overlayHeight);
-
-			// Draw cooldown seconds
-			g2.setColor(Color.WHITE);
-			g2.setFont(g2.getFont().deriveFont(Font.BOLD, 32f));
-			String cdText = String.format("%.1f", gp.player.flashCooldown / 60.0);
-			int textWidth = g2.getFontMetrics().stringWidth(cdText);
-			g2.drawString(cdText, flashX + (iconSize - textWidth) / 2, flashY + iconSize / 2 + 12);
-		}
-
-		// Draw assigned key at bottom right corner
-		String keyName = gp.keyConfig.getKeyName(main.KeyConfig.FLASH);
-		g2.setFont(g2.getFont().deriveFont(Font.BOLD, 22F));
-		g2.setColor(Color.WHITE);
-		int keyTextWidth = g2.getFontMetrics().stringWidth(keyName);
-		g2.drawString(keyName, flashX + 4, flashY + iconSize - 4);
-	}
-
 	public void drawMiniMap(Graphics2D g2) {
 		// Mini map size and position
 		int mapWidth = gp.tileSize * 4;
@@ -1858,5 +1726,290 @@ public class UI {
 		int playerDotSize = 8;
 		g2.setColor(Color.RED);
 		g2.fillOval(playerMiniX - playerDotSize/2, playerMiniY - playerDotSize/2, playerDotSize, playerDotSize);
+	}
+
+	public int skillsCommandNum = 0; // 0-3: Q/W/E/R, 4+: unlocked skills
+	public boolean assigningSkill = false; // true if picking a skill to assign
+	public int skillAssignSlotIndex = 0;
+
+	public void drawSkillScreen() {
+		int width = gp.tileSize * 14;
+		int height = gp.tileSize * 10;
+		int frameX = (gp.baseWidth - width) / 2;
+		int frameY = (gp.baseHeight - height) / 2;
+
+		drawSubWindow(frameX, frameY, width, height);
+
+		// Title
+		g2.setFont(currentFontBold.deriveFont(Font.BOLD, 48F));
+		String title = tr("skills.title", "Skills");
+		int titleX = getXForCenteredText(title);
+		int titleY = frameY + gp.tileSize;
+		g2.setColor(Color.WHITE);
+		g2.drawString(title, titleX, titleY);
+
+		// Assigned skills (Q/W/E/R)
+		String[] keys = {"Q", "W", "E", "R"};
+		int slotSize = gp.tileSize;
+		int slotGap = gp.tileSize / 2;
+		int slotsStartX = titleX - gp.tileSize / 2 - slotGap / 2;
+		int slotsY = titleY + gp.tileSize * 3 / 4;
+
+		g2.setFont(currentFontBold.deriveFont(Font.BOLD, 32F));
+		for (int i = 0; i < 4; i++) {
+			int slotX = slotsStartX + i * (slotSize + slotGap);
+
+			// Highlight if selected
+			if (!assigningSkill && skillsCommandNum == i) {
+				g2.setColor(new Color(255, 255, 100, 220));
+				g2.fillRoundRect(slotX - 6, slotsY - 6, slotSize + 12, slotSize + 12, 24, 24);
+			}
+			g2.setColor(new Color(255, 255, 100, 180));
+			g2.fillRoundRect(slotX, slotsY, slotSize, slotSize, 20, 20);
+
+			g2.setColor(Color.WHITE);
+			g2.setStroke(new BasicStroke(4));
+			g2.drawRoundRect(slotX, slotsY, slotSize, slotSize, 20, 20);
+
+			// Draw skill icon to fill the slot (edge-to-edge)
+			Skill skill = gp.player.assignedSkills[i];
+			if (skill != null && skill.getIcon() != null) {
+				g2.drawImage(skill.getIcon(), slotX, slotsY, slotSize, slotSize, null);
+			}
+
+			// Draw key label at bottom right corner
+			g2.setFont(currentFontBold.deriveFont(Font.BOLD, 22F));
+			String keyLabel = keys[i];
+			int labelWidth = g2.getFontMetrics().stringWidth(keyLabel);
+			int labelHeight = g2.getFontMetrics().getAscent();
+			g2.setColor(Color.WHITE);
+			g2.drawString(keyLabel, slotX + slotSize - labelWidth - 6, slotsY + slotSize - 8);
+		}
+
+		// List all unlocked skills
+		int listX = frameX + gp.tileSize;
+		int listY = slotsY + slotSize + gp.tileSize / 2;
+		g2.setFont(currentFontBold.deriveFont(Font.BOLD, 28F));
+		g2.setColor(Color.WHITE);
+		g2.drawString(tr("skills.unlocked", "Unlocked Skills:"), listX, listY);
+
+		int skillListY = listY + gp.tileSize / 2;
+		g2.setFont(currentFont.deriveFont(Font.PLAIN, 22F));
+		for (int i = 0; i < gp.player.unlockedSkills.size(); i++) {
+			Skill skill = gp.player.unlockedSkills.get(i);
+			// Highlight if assigning and this skill is selected
+			if (assigningSkill && skillsCommandNum == i + 4) {
+				g2.setColor(new Color(100, 200, 255, 180));
+				g2.fillRoundRect(listX - 8, skillListY - 24, width - 2 * gp.tileSize, gp.tileSize, 16, 16);
+				g2.setColor(Color.WHITE);
+			}
+			String skillText = skill.getName() + " - " + skill.getDescription();
+			g2.drawString(skillText, listX, skillListY);
+			skillListY += gp.tileSize;
+		}
+
+		// Instructions
+		g2.setFont(currentFont.deriveFont(Font.PLAIN, 20F));
+		g2.setColor(Color.YELLOW);
+		if (!assigningSkill) {
+			String instr1 = tr("skills.instruction1", "Select a slot (Q/W/E/R) and press Enter to assign.");
+			String instr2 = tr("skills.instruction2", "Press [ESC] to return.");
+			g2.drawString(instr1, frameX + gp.tileSize, frameY + height - gp.tileSize * 2);
+			g2.drawString(instr2, frameX + gp.tileSize, frameY + height - gp.tileSize);
+		} else {
+			String instr = tr("skills.instruction3", "Select a skill and press Enter to assign. [ESC] to cancel.");
+			g2.drawString(instr, frameX + gp.tileSize, frameY + height - gp.tileSize * 2);
+		}
+	}
+	
+	public void drawSkillBar() {
+		int slotSize = gp.tileSize;
+		int slotGap = gp.tileSize / 3;
+
+		// The skill bar will be horizontal: Q W E R | quick | flash
+		int numSlots = 6;
+		int barWidth = numSlots * slotSize + (numSlots - 1) * slotGap + 12;
+		int barHeight = slotSize + 12;
+
+		// Place bar at the bottom left corner
+		int barX = 24; // 24px from left
+		int barY = gp.baseHeight - barHeight - 24; // 24px from bottom
+
+		// Draw connected background bar
+		g2.setColor(new Color(30, 30, 60, 180));
+		g2.fillRoundRect(barX - 6, barY - 6, barWidth, barHeight, 16, 16);
+		g2.setColor(new Color(120, 120, 180, 120));
+		g2.setStroke(new BasicStroke(4));
+		g2.drawRoundRect(barX - 6, barY - 6, barWidth, barHeight, 16, 16);
+
+		String[] keys = {"Q", "W", "E", "R"};
+
+		// --- Draw skill slots ---
+		for (int i = 0; i < 4; i++) {
+			int slotX = barX + i * (slotSize + slotGap);
+			int slotY = barY;
+
+			// Draw slot background
+			g2.setColor(new Color(40, 40, 40, 220));
+			g2.fillRoundRect(slotX, slotY, slotSize, slotSize, 16, 16);
+			g2.setColor(Color.WHITE);
+			g2.setStroke(new BasicStroke(4));
+			g2.drawRect(slotX - 2, slotY - 2, slotSize + 4, slotSize + 4);
+			g2.setStroke(new BasicStroke(1)); // Reset stroke
+
+			// Draw skill icon
+			Skill skill = gp.player.assignedSkills[i];
+			if (skill != null && skill.getIcon() != null) {
+				g2.drawImage(skill.getIcon(), slotX, slotY, slotSize, slotSize, null);
+			}
+
+			// Draw cooldown overlay if on cooldown
+			if (skill != null && skill.getCooldown() > 0) {
+				float percent = (float)skill.getCooldown() / skill.getCooldownMax();
+				int overlayHeight = (int)(slotSize * percent);
+				g2.setColor(new Color(0, 0, 0, 140));
+				g2.fillRect(slotX, slotY, slotSize, overlayHeight);
+
+				// Draw cooldown seconds
+				g2.setColor(Color.WHITE);
+				g2.setFont(currentFontBold.deriveFont(Font.BOLD, 22F));
+				String cdText = String.format("%.1f", skill.getCooldown() / 60.0);
+				int textWidth = g2.getFontMetrics().stringWidth(cdText);
+				g2.drawString(cdText, slotX + (slotSize - textWidth) / 2, slotY + slotSize / 2 + 10);
+			}
+
+			// Draw key label at bottom right
+			g2.setFont(currentFontBold.deriveFont(Font.BOLD, 18F));
+			String keyLabel = keys[i];
+			int labelWidth = g2.getFontMetrics().stringWidth(keyLabel);
+			g2.setColor(Color.WHITE);
+			g2.drawString(keyLabel, slotX + slotSize - labelWidth - 4, slotY + slotSize - 6);
+		}
+
+		// --- Draw quick-use item slot (slot 4) ---
+		int quickX = barX + 4 * (slotSize + slotGap);
+		int quickY = barY;
+
+		g2.setColor(new Color(40, 40, 40, 220));
+		g2.fillRoundRect(quickX, quickY, slotSize, slotSize, 16, 16);
+		g2.setColor(Color.WHITE);
+		g2.setStroke(new BasicStroke(4));
+		g2.drawRect(quickX - 2, quickY - 2, slotSize + 4, slotSize + 4);
+		g2.setStroke(new BasicStroke(1));
+
+		Entity quickItem = null;
+		if (gp.player.quickUseItemClass != null) {
+			for (Entity item : gp.player.inventory) {
+				if (item != null
+					&& item.getClass() == gp.player.quickUseItemClass
+					&& (gp.player.quickUseItemName == null || gp.player.quickUseItemName.equals(item.name))
+					&& item.quantity > 0) {
+					quickItem = item;
+					break;
+				}
+			}
+		}
+		if (quickItem != null && quickItem.down1 != null) {
+			g2.drawImage(quickItem.down1, quickX, quickY, slotSize, slotSize, null);
+			// Draw quantity if stackable
+			if (quickItem.stackable && quickItem.quantity > 1) {
+				g2.setFont(g2.getFont().deriveFont(Font.BOLD, 18F));
+				String qtyText = "x" + quickItem.quantity;
+				int qtyWidth = g2.getFontMetrics().stringWidth(qtyText);
+				g2.setColor(Color.WHITE);
+				g2.drawString(qtyText, quickX + slotSize - qtyWidth - 4, quickY + slotSize - 6);
+			}
+		} else {
+			// Draw placeholder
+			g2.setColor(new Color(200, 200, 200, 200));
+			g2.fillRect(quickX, quickY, slotSize, slotSize);
+			g2.setColor(Color.GRAY);
+			String text = tr("quick_use.empty");
+			int fontSize = 16;
+			int maxWidth = slotSize - 8;
+			java.util.List<String> lines = new java.util.ArrayList<>();
+			String[] words = text.split(" ");
+			StringBuilder line = new StringBuilder();
+			for (String word : words) {
+				String testLine = line.length() == 0 ? word : line + " " + word;
+				g2.setFont(g2.getFont().deriveFont(Font.PLAIN, (float)fontSize));
+				int lineWidth = g2.getFontMetrics().stringWidth(testLine);
+				if (lineWidth > maxWidth && line.length() > 0) {
+					lines.add(line.toString());
+					line = new StringBuilder(word);
+				} else {
+					if (line.length() > 0) line.append(" ");
+					line.append(word);
+				}
+			}
+			if (line.length() > 0) lines.add(line.toString());
+			while (true) {
+				boolean fits = true;
+				for (String l : lines) {
+					g2.setFont(g2.getFont().deriveFont(Font.BOLD, (float)fontSize));
+					if (g2.getFontMetrics().stringWidth(l) > maxWidth) {
+						fits = false;
+						break;
+					}
+				}
+				if (fits || fontSize <= 8) break;
+				fontSize--;
+			}
+			int textHeight = g2.getFontMetrics().getAscent();
+			int totalHeight = lines.size() * textHeight + (lines.size() - 1) * 2;
+			int startY = quickY + (slotSize - totalHeight) / 2 + textHeight - 2;
+			for (String l : lines) {
+				int textWidth = g2.getFontMetrics().stringWidth(l);
+				g2.drawString(l, quickX + (slotSize - textWidth) / 2, startY);
+				startY += textHeight + 2;
+			}
+		}
+		// Draw assigned key for quick-use
+		String quickKey = gp.keyConfig.getKeyName(main.KeyConfig.QUICK_USE);
+		g2.setFont(g2.getFont().deriveFont(Font.BOLD, 22F));
+		g2.setColor(Color.WHITE);
+		int quickKeyWidth = g2.getFontMetrics().stringWidth(quickKey);
+		g2.drawString(quickKey, quickX + 4, quickY + slotSize - 4);
+
+		// --- Draw flash slot (slot 5) ---
+		int flashX = barX + 5 * (slotSize + slotGap);
+		int flashY = barY;
+
+		g2.setColor(new Color(40, 40, 40, 220));
+		g2.fillRoundRect(flashX, flashY, slotSize, slotSize, 16, 16);
+		g2.setColor(Color.WHITE);
+		g2.setStroke(new BasicStroke(4));
+		g2.drawRect(flashX - 2, flashY - 2, slotSize + 4, slotSize + 4);
+		g2.setStroke(new BasicStroke(1));
+
+		// Draw flash icon
+		if (flash != null) {
+			g2.drawImage(flash, flashX, flashY, slotSize, slotSize, null);
+		} else {
+			g2.setColor(Color.YELLOW);
+			g2.fillRect(flashX, flashY, slotSize, slotSize);
+		}
+
+		// Draw cooldown overlay if on cooldown
+		if (gp.player.flashCooldown > 0) {
+			float percent = (float)gp.player.flashCooldown / gp.player.FLASH_COOLDOWN_MAX;
+			int overlayHeight = (int)(slotSize * percent);
+			g2.setColor(new Color(0, 0, 0, 120));
+			g2.fillRect(flashX, flashY, slotSize, overlayHeight);
+
+			// Draw cooldown seconds
+			g2.setColor(Color.WHITE);
+			g2.setFont(g2.getFont().deriveFont(Font.BOLD, 32f));
+			String cdText = String.format("%.1f", gp.player.flashCooldown / 60.0);
+			int textWidth = g2.getFontMetrics().stringWidth(cdText);
+			g2.drawString(cdText, flashX + (slotSize - textWidth) / 2, flashY + slotSize / 2 + 12);
+		}
+
+		// Draw assigned key at bottom right corner
+		String keyName = gp.keyConfig.getKeyName(main.KeyConfig.FLASH);
+		g2.setFont(g2.getFont().deriveFont(Font.BOLD, 22F));
+		g2.setColor(Color.WHITE);
+		int keyTextWidth = g2.getFontMetrics().stringWidth(keyName);
+		g2.drawString(keyName, flashX + 4, flashY + slotSize - 4);
 	}
 }

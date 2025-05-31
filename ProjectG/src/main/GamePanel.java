@@ -12,7 +12,7 @@ import java.util.Comparator;
 import javax.swing.JPanel;
 
 import ai.PathFinder;
-import data.DataStorage;
+// import data.DataStorage;
 import entity.Entity;
 import entity.Player;
 import tile.TileManager;
@@ -74,6 +74,7 @@ public class GamePanel extends JPanel implements Runnable{
 	public final int gameOverState = 9;
 	public final int deathState = 10;
 	public final int transitionState = 11;	//Transition state for map change
+	public final int skillsState = 12;	//Skill tree state
 
 	public boolean debugMode = false;	//Debug mode, true to enable debug features
 

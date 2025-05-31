@@ -14,6 +14,7 @@ import main.GamePanel;
 import main.KeyHandler;
 import object.OBJ_Chest;
 import projectile.PROJECTILE_Fire_Ball;
+import skill.Skill;
 
 public class Player extends Entity{
 	
@@ -49,6 +50,11 @@ public class Player extends Entity{
 	public int monsterNearbyCounter = 0;
 	public int MONSTER_NEARBY_DURATION = 60; // 1 seconds at 60fps
 
+	public ArrayList<Skill> skills = new ArrayList<>();
+	public ArrayList<Skill> unlockedSkills = new ArrayList<>();
+	public Skill[] assignedSkills = new Skill[4];
+	public int selectedSkillIndex = 0;
+
 	public Player(GamePanel gp, KeyHandler kH) {
 
 		super(gp);
@@ -72,6 +78,7 @@ public class Player extends Entity{
 			getPlayerAttackImage();
 		}
 		setItems();
+		initializeSkills();
 	}
 	
 	public void setDefaultValues() {
@@ -135,6 +142,7 @@ public class Player extends Entity{
 		data.progressionManaUpgrades = this.progressionManaUpgrades;
 		data.progressionAttackUpgrades = this.progressionAttackUpgrades;
 		data.progressionDefenseUpgrades = this.progressionDefenseUpgrades;
+		data.flashCooldown = this.flashCooldown;
 		data.currentWeapon = (this.currentWeapon != null) ? this.currentWeapon.toEntitySaveData() : null;
 		data.currentArmor = (this.currentArmor != null) ? this.currentArmor.toEntitySaveData() : null;
 		data.currentHat = (this.currentHat != null) ? this.currentHat.toEntitySaveData() : null;
@@ -173,6 +181,29 @@ public class Player extends Entity{
 		    if (item != null) data.inventory.add(item.toEntitySaveData());
 		}
 
+		// Save unlocked skills
+		data.unlockedSkillClassNames.clear();
+		for (Skill skill : unlockedSkills) {
+			if (skill != null) {
+				data.unlockedSkillClassNames.add(skill.getClass().getName());
+			} else {
+				data.unlockedSkillClassNames.add(null);
+			}
+		}
+
+		// Save assigned skills and their cooldowns
+		data.assignedSkillClassNames.clear();
+		data.assignedSkillCooldowns.clear();
+		for (Skill skill : assignedSkills) {
+			if (skill != null) {
+				data.assignedSkillClassNames.add(skill.getClass().getName());
+				data.assignedSkillCooldowns.add(skill.getCooldown());
+			} else {
+				data.assignedSkillClassNames.add(null);
+				data.assignedSkillCooldowns.add(0);
+			}
+		}
+
 		return data;
 	}
 
@@ -193,6 +224,7 @@ public class Player extends Entity{
 		this.progressionManaUpgrades = data.progressionManaUpgrades;
 		this.progressionAttackUpgrades = data.progressionAttackUpgrades;
 		this.progressionDefenseUpgrades = data.progressionDefenseUpgrades;
+		this.flashCooldown = data.flashCooldown;
 		this.currentWeapon = data.currentWeapon != null ? Entity.fromEntitySaveData(data.currentWeapon, gp) : null;
 		this.currentArmor = data.currentArmor != null ? Entity.fromEntitySaveData(data.currentArmor, gp) : null;
 		this.currentHat = data.currentHat != null ? Entity.fromEntitySaveData(data.currentHat, gp) : null;
@@ -267,6 +299,44 @@ public class Player extends Entity{
 						gp.npc[map][i++] = e;
 					}
 				}
+			}
+		}
+
+		// Restore unlocked skills
+		unlockedSkills.clear();
+		if (data.unlockedSkillClassNames != null) {
+			for (String className : data.unlockedSkillClassNames) {
+				if (className != null) {
+					try {
+						Class<?> clazz = Class.forName(className);
+						Skill skill = (Skill) clazz.getConstructor(main.GamePanel.class).newInstance(this.gp);
+						unlockedSkills.add(skill);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+
+		// Restore assigned skills and their cooldowns
+		for (int i = 0; i < assignedSkills.length && i < data.assignedSkillClassNames.size(); i++) {
+			String className = data.assignedSkillClassNames.get(i);
+			int cooldown = data.assignedSkillCooldowns.get(i);
+			if (className != null) {
+				try {
+					Class<?> clazz = Class.forName(className);
+					Skill skill = (Skill) clazz.getConstructor(main.GamePanel.class).newInstance(this.gp);
+					// Set cooldown via reflection or a setter if available
+					java.lang.reflect.Field cooldownField = skill.getClass().getDeclaredField("cooldown");
+					cooldownField.setAccessible(true);
+					cooldownField.setInt(skill, cooldown);
+					assignedSkills[i] = skill;
+				} catch (Exception e) {
+					assignedSkills[i] = null;
+					e.printStackTrace();
+				}
+			} else {
+				assignedSkills[i] = null;
 			}
 		}
 	}
@@ -487,6 +557,13 @@ public class Player extends Entity{
 				}
 			}
 		}		
+
+		for (int i = 0; i < assignedSkills.length; i++) {
+			Skill skill = assignedSkills[i];
+			if (skill != null) {
+				skill.tickCooldown();
+			}
+		}
 	}
 	
 	public void attacking(){
@@ -1192,5 +1269,48 @@ public class Player extends Entity{
 
 		worldX += dx * gp.tileSize * FLASH_RANGE;
 		worldY += dy * gp.tileSize * FLASH_RANGE;
+	}
+
+	public void initializeSkills() {
+	    // Example: Add all unlocked skills here (could be loaded from save or progression)
+	    unlockedSkills.clear();
+	    unlockedSkills.add(new skill.SKILL_Fireball(this.gp));
+	    unlockedSkills.add(new skill.SKILL_Fireball(this.gp));
+	    unlockedSkills.add(new skill.SKILL_Dash(this.gp));
+	    unlockedSkills.add(new skill.SKILL_Fireball(this.gp));
+	    // ...add more as needed
+
+	    // Assign default skills to Q/W/E/R (indices 0-3)
+	    assignedSkills[0] = unlockedSkills.get(0); // Q
+	    assignedSkills[1] = unlockedSkills.get(1); // W
+	    assignedSkills[2] = unlockedSkills.get(2); // E
+	    assignedSkills[3] = unlockedSkills.get(3); // R
+	}
+
+	// Use the skill assigned to a specific key (Q/W/E/R)
+	public void useAssignedSkill(int index) {
+	    if (index < 0 || index >= assignedSkills.length) return;
+	    Skill skill = assignedSkills[index];
+	    if (skill != null && skill.canUse(mana, level)) {
+	        mana -= skill.getManaCost();
+	        skill.use();
+	        skill.applyEffect(gp, this);
+	    } else {
+	        
+	    }
+	}
+
+	// Optionally, add a method to assign a skill to a key (for use in a skill menu)
+	public void assignSkillToKey(int keyIndex, Skill skill) {
+		if (keyIndex >= 0 && keyIndex < assignedSkills.length && unlockedSkills.contains(skill)) {
+			try {
+				// Create a new instance of the skill for this slot
+				Skill newSkill = skill.getClass().getConstructor(main.GamePanel.class).newInstance(this.gp);
+				assignedSkills[keyIndex] = newSkill;
+			} catch (Exception e) {
+				// Fallback: assign the same instance if reflection fails
+				assignedSkills[keyIndex] = skill;
+			}
+		}
 	}
 }

@@ -19,6 +19,7 @@ public class KeyConfig {
     public static final String FLASH = "Flash";
     public static final String QUICK_USE = "QuickUse";
     public static final String ASSIGN_QUICK_USE = "AssignQuickUse";
+    public static final String SKILLS = "Skills";
 
     private final Map<String, Integer> keyBindings = new HashMap<>();
 
@@ -37,6 +38,7 @@ public class KeyConfig {
         keyBindings.put(FLASH, KeyEvent.VK_F); 
         keyBindings.put(QUICK_USE, KeyEvent.VK_D);
         keyBindings.put(ASSIGN_QUICK_USE, KeyEvent.VK_Q);
+        keyBindings.put(SKILLS, KeyEvent.VK_S); // Added SKILLS binding
     }
 
     public int getKey(String action) {
@@ -70,5 +72,6 @@ public class KeyConfig {
         keyBindings.put(FLASH, KeyEvent.VK_F);
         keyBindings.put(QUICK_USE, KeyEvent.VK_D);
         keyBindings.put(ASSIGN_QUICK_USE, KeyEvent.VK_Q);
+        keyBindings.put(SKILLS, KeyEvent.VK_S); // Reset SKILLS binding
     }
 }
