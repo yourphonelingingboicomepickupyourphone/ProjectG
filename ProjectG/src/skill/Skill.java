@@ -16,7 +16,7 @@ public interface Skill extends Serializable {
     BufferedImage getIcon();
 
     boolean canUse(int playerMana, int playerLevel);
-    void use();
+    void use(Player player);
     void tickCooldown();
     void applyEffect(GamePanel gp, Player player);
 }

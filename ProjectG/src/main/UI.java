@@ -535,7 +535,8 @@ public class UI {
 		int xMana = x + 3 * gp.tileSize / 80;
 		int yMana = y + 3 * gp.tileSize / 80;
 		if (gp.player.mana > 0){
-			width = (int) ((gp.player.mana / gp.player.getTotalMaxMana()) * width) - 6;
+			float manaPercent = (float)gp.player.mana / gp.player.getTotalMaxMana();
+			width = (int)(manaPercent * width) - 6;
 		} else {
 			width = 0;
 		}

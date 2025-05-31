@@ -38,7 +38,7 @@ public class SKILL_Fireball implements Skill {
         return playerMana >= manaCost && cooldown == 0 && playerLevel >= levelRequirement;
     }
 
-    public void use() {
+    public void use(Player player) {
         cooldown = cooldownMax;
     }
 

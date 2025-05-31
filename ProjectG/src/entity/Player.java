@@ -2,6 +2,7 @@ package entity;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -562,6 +563,9 @@ public class Player extends Entity{
 			Skill skill = assignedSkills[i];
 			if (skill != null) {
 				skill.tickCooldown();
+				if (skill instanceof skill.SKILL_Dash) {
+                    ((skill.SKILL_Dash)skill).tickDash(this);
+                }
 			}
 		}
 	}
@@ -999,6 +1003,12 @@ public class Player extends Entity{
 		if (gp.debugMode){
 			g2.setColor(Color.RED);
 			g2.drawRect(x + solidArea.x, y + solidArea.y, solidArea.width, solidArea.height);
+
+			// Show player speed in debug mode
+			g2.setFont(g2.getFont().deriveFont(Font.BOLD, 18f));
+			g2.setColor(Color.YELLOW);
+			String speedText = "Speed: " + speed;
+			g2.drawString(speedText, x, y - 10);
 		}
 		// Restore composite
 		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
@@ -1292,11 +1302,14 @@ public class Player extends Entity{
 	    if (index < 0 || index >= assignedSkills.length) return;
 	    Skill skill = assignedSkills[index];
 	    if (skill != null && skill.canUse(mana, level)) {
-	        mana -= skill.getManaCost();
-	        skill.use();
-	        skill.applyEffect(gp, this);
+	        skill.use(this); // Only call use!
+	        // For dash, effect is handled in use() and tickDash()
+	        // For other skills, call applyEffect if needed
+	        if (!(skill instanceof skill.SKILL_Dash)) {
+	            skill.applyEffect(gp, this);
+	        }
 	    } else {
-	        
+	        gp.ui.addMessage("Not enough mana or skill on cooldown!");
 	    }
 	}
 
