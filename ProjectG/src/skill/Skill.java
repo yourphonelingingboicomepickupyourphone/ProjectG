@@ -7,8 +7,8 @@ import entity.Player;
 import main.GamePanel;
 
 public interface Skill extends Serializable {
-    String getName();
-    String getDescription();
+    String getName(GamePanel gp);
+    String getDescription(GamePanel gp);
     int getManaCost();
     int getCooldownMax();
     int getCooldown();

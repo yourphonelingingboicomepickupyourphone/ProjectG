@@ -1006,7 +1006,7 @@ public class KeyHandler implements KeyListener{
 					gp.player.assignSkillToKey(slotIndex, gp.player.unlockedSkills.get(skillIndex));
 					gp.ui.assigningSkill = false;
 					gp.ui.skillsCommandNum = slotIndex;
-					gp.ui.addMessage(gp.ui.tr("skills.assigned", gp.player.unlockedSkills.get(skillIndex).getName(), "QWER".charAt(slotIndex) + ""));
+					gp.ui.addMessage(gp.ui.tr("skills.assigned", gp.player.unlockedSkills.get(skillIndex).getName(this.gp), "1234".charAt(slotIndex) + ""));
 				}
 			}
 			if (code == gp.keyConfig.getKey(KeyConfig.ESCAPE)) {

@@ -1870,7 +1870,7 @@ public class UI {
 				g2.fillRoundRect(listX - 8, skillListY - 24, width - 2 * gp.tileSize, gp.tileSize, 16, 16);
 				g2.setColor(Color.WHITE);
 			}
-			String skillText = skill.getName() + " - " + skill.getDescription();
+			String skillText = skill.getName(this.gp) + " - " + skill.getDescription(this.gp);
 			g2.drawString(skillText, listX, skillListY);
 			skillListY += gp.tileSize;
 		}

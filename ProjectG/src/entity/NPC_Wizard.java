@@ -51,34 +51,42 @@ public class NPC_Wizard extends Entity {
 
     public void setAction() {
 
-        if (onPath == true){
-            int goalCol = (gp.player.worldX + gp.player.solidArea.x) / gp.tileSize;
-            int goalRow = (gp.player.worldY + gp.player.solidArea.y) / gp.tileSize;
-
-            searchPath(goalCol, goalRow);
+        if (gp.currentMap == 0){
+            speed = 0;
+            direction = "down";
+            spriteNum = 1;
+            spriteCounter = 0;
+            return;
         } else {
-            actionLockCounter++;
-            if(actionLockCounter == 240) //direction changes after 2 secs
-            {
-                Random random = new Random();
-                int i = random.nextInt(100) + 1;  // pick up a number from 1 to 100
-                if(i <= 25)
+            if (onPath == true){
+                int goalCol = (gp.player.worldX + gp.player.solidArea.x) / gp.tileSize;
+                int goalRow = (gp.player.worldY + gp.player.solidArea.y) / gp.tileSize;
+
+                searchPath(goalCol, goalRow);
+            } else {
+                actionLockCounter++;
+                if(actionLockCounter == 240) //direction changes after 2 secs
                 {
-                    direction = "up";
+                    Random random = new Random();
+                    int i = random.nextInt(100) + 1;  // pick up a number from 1 to 100
+                    if(i <= 25)
+                    {
+                        direction = "up";
+                    }
+                    if(i>25 && i <= 50)
+                    {
+                        direction = "down";
+                    }
+                    if(i>50 && i <= 75)
+                    {
+                        direction = "left";
+                    }
+                    if(i>75 && i <= 100)
+                    {
+                        direction = "right";
+                    }
+                    actionLockCounter = 0; // reset
                 }
-                if(i>25 && i <= 50)
-                {
-                    direction = "down";
-                }
-                if(i>50 && i <= 75)
-                {
-                    direction = "left";
-                }
-                if(i>75 && i <= 100)
-                {
-                    direction = "right";
-                }
-                actionLockCounter = 0; // reset
             }
         }
     }

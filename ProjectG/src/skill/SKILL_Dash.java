@@ -9,8 +9,6 @@ import main.GamePanel;
 
 public class SKILL_Dash implements Skill{
 
-    private String name;
-    private String description;
     private int manaCost = 50;
     private int cooldownMax = 3000;
     private int cooldown = 0;
@@ -25,16 +23,14 @@ public class SKILL_Dash implements Skill{
 
     private BufferedImage icon;
 
-    public String getName() { return name; }
-    public String getDescription() { return description; }
+    public String getName(GamePanel gp) { return gp.ui.tr("skill.dash.name"); }
+    public String getDescription(GamePanel gp) { return java.text.MessageFormat.format(gp.ui.tr("skill.dash.description"), DASH_SPEED_BOOST, DASH_DURATION, cooldownMax / 60.0); }
     public int getManaCost() { return manaCost; }
     public int getCooldownMax() { return cooldownMax; }
     public int getCooldown() { return cooldown; }
     public int getLevelRequirement() { return levelRequirement; }
 
     public SKILL_Dash(GamePanel gp) {
-        this.name = gp.ui.tr("skill.dash.name");
-        this.description = gp.ui.tr("skill.dash.description");
         try {
             icon = ImageIO.read(getClass().getResourceAsStream("/skills/skill_dash.png"));
         } catch (IOException e) {

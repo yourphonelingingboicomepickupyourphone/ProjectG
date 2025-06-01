@@ -116,8 +116,16 @@ public class AssetSetter {
 
 
 	public void setNPC() {
-		int map = 1;
+		int map = 0;
 		int i = 0;
+
+		gp.npc[map][i] = new NPC_Wizard(gp);
+		gp.npc[map][i].worldX = gp.tileSize * 50;
+		gp.npc[map][i].worldY = gp.tileSize * 46;
+		i++;
+
+		map = 1;
+		i = 0;
 		gp.npc[map][i] = new NPC_Wizard(gp);
 		gp.npc[map][i].worldX = gp.tileSize * 51;
 		gp.npc[map][i].worldY = gp.tileSize * 80;

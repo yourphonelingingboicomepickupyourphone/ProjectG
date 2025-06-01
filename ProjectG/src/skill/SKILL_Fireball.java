@@ -9,7 +9,6 @@ import entity.Player;
 import main.GamePanel;
 
 public class SKILL_Fireball implements Skill {
-    private String name;
     private String description;
     private int manaCost = 20;
     private int cooldownMax = 180;
@@ -18,7 +17,6 @@ public class SKILL_Fireball implements Skill {
     private BufferedImage icon;
 
     public SKILL_Fireball(GamePanel gp) {
-        this.name = gp.ui.tr("skill.fireball.name");
         this.description = gp.ui.tr("skill.fireball.description");
         try {
             icon = ImageIO.read(getClass().getResourceAsStream("/skills/skill_fireball.png"));
@@ -27,8 +25,8 @@ public class SKILL_Fireball implements Skill {
         }
     }
 
-    public String getName() { return name; }
-    public String getDescription() { return description; }
+    public String getName(GamePanel gp) { return gp.ui.tr("skill.fireball.name"); }
+    public String getDescription(GamePanel gp) { return gp.ui.tr("skill.fireball.description"); }
     public int getManaCost() { return manaCost; }
     public int getCooldownMax() { return cooldownMax; }
     public int getCooldown() { return cooldown; }

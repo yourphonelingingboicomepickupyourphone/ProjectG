@@ -380,12 +380,31 @@ public class Player extends Entity{
 	public void update() {
 
 		if (knockbackCounter > 0) {
-			worldX += knockbackDX;
-			worldY += knockbackDY;
-			knockbackCounter--;
-			// Optionally, check collision and stop knockback if blocked
-			return; // Skip normal movement while being knocked back
-		}
+            // Save old position
+            int oldX = worldX;
+            int oldY = worldY;
+
+            // Move by knockback
+            worldX += knockbackDX;
+            worldY += knockbackDY;
+
+            // Check all collisions
+            collisionOn = false;
+            gp.cChecker.checkTile(this);
+            gp.cChecker.checkObject(this, true);
+            gp.cChecker.checkEntity(this, gp.npc);
+            gp.cChecker.checkEntity(this, gp.monster);
+
+            if (collisionOn) {
+                // Undo move and stop knockback
+                worldX = oldX;
+                worldY = oldY;
+                knockbackCounter = 0;
+            } else {
+                knockbackCounter--;
+            }
+            return; // Skip normal movement while being knocked back
+        }
 
 		if (collisionRecoilCounter > 0) {
 			collisionRecoilCounter--;
