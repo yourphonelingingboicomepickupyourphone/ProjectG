@@ -554,66 +554,69 @@ public class KeyHandler implements KeyListener{
 		int row = index % rows;
 		int col = index / rows;
 
-	    if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
-	        if (gp.ui.controlsCommandNum == total) {
-	            // From "Back" go to last row, first column
-	            row = rows - 1;
-	            col = 0;
-	        } else {
+	    // Navigation for grid
+	    if (gp.ui.controlsCommandNum < total) {
+	        if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
 	            row--;
 	            if (row < 0) {
-	                // If at top, wrap to "Back"
+	                // Move to "Back"
 	                gp.ui.controlsCommandNum = total;
 	                return;
 	            }
 	        }
-	    }
-	    if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
-	        if (gp.ui.controlsCommandNum == total) {
-	            // From "Back" go to first row, first column
-	            row = 0;
-	            col = 0;
-	        } else {
+	        if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
 	            row++;
 	            if (row >= rows || (col * rows + row) >= total) {
-	                // If at bottom, go to "Back"
+	                // Move to "Back"
 	                gp.ui.controlsCommandNum = total;
 	                return;
 	            }
 	        }
-	    }
-	    if (code == gp.keyConfig.getKey(KeyConfig.LEFT)) {
-	        if (gp.ui.controlsCommandNum == total) {
-	            // Stay on "Back"
+	        if (code == gp.keyConfig.getKey(KeyConfig.LEFT)) {
+	            col--;
+	            if (col < 0) col = cols - 1;
+	            if (col * rows + row >= total) col = (total - 1) / rows;
+	        }
+	        if (code == gp.keyConfig.getKey(KeyConfig.RIGHT)) {
+	            col++;
+	            if (col >= cols || (col * rows + row) >= total) col = 0;
+	        }
+	        int newIndex = col * rows + row;
+	        if (newIndex >= total) newIndex = total; // If out of bounds, select "Back"
+	        if (code == gp.keyConfig.getKey(KeyConfig.UP) ||
+	            code == gp.keyConfig.getKey(KeyConfig.DOWN) ||
+	            code == gp.keyConfig.getKey(KeyConfig.LEFT) ||
+	            code == gp.keyConfig.getKey(KeyConfig.RIGHT)) {
+	            gp.ui.controlsCommandNum = newIndex;
+	        }
+	    } else {
+	        // Navigation for Back and Reset
+	        if (code == gp.keyConfig.getKey(KeyConfig.LEFT) || code == gp.keyConfig.getKey(KeyConfig.RIGHT)) {
+	            // Toggle between Back and Reset
+	            gp.ui.controlsCommandNum = (gp.ui.controlsCommandNum == total) ? total + 1 : total;
 	            return;
 	        }
-	        col--;
-	        if (col < 0) col = cols - 1;
-	        if (col * rows + row >= total) col = (total - 1) / rows;
-	    }
-	    if (code == gp.keyConfig.getKey(KeyConfig.RIGHT)) {
-	        if (gp.ui.controlsCommandNum == total) {
-	            // Stay on "Back"
+	        if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
+	            // Move to last row, first or last column
+	            gp.ui.controlsCommandNum = (gp.ui.controlsCommandNum == total)
+	                ? (rows - 1)
+	                : (rows * 2 - 1);
+	            if (gp.ui.controlsCommandNum >= total) gp.ui.controlsCommandNum = total - 1;
 	            return;
 	        }
-	        col++;
-	        if (col >= cols || (col * rows + row) >= total) col = 0;
 	    }
 
-	    int newIndex = col * rows + row;
-	    if (newIndex >= total) newIndex = total; // If out of bounds, select "Back"
-	    if (code == gp.keyConfig.getKey(KeyConfig.UP) ||
-	        code == gp.keyConfig.getKey(KeyConfig.DOWN) ||
-	        code == gp.keyConfig.getKey(KeyConfig.LEFT) ||
-	        code == gp.keyConfig.getKey(KeyConfig.RIGHT)) {
-	        gp.ui.controlsCommandNum = newIndex;
-	    }
-
-	    // Handle Enter/Choose for rebinding or going back
+	    // Handle Enter/Choose for rebinding, back, or reset
 	    if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
-	        if (gp.ui.controlsCommandNum == gp.ui.controlActions.length) {
+	        if (gp.ui.controlsCommandNum == total) {
 	            // "Back" selected
+	            gp.config.saveConfig();
 	            gp.ui.subState = 0;
+	        } else if (gp.ui.controlsCommandNum == total + 1) {
+	            // "Reset" selected
+	            gp.keyConfig.resetToDefault();
+	            gp.config.saveConfig();
+	            gp.ui.addMessage(gp.ui.tr("controls.reset_success"));
 	        } else {
 	            // Start rebinding
 	            gp.ui.waitingForKey = true;
@@ -849,71 +852,78 @@ public class KeyHandler implements KeyListener{
 		int row = index % rows;
 		int col = index / rows;
 
-	    if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
-	        if (gp.ui.menuControlsCommandNum == total) {
-	            // From "Back" go to last row, first column
-	            row = rows - 1;
-	            col = 0;
-	        } else {
+	    // Navigation for grid
+	    if (gp.ui.menuControlsCommandNum < total) {
+	        if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
 	            row--;
 	            if (row < 0) {
-	                // If at top, wrap to "Back"
+	                // Move to "Back"
 	                gp.ui.menuControlsCommandNum = total;
 	                return;
 	            }
 	        }
-	    }
-	    if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
-	        if (gp.ui.menuControlsCommandNum == total) {
-	            // From "Back" go to first row, first column
-	            row = 0;
-	            col = 0;
-	        } else {
+	        if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
 	            row++;
 	            if (row >= rows || (col * rows + row) >= total) {
-	                // If at bottom, go to "Back"
+	                // Move to "Back"
 	                gp.ui.menuControlsCommandNum = total;
 	                return;
 	            }
 	        }
-	    }
-	    if (code == gp.keyConfig.getKey(KeyConfig.LEFT)) {
-	        if (gp.ui.menuControlsCommandNum == total) {
-	            // Stay on "Back"
+	        if (code == gp.keyConfig.getKey(KeyConfig.LEFT)) {
+	            col--;
+	            if (col < 0) col = cols - 1;
+	            if (col * rows + row >= total) col = (total - 1) / rows;
+	        }
+	        if (code == gp.keyConfig.getKey(KeyConfig.RIGHT)) {
+	            col++;
+	            if (col >= cols || (col * rows + row) >= total) col = 0;
+	        }
+	        int newIndex = col * rows + row;
+	        if (newIndex >= total) newIndex = total; // If out of bounds, select "Back"
+	        if (code == gp.keyConfig.getKey(KeyConfig.UP) ||
+	            code == gp.keyConfig.getKey(KeyConfig.DOWN) ||
+	            code == gp.keyConfig.getKey(KeyConfig.LEFT) ||
+	            code == gp.keyConfig.getKey(KeyConfig.RIGHT)) {
+	            gp.ui.menuControlsCommandNum = newIndex;
+	        }
+	    } else {
+	        // Navigation for Back and Reset
+	        if (code == gp.keyConfig.getKey(KeyConfig.LEFT) || code == gp.keyConfig.getKey(KeyConfig.RIGHT)) {
+	            // Toggle between Back and Reset
+	            gp.ui.menuControlsCommandNum = (gp.ui.menuControlsCommandNum == total) ? total + 1 : total;
 	            return;
 	        }
-	        col--;
-	        if (col < 0) col = cols - 1;
-	        if (col * rows + row >= total) col = (total - 1) / rows;
-	    }
-	    if (code == gp.keyConfig.getKey(KeyConfig.RIGHT)) {
-	        if (gp.ui.menuControlsCommandNum == total) {
-	            // Stay on "Back"
+	        if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
+	            // Move to last row, first or last column
+	            gp.ui.menuControlsCommandNum = (gp.ui.menuControlsCommandNum == total)
+	                ? (rows - 1)
+	                : (rows * 2 - 1);
+	            if (gp.ui.menuControlsCommandNum >= total) gp.ui.menuControlsCommandNum = total - 1;
 	            return;
 	        }
-	        col++;
-	        if (col >= cols || (col * rows + row) >= total) col = 0;
 	    }
 
-	    int newIndex = col * rows + row;
-	    if (newIndex >= total) newIndex = total; // If out of bounds, select "Back"
-	    if (code == gp.keyConfig.getKey(KeyConfig.UP) ||
-	        code == gp.keyConfig.getKey(KeyConfig.DOWN) ||
-	        code == gp.keyConfig.getKey(KeyConfig.LEFT) ||
-	        code == gp.keyConfig.getKey(KeyConfig.RIGHT)) {
-	        gp.ui.menuControlsCommandNum = newIndex;
-	    }
-
+	    // Handle Enter/Choose for rebinding, back, or reset
 	    if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
 	        if (gp.ui.menuControlsCommandNum == total) {
-	            gp.ui.titleScreenState = 3; // Go back to options/settings
+	            // "Back" selected
+	            gp.config.saveConfig();
+	            gp.ui.titleScreenState = 3;
 	            gp.ui.menuControlsCommandNum = 0;
+	        } else if (gp.ui.menuControlsCommandNum == total + 1) {
+	            // "Reset" selected
+	            gp.keyConfig.resetToDefault();
+	            gp.config.saveConfig();
+	            gp.ui.addMessage(gp.ui.tr("controls.reset_success"));
 	        } else {
+	            // Start rebinding
 	            gp.ui.waitingForKey = true;
 	            gp.ui.waitingAction = gp.ui.controlActions[gp.ui.menuControlsCommandNum];
 	        }
 	    }
 	    if (code == gp.keyConfig.getKey(KeyConfig.ESCAPE)) {
+	        gp.config.saveConfig();
 	        gp.ui.titleScreenState = 3;
 	        gp.ui.menuControlsCommandNum = 0;
 	    }

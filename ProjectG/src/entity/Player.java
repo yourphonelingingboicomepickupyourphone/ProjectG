@@ -41,7 +41,7 @@ public class Player extends Entity{
 	public ArrayList<Entity> inventory = new ArrayList<>();
 	public Entity currentChest;
 	public int flashCooldown = 0;
-	public int FLASH_COOLDOWN_MAX = 3600; // 60 seconds at 60fps
+	public int FLASH_COOLDOWN_MAX = 5400; // 90 seconds at 60fps
 	public int FLASH_RANGE = 4; // 4 tiles
 	public Entity quickUseItem;
 	public Class<?> quickUseItemClass = null;

@@ -1313,7 +1313,7 @@ public class UI {
 		g2.drawString(cText, getXForCenteredText(cText), textYStart - gp.tileSize / 2);
 
 		g2.setFont(currentFont.deriveFont(Font.PLAIN, 36F));
-		int startY = textYStart + lineHeight;
+		int startY = textYStart + lineHeight / 2;
 		int[] colXs = new int[cols];
 		for (int c = 0; c < cols; c++) {
 			colXs[c] = frameX + gp.tileSize + c * (colWidth + colGap);
@@ -1329,11 +1329,6 @@ public class UI {
 			String action = controlActions[i];
 			String keyName = gp.keyConfig.getKeyName(action);
 
-			// Show Q/W/E/R for skill keys
-			if (action.equals(main.KeyConfig.SKILLS)) {
-				keyName = "Q/W/E/R";
-			}
-
 			String actionLabel = tr("controls." + action.toLowerCase());
 			if (controlsCommandNum == i && !waitingForKey) {
 				g2.setColor(Color.YELLOW);
@@ -1343,25 +1338,54 @@ public class UI {
 			g2.drawString(actionLabel + ": " + keyName, x, y);
 		}
 
-		// Draw "Back" option at the bottom center
-		int backY = startY + rows * lineHeight + lineHeight / 4;
+		// After drawing all key bindings, draw "Back" and "Reset" side by side at the bottom center
+		int buttonY = startY + rows * lineHeight; // Adjust vertical position as needed
+
+		String back = tr("controls.back");
+		String reset = tr("controls.reset");
+
+		g2.setFont(currentFont.deriveFont(Font.PLAIN, 36F));
+		int backWidth = g2.getFontMetrics().stringWidth(back);
+		int resetWidth = g2.getFontMetrics().stringWidth(reset);
+		int buttonGap = gp.tileSize; // Space between buttons
+
+		int totalButtonsWidth = backWidth + resetWidth + buttonGap;
+		int buttonsStartX = (gp.baseWidth - totalButtonsWidth) / 2;
+
+		int backX = buttonsStartX + gp.tileSize / 2;
+		int resetX = backX + backWidth + buttonGap;
+
+		// Draw "Back" button
 		if (controlsCommandNum == total && !waitingForKey) {
-			g2.setColor(Color.YELLOW);
-			g2.drawString(">", getXForCenteredText(tr("controls.back")) - gp.tileSize, backY);
+		    g2.setColor(Color.YELLOW);
+		    g2.drawString(">", backX - gp.tileSize / 2, buttonY);
 		}
 		g2.setColor(Color.WHITE);
-		g2.drawString(tr("controls.back"), getXForCenteredText(tr("controls.back")), backY);
+		g2.drawString(back, backX, buttonY);
+
+		// Draw "Reset" button
+		if (controlsCommandNum == total + 1 && !waitingForKey) {
+		    g2.setColor(Color.YELLOW);
+		    g2.drawString(">", resetX - gp.tileSize / 2, buttonY);
+		}
+		g2.setColor(Color.WHITE);
+		g2.drawString(reset, resetX, buttonY);
 
 		if (waitingForKey) {
 			g2.setColor(Color.CYAN);
 			String kText = tr("message.press_key");
-			g2.drawString(kText, getXForCenteredText(kText), backY + 3 * lineHeight / 4);
+			int msgX = getXForCenteredText(kText);
+			int msgY = buttonY + 3 * gp.tileSize / 4;
+			g2.drawString(kText, msgX, msgY);
 		}
 
+		// Show duplicate key warning if needed
 		if (keyBindWarning) {
 			g2.setColor(Color.RED);
 			String warn = tr("message.key_already_assigned");
-			g2.drawString(warn, getXForCenteredText(warn), backY + 3 * lineHeight / 4);
+			int warnX = getXForCenteredText(warn);
+			int warnY = buttonY + 3 * gp.tileSize / 4;
+			g2.drawString(warn, warnX, warnY);
 			// Hide warning after 2 seconds
 			if (System.currentTimeMillis() - keyBindWarningTime > 2000) {
 				keyBindWarning = false;
@@ -1478,29 +1502,55 @@ public class UI {
 			}
 		}
 
-		// Draw "Back" option at the bottom center
-		int backY = startY + rows * lineHeight;
+		// Draw "Back" and "Reset" side by side at the bottom center
+		int buttonY = startY + rows * lineHeight + gp.tileSize; // Adjust vertical position as needed
+
 		String back = tr("controls.back");
-		int backX = getXForCenteredText(back);
-		if (menuControlsCommandNum == controlActions.length && !waitingForKey) {
-			g2.setColor(Color.YELLOW);
-			g2.drawString(">", backX - gp.tileSize, backY + 3 * lineHeight / 4);
+		String reset = tr("controls.reset");
+
+		g2.setFont(currentFont.deriveFont(Font.PLAIN, 36F));
+		int backWidth = g2.getFontMetrics().stringWidth(back);
+		int resetWidth = g2.getFontMetrics().stringWidth(reset);
+		int buttonGap = gp.tileSize; // Space between buttons
+
+		int totalButtonsWidth = backWidth + resetWidth + buttonGap;
+		int buttonsStartX = (gp.baseWidth - totalButtonsWidth) / 2;
+
+		int backX = buttonsStartX;
+		int resetX = backX + backWidth + buttonGap;
+
+		// Draw "Back" button
+		if (menuControlsCommandNum == total && !waitingForKey) {
+		    g2.setColor(Color.YELLOW);
+		    g2.drawString(">", backX - gp.tileSize / 2, buttonY);
 		}
 		g2.setColor(Color.WHITE);
-		g2.drawString(back, backX, backY + 3 * lineHeight / 4);
+		g2.drawString(back, backX, buttonY);
 
-		// Show waiting for key message
+		// Draw "Reset" button
+		if (menuControlsCommandNum == total + 1 && !waitingForKey) {
+		    g2.setColor(Color.YELLOW);
+		    g2.drawString(">", resetX - gp.tileSize / 2, buttonY);
+		}
+		g2.setColor(Color.WHITE);
+		g2.drawString(reset, resetX, buttonY);
+
 		if (waitingForKey) {
 			g2.setColor(Color.CYAN);
 			String kText = tr("message.press_key");
-			g2.drawString(kText, getXForCenteredText(kText), backY + 3 * lineHeight / 2);
+			int msgX = getXForCenteredText(kText);
+			int msgY = buttonY + 3 * gp.tileSize / 4;
+			g2.drawString(kText, msgX, msgY);
 		}
 
-		// Show duplicate key warning
+		// Show duplicate key warning if needed
 		if (keyBindWarning) {
 			g2.setColor(Color.RED);
 			String warn = tr("message.key_already_assigned");
-			g2.drawString(warn, getXForCenteredText(warn), backY + 3 * lineHeight / 2);
+			int warnX = getXForCenteredText(warn);
+			int warnY = buttonY + 3 * gp.tileSize / 4;
+			g2.drawString(warn, warnX, warnY);
+			// Hide warning after 2 seconds
 			if (System.currentTimeMillis() - keyBindWarningTime > 2000) {
 				keyBindWarning = false;
 			}
@@ -1513,7 +1563,7 @@ public class UI {
 		
 		g2.setColor(Color.WHITE);
 
-		g2.setFont(currentFontBold.deriveFont(Font.BOLD, 48F));
+		g2.setFont(currentFontBold.deriveFont(Font.BOLD,  48F));
 		String text = tr("game_over.title");
 		int textX = getXForCenteredText(text);
 		int textY = gp.tileSize * 2;
@@ -1521,7 +1571,7 @@ public class UI {
 
 		textY += gp.tileSize * 8;
 		g2.setFont(currentFont.deriveFont(Font.PLAIN, 36F));
-		text = tr("game_over.restart");
+			text = tr("game_over.restart");
 		textX = getXForCenteredText(text);
 		g2.drawString(text, textX, textY);
 		if (commandNum == 0) {
@@ -1757,7 +1807,7 @@ public class UI {
 
 		// Title
 		g2.setFont(currentFontBold.deriveFont(Font.BOLD, 48F));
-		String title = tr("skills.title", "Skills");
+		String title = tr("skills.title");
 		int titleX = getXForCenteredText(title);
 		int titleY = frameY + gp.tileSize;
 		g2.setColor(Color.WHITE);
@@ -1767,7 +1817,9 @@ public class UI {
 		String[] keys = {gp.keyConfig.getKeyName(KeyConfig.SKILL1), gp.keyConfig.getKeyName(KeyConfig.SKILL2), gp.keyConfig.getKeyName(KeyConfig.SKILL3), gp.keyConfig.getKeyName(KeyConfig.SKILL4)};
 		int slotSize = gp.tileSize;
 		int slotGap = gp.tileSize / 2;
-		int slotsStartX = titleX - gp.tileSize / 2 - slotGap / 2;
+		// Center the 4 slots horizontally in the skill window:
+		int totalSlotsWidth = 4 * slotSize + 3 * slotGap;
+		int slotsStartX = frameX + (width - totalSlotsWidth) / 2;
 		int slotsY = titleY + gp.tileSize * 3 / 4;
 
 		g2.setFont(currentFontBold.deriveFont(Font.BOLD, 32F));
@@ -1806,7 +1858,7 @@ public class UI {
 		int listY = slotsY + slotSize + gp.tileSize / 2;
 		g2.setFont(currentFontBold.deriveFont(Font.BOLD, 28F));
 		g2.setColor(Color.WHITE);
-		g2.drawString(tr("skills.unlocked", "Unlocked Skills:"), listX, listY);
+		g2.drawString(tr("skills.unlocked"), listX, listY);
 
 		int skillListY = listY + gp.tileSize / 2;
 		g2.setFont(currentFont.deriveFont(Font.PLAIN, 22F));
@@ -1827,12 +1879,12 @@ public class UI {
 		g2.setFont(currentFont.deriveFont(Font.PLAIN, 20F));
 		g2.setColor(Color.YELLOW);
 		if (!assigningSkill) {
-			String instr1 = tr("skills.instruction1", "Select a slot (Q/W/E/R) and press Enter to assign.");
-			String instr2 = tr("skills.instruction2", "Press [ESC] to return.");
+			String instr1 = java.text.MessageFormat.format(tr("skills.instruction1"), gp.keyConfig.getKeyName(KeyConfig.CHOOSE));
+			String instr2 = java.text.MessageFormat.format(tr("skills.instruction2"), gp.keyConfig.getKeyName(KeyConfig.ESCAPE));
 			g2.drawString(instr1, frameX + gp.tileSize, frameY + height - gp.tileSize * 2);
 			g2.drawString(instr2, frameX + gp.tileSize, frameY + height - gp.tileSize);
 		} else {
-			String instr = tr("skills.instruction3", "Select a skill and press Enter to assign. [ESC] to cancel.");
+			String instr = java.text.MessageFormat.format(tr("skills.assign_instruction"), gp.keyConfig.getKeyName(KeyConfig.CHOOSE), gp.keyConfig.getKeyName(KeyConfig.ESCAPE));
 			g2.drawString(instr, frameX + gp.tileSize, frameY + height - gp.tileSize * 2);
 		}
 	}
