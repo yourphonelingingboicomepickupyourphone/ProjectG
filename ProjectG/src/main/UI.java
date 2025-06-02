@@ -1844,7 +1844,7 @@ public class UI {
 
 		// --- Draw objects (optional) ---
 		for (Entity obj : gp.obj[gp.currentMap]) {
-			if (obj != null) {
+			if (obj != null && obj.pickable) {
 				int objMiniX = mapX + (int)(obj.worldX * scaleX);
 				int objMiniY = mapY + (int)(obj.worldY * scaleY);
 				g2.setColor(Color.YELLOW);

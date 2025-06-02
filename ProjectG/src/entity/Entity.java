@@ -340,8 +340,10 @@ public class Entity implements Serializable{
 					}
 
 			g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);		
-			g2.setColor(Color.red);
-			g2.drawRect(screenX + solidAreaDefaultX, screenY + solidAreaDefaultY, solidArea.width, solidArea.height); // debug rectangle
+			if (gp.debugMode) {
+				g2.setColor(Color.red);
+				g2.drawRect(screenX + solidAreaDefaultX, screenY + solidAreaDefaultY, solidArea.width, solidArea.height); // debug rectangle
+			}
 			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 		}
 	}
