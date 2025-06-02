@@ -18,7 +18,11 @@ public class KeyConfig {
     public static final String RESET = "Reset";
     public static final String FLASH = "Flash";
     public static final String QUICK_USE = "QuickUse";
-    public static final String ASSIGN_QUICK_USE = "AssignQuickUse";
+    public static final String SKILLS = "Skills";
+    public static final String SKILL1 = "Skill1"; // Added SKILLS1 binding
+    public static final String SKILL2 = "Skill2"; // Added SKILLS2 binding
+    public static final String SKILL3 = "Skill3"; // Added SKILLS3 binding
+    public static final String SKILL4 = "Skill4"; // Added SKILLS4 binding
 
     private final Map<String, Integer> keyBindings = new HashMap<>();
 
@@ -36,7 +40,11 @@ public class KeyConfig {
         keyBindings.put(RESET, KeyEvent.VK_R);
         keyBindings.put(FLASH, KeyEvent.VK_F); 
         keyBindings.put(QUICK_USE, KeyEvent.VK_D);
-        keyBindings.put(ASSIGN_QUICK_USE, KeyEvent.VK_Q);
+        keyBindings.put(SKILLS, KeyEvent.VK_S); // Added SKILLS binding
+        keyBindings.put(SKILL1, KeyEvent.VK_1); // Default binding for SKILL1
+        keyBindings.put(SKILL2, KeyEvent.VK_2); // Default binding for SKILL2
+        keyBindings.put(SKILL3, KeyEvent.VK_3); // Default binding for SKILL3
+        keyBindings.put(SKILL4, KeyEvent.VK_4); // Default binding for SKILL4
     }
 
     public int getKey(String action) {
@@ -69,6 +77,10 @@ public class KeyConfig {
         keyBindings.put(RESET, KeyEvent.VK_R);
         keyBindings.put(FLASH, KeyEvent.VK_F);
         keyBindings.put(QUICK_USE, KeyEvent.VK_D);
-        keyBindings.put(ASSIGN_QUICK_USE, KeyEvent.VK_Q);
+        keyBindings.put(SKILLS, KeyEvent.VK_S); // Reset SKILLS binding
+        keyBindings.put(SKILL1, KeyEvent.VK_1); // Reset SKILL1 binding
+        keyBindings.put(SKILL2, KeyEvent.VK_2); // Reset SKILL2 binding
+        keyBindings.put(SKILL3, KeyEvent.VK_3); // Reset SKILL3 binding
+        keyBindings.put(SKILL4, KeyEvent.VK_4); // Reset SKILL4 binding
     }
 }

@@ -7,8 +7,6 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import entity.Entity;
-
 public class DataStorage implements Serializable{
 
     private static final long serialVersionUID = 1L;
@@ -31,6 +29,7 @@ public class DataStorage implements Serializable{
 	public int progressionDefenseUpgrades;
 	public int ATTACK_COOLDOWN_MAX;
 	public int FLASH_COOLDOWN_MAX;
+    public int flashCooldown = 0;
 
     public ArrayList<EntitySaveData> inventory = new ArrayList<>();
     public String quickUseItemClass;
@@ -51,6 +50,11 @@ public class DataStorage implements Serializable{
     public EntitySaveData currentArmor;
     public EntitySaveData currentHat;
     public EntitySaveData currentBoots;
+
+    public ArrayList<String> skills = new ArrayList<>();
+    public ArrayList<String> unlockedSkillClassNames = new ArrayList<>();
+    public ArrayList<String> assignedSkillClassNames = new ArrayList<>();
+    public ArrayList<Integer> assignedSkillCooldowns = new ArrayList<>();
 
     
     public void savePlayerData(DataStorage data) {

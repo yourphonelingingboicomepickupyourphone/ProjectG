@@ -13,19 +13,19 @@ import item.ITEM_Staff_Normal;
 import item.ITEM_Sword_Normal;
 import main.GamePanel;
 
-public class MON_rSlime extends Entity{
+public class MON_skeleton extends Entity{
 
     int baseEXP = 400; // Base experience points for the monster
     int baseHeath = 200; // Base health for the monster
     int baseAttack = 100; // Base mana for the monster
 
-    public MON_rSlime(GamePanel gp) {
+    public MON_skeleton(GamePanel gp) {
         this(gp, 1); // Default to level 1 if not specified
     }
     
-    public MON_rSlime(GamePanel gp, int lv) {
+    public MON_skeleton(GamePanel gp, int lv) {
         super(gp);
-        name = "Red Slime";
+        name = "Skeleton";
         type = 1;
         
         level = lv; // Set the level of the monster

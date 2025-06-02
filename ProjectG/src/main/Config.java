@@ -33,7 +33,7 @@ public class Config {
     }
 
     public void loadConfig() {
-        File file = new File("config.txt");
+        File file = new File("config.cfg");
         if (!file.exists()) return;
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;

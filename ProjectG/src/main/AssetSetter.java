@@ -6,6 +6,7 @@ import entity.Entity;
 import entity.NPC_Wizard;
 import item.ITEM_Dual_Blade_Axe;
 import item.ITEM_Mini_Health_Potion;
+import item.ITEM_Mini_Mana_Potion;
 import item.ITEM_Spear_Normal;
 import item.ITEM_Sword_Normal;
 import item.ITEM_Armor_Normal;
@@ -96,7 +97,7 @@ public class AssetSetter {
 		gp.obj[map][i].worldY = gp.tileSize * 62;
 		i++;
 
-		gp.obj[map][i] = new ITEM_Mini_Health_Potion(gp);
+		gp.obj[map][i] = new ITEM_Mini_Mana_Potion(gp);
 		gp.obj[map][i].worldX = gp.tileSize * 54;
 		gp.obj[map][i].worldY = gp.tileSize * 65;
 		i++;
@@ -115,8 +116,16 @@ public class AssetSetter {
 
 
 	public void setNPC() {
-		int map = 1;
+		int map = 0;
 		int i = 0;
+
+		gp.npc[map][i] = new NPC_Wizard(gp);
+		gp.npc[map][i].worldX = gp.tileSize * 50;
+		gp.npc[map][i].worldY = gp.tileSize * 46;
+		i++;
+
+		map = 1;
+		i = 0;
 		gp.npc[map][i] = new NPC_Wizard(gp);
 		gp.npc[map][i].worldX = gp.tileSize * 51;
 		gp.npc[map][i].worldY = gp.tileSize * 80;
