@@ -942,7 +942,6 @@ public class UI {
 		    g2.setFont(g2.getFont().deriveFont(Font.BOLD, 32F));
 		    g2.drawString(selectedItem.name, infoX + 24, infoY + 40);
 
-		    // --- Auto-fit description ---
 		    String desc = selectedItem.description;
 		    int descX = infoX + 24;
 		    int descY = infoY + 80;
@@ -964,6 +963,8 @@ public class UI {
 		        fontSize--;
 		    } while ((totalHeight > maxDescHeight) && fontSize > 10);
 
+		    // Now use the final font size and line height
+		    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, (float)(fontSize + 1)));
 		    int lineHeight = g2.getFontMetrics().getHeight();
 		    for (String line : lines) {
 		        g2.drawString(line, descX, descY);
@@ -1116,19 +1117,18 @@ public class UI {
 		    selectedItem = chest.chestInventory.get(selectedIndex);
 		}
 
-		// Draw selected item's name and info below the grid
 		// Calculate info area position (always, so variables are in scope)
 		int infoX = frameX + gp.tileSize / 2;
 		int infoWidth = width - gp.tileSize;
 		int infoHeight = gp.tileSize * 3 + gp.tileSize / 2;
 
-		// Clamp info box to not go beyond the inventory window
+		// Clamp info box to not go beyond the chest window
 		if (infoX + infoWidth > frameX + width - 8) {
 		    infoWidth = frameX + width - 8 - infoX;
 		}
 
 		// Don't let info box overlap character window
-		int characterWindowX = gp.tileSize * 13;
+		int characterWindowX = gp.tileSize * 26 + gp.tileSize / 2;
 		if (infoX + infoWidth > characterWindowX - 8) {
 		    infoWidth = characterWindowX - 8 - infoX;
 		}
@@ -1143,17 +1143,17 @@ public class UI {
 		    if (infoY < frameY + 8) infoY = frameY + 8;
 		}
 
-		// Draw info background
+		// Draw info background (subwindow)
 		g2.setColor(new Color(40, 40, 40, 220));
 		g2.fillRoundRect(infoX, infoY, infoWidth, infoHeight, 20, 20);
 
 		if (selectedItem != null) {
-		    // Draw selected item's name and info below the grid
+		    // Draw selected item's name
 		    g2.setColor(Color.WHITE);
 		    g2.setFont(g2.getFont().deriveFont(Font.BOLD, 32F));
 		    g2.drawString(selectedItem.name, infoX + 24, infoY + 40);
 
-		    // --- Auto-fit description ---
+		    // --- Auto-fit description (same as inventory) ---
 		    String desc = selectedItem.description;
 		    int descX = infoX + 24;
 		    int descY = infoY + 80;
@@ -1175,6 +1175,8 @@ public class UI {
 		        fontSize--;
 		    } while ((totalHeight > maxDescHeight) && fontSize > 10);
 
+		    // Now use the final font size and line height
+		    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, (float)(fontSize + 1)));
 		    int lineHeight = g2.getFontMetrics().getHeight();
 		    for (String line : lines) {
 		        g2.drawString(line, descX, descY);

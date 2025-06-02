@@ -40,6 +40,9 @@ public class AssetSetter {
 		gp.obj[map][i] = new OBJ_Chest(gp);
 		gp.obj[map][i].worldX = gp.tileSize * 47;
 		gp.obj[map][i].worldY = gp.tileSize * 50;
+		OBJ_Chest chest = (OBJ_Chest) gp.obj[map][i];
+		chest.chestInventory.add(new ITEM_Mini_Health_Potion(gp));
+		chest.chestInventory.add(new ITEM_Mini_Mana_Potion(gp));
 		i++;
 		gp.obj[map][i] = new ITEM_Sword_Normal(gp);
 		gp.obj[map][i].worldX = gp.tileSize * 50;
