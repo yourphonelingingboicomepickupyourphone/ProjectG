@@ -8,6 +8,7 @@ import item.ITEM_Dual_Blade_Axe;
 import item.ITEM_Mini_Health_Potion;
 import item.ITEM_Mini_Mana_Potion;
 import item.ITEM_Spear_Normal;
+import item.ITEM_Staff_Normal;
 import item.ITEM_Sword_Normal;
 import item.ITEM_Armor_Normal;
 import item.ITEM_Better_Armor;
@@ -49,8 +50,12 @@ public class AssetSetter {
 		gp.obj[map][i].worldY = gp.tileSize * 47;
 		i++;
 		gp.obj[map][i] = new ITEM_Spear_Normal(gp);
-		gp.obj[map][i].worldX = gp.tileSize * 50;
-		gp.obj[map][i].worldY = gp.tileSize * 51;
+		gp.obj[map][i].worldX = gp.tileSize * 48;
+		gp.obj[map][i].worldY = gp.tileSize * 47;
+		i++;
+		gp.obj[map][i] = new ITEM_Staff_Normal(gp);
+		gp.obj[map][i].worldX = gp.tileSize * 46;
+		gp.obj[map][i].worldY = gp.tileSize * 47;
 		i++;
 
 		map = 1;

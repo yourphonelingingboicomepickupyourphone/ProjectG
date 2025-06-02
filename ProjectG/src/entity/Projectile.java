@@ -17,12 +17,11 @@ public class Projectile extends Entity {
         this.direction = direction;
         this.alive = alive;
         this.user = user;
-        this.attackRange = 0;
-        this.speed = 5;
-
+        this.attackRange = 4 * gp.tileSize; //attack range in tiles
     }
 
     public void update(){
+        System.out.println("Projectile update: " + this.getClass().getName() + " alive=" + alive + " pos=" + worldX + "," + worldY);
         if (user == gp.player){
             int monsterIndex = gp.cChecker.checkEntity(this, gp.monster);
             if (monsterIndex != -999) {

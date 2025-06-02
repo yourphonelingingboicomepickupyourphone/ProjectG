@@ -424,10 +424,32 @@ public class Player extends Entity{
 
 		if (keyH.spacePressed == true && attackCooldown == 0 && this.currentWeapon != null && 
 				!attackCancel) {
-			attacking = true;
-			attackCooldown = ATTACK_COOLDOWN_MAX; // Reset cooldown
-			keyH.spacePressed = false;
-			return;
+			int hitboxType = currentWeapon.weaponType;
+			if (hitboxType == 4) { // Staff
+				int manaCost = 20;
+				if (mana >= manaCost) {
+					mana -= manaCost;
+					projectile.PROJECTILE_Fire_Ball fireball = new projectile.PROJECTILE_Fire_Ball(gp);
+					int px = this.worldX;
+					int py = this.worldY;
+					fireball.set(px, py, direction, true, this);
+					System.out.println("Creating fireball at: " + px + "," + py + " dir=" + direction);
+					System.out.println("projectileList size before: " + gp.projectileList.size());
+					gp.projectileList.add(fireball);
+					System.out.println("projectileList size after: " + gp.projectileList.size());
+					attacking = true;
+					attackCooldown = ATTACK_COOLDOWN_MAX;
+				} else {
+					gp.ui.addMessage(gp.ui.tr("message.not_enough_mana"));
+				}
+				keyH.spacePressed = false;
+				return;
+			} else {
+				attacking = true;
+				attackCooldown = ATTACK_COOLDOWN_MAX;
+				keyH.spacePressed = false;
+				return;
+			}
 		}
 		
 		if (collisionRecoilCounter > 0) {
@@ -529,8 +551,12 @@ public class Player extends Entity{
 
 		if (currentWeapon != null && currentWeapon.weaponType == 4 && keyH.enterPressed == true) {
 			// Fireball attack
-			projectile.set(worldX, worldY, direction, true, this);
-			gp.projectileList.add(projectile);
+			// projectile.PROJECTILE_Fire_Ball fireball = new projectile.PROJECTILE_Fire_Ball(gp);
+			// int px = worldX + gp.tileSize; // Center X (player is 2 tiles wide)
+			// int py = worldY + gp.tileSize; // Center Y
+			// fireball.set(px, py, direction, true, this);
+			// gp.projectileList.add(fireball);
+			// keyH.spacePressed = false; // Prevent continuous firing
 		}
 
 		if (invincible == true) {
@@ -767,6 +793,23 @@ public class Player extends Entity{
 						}
 					}
 				}
+			}
+			if (hitboxType == 4){
+				// int manaCost = 20;
+				// System.out.println("Current mana: " + mana + ", manaCost: " + manaCost + ", attackCooldown: " + attackCooldown);
+				// if (mana >= manaCost && attackCooldown == 0) {
+				// 	mana -= manaCost;
+				// 	projectile.PROJECTILE_Fire_Ball fireball = new projectile.PROJECTILE_Fire_Ball(gp);
+				// 	int px = worldX + gp.tileSize;
+				// 	int py = worldY + gp.tileSize;
+				// 	fireball.set(px, py, direction, true, this);
+				// 	gp.projectileList.add(fireball);
+				// 	attackCooldown = ATTACK_COOLDOWN_MAX; // Prevent spamming
+				// 	// Optionally: play fireball sound here
+				// } else {
+				// 	System.out.println("Not enough mana or attackCooldown not zero!");
+				// 	gp.ui.addMessage(gp.ui.tr("message.not_enough_mana"));
+				// }
 			}
 
 			

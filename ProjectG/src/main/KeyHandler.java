@@ -218,20 +218,20 @@ public class KeyHandler implements KeyListener{
 						java.awt.Window win = javax.swing.SwingUtilities.getWindowAncestor(gp);
 						java.awt.GraphicsDevice gd = java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 						if (win instanceof javax.swing.JFrame) {
-						 javax.swing.JFrame frame = (javax.swing.JFrame) win;
-						 if (gp.ui.fullscreenOn) {
-						 frame.dispose();
-						 frame.setUndecorated(true);
-						 frame.setResizable(false);
-						 frame.setVisible(true);
-						 gd.setFullScreenWindow(frame);
-						 } else {
-						 gd.setFullScreenWindow(null);
-						 frame.dispose();
-						 frame.setUndecorated(false);
-						 frame.setResizable(true);
-						 frame.setVisible(true);
-						 }
+							javax.swing.JFrame frame = (javax.swing.JFrame) win;
+							if (gp.ui.fullscreenOn) {
+								frame.dispose();
+								frame.setUndecorated(true);
+								frame.setResizable(false);
+								frame.setVisible(true);
+								gd.setFullScreenWindow(frame);
+							} else {
+								gd.setFullScreenWindow(null);
+								frame.dispose();
+								frame.setUndecorated(false);
+								frame.setResizable(true);
+								frame.setVisible(true);
+							}
 						}
 						break;
 					case 4: // Back

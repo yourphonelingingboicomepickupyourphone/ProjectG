@@ -228,29 +228,27 @@ public class GamePanel extends JPanel implements Runnable{
 		} else {
 			tileM.draw(g2);	//tile draw
 
-			entityList.add(player);	//add player to entity list
+			// Add all entities and projectiles to entityList
+			entityList.add(player);
 
 			for(int i = 0; i < obj[currentMap].length; i++) {
 				if(obj[currentMap][i] != null) {
-					entityList.add(obj[currentMap][i]);	//add object to entity list
+					entityList.add(obj[currentMap][i]);
 				}
 			}
-
 			for(int i = 0; i < npc[currentMap].length; i++) {
 				if(npc[currentMap][i] != null) {
-					entityList.add(npc[currentMap][i]);	//add NPC to entity list
+					entityList.add(npc[currentMap][i]);
 				}
 			}
-
 			for(int i = 0; i < monster[currentMap].length; i++) {
 				if(monster[currentMap][i] != null) {
-					entityList.add(monster[currentMap][i]);	//add monster to entity list
+					entityList.add(monster[currentMap][i]);
 				}
 			}
-
 			for (int i = 0; i < projectileList.size(); i++) {
 				if (projectileList.get(i) != null) {
-					entityList.add(projectileList.get(i));	//add projectile to entity list
+					entityList.add(projectileList.get(i));
 				}
 			}
 
@@ -258,19 +256,24 @@ public class GamePanel extends JPanel implements Runnable{
 			Collections.sort(entityList, new Comparator<Entity>() {
 				@Override
 				public int compare(Entity e1, Entity e2) {
-					if (e1.renderLayer != e2.renderLayer) {	//compare the render layer of two entities
-						return Integer.compare(e1.renderLayer, e2.renderLayer);	//compare the render layer of two entities
+					if (e1.renderLayer != e2.renderLayer) {
+						return Integer.compare(e1.renderLayer, e2.renderLayer);
 					}
-					return Integer.compare(e1.worldY, e2.worldY);	//compare the Y coordinate of two entities
+					return Integer.compare(e1.worldY, e2.worldY);
 				}
 			});
 
-			//Draw entities
+			//Draw entities (including projectiles)
 			for(int i = 0; i < entityList.size(); i++) {
-				entityList.get(i).draw(g2);	//draw each entity in the list
+				entityList.get(i).draw(g2);
 			}
 
-			entityList.clear();	//clear the entity list for next time
+			System.out.println("entityList contents:");
+			for (Entity e : entityList) {
+			    System.out.println(" - " + e.getClass().getName() + " alive=" + e.alive);
+			}
+
+			entityList.clear(); //clear the entity list for next time
 			
 			ui.draw(g2);	//ui
 		}
