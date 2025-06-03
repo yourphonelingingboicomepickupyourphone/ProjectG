@@ -268,11 +268,6 @@ public class GamePanel extends JPanel implements Runnable{
 				entityList.get(i).draw(g2);
 			}
 
-			System.out.println("entityList contents:");
-			for (Entity e : entityList) {
-			    System.out.println(" - " + e.getClass().getName() + " alive=" + e.alive);
-			}
-
 			entityList.clear(); //clear the entity list for next time
 			
 			ui.draw(g2);	//ui
