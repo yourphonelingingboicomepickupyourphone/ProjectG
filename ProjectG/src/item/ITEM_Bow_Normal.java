@@ -12,6 +12,16 @@ public class ITEM_Bow_Normal extends Entity {
         itemType = 0;
         level = 1;
         down1 = setup("/items/normal_bow");
+
+        attackUp1 = setup("/player/attack_bow_up_1");
+        attackUp2 = setup("/player/attack_bow_up_2");
+        attackDown1 = setup("/player/attack_bow_down_1");
+        attackDown2 = setup("/player/attack_bow_down_2");
+        attackLeft1 = setup("/player/attack_bow_left_1");
+        attackLeft2 = setup("/player/attack_bow_left_2");
+        attackRight1 = setup("/player/attack_bow_right_1");
+        attackRight2 = setup("/player/attack_bow_right_2");
+
         attackBonus = 10;
         cooldownBonus = 10; //time in ms to wait before the
         // next attack
