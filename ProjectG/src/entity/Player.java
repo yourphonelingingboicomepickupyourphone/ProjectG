@@ -613,6 +613,22 @@ public class Player extends Entity{
                 }
 			}
 		}
+
+		if (keyH.enterPressed) {
+			for (int i = 0; i < gp.obj[gp.currentMap].length; i++) {
+				Entity obj = gp.obj[gp.currentMap][i];
+				if (obj != null && obj instanceof object.OBJ_Fountain && this.alive) {
+					// Check if player is adjacent or overlapping
+					Rectangle playerArea = new Rectangle(worldX + solidArea.x, worldY + solidArea.y, solidArea.width, solidArea.height);
+					Rectangle objArea = new Rectangle(obj.worldX + obj.solidArea.x, obj.worldY + obj.solidArea.y, obj.solidArea.width, obj.solidArea.height);
+					if (playerArea.intersects(objArea)) {
+						((object.OBJ_Fountain)obj).interact();
+						break;
+					}
+				}
+			}
+			keyH.enterPressed = false; // Prevent repeat
+		}
 	}
 	
 	public void attacking(){

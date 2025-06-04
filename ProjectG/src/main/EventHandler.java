@@ -57,10 +57,6 @@ public class EventHandler {
 
             // }
 
-            // if (hit(1, 23, 28, "any") == true) {
-            //     useFountain(23, 28, gp.dialogueState);
-
-            // }
             if (hit(0, 50, 57, "any")) {
                 teleport(1, 50, 50); // Teleport to map 1 at coordinates (50, 50)
             }
@@ -100,21 +96,6 @@ public class EventHandler {
         gp.player.health -= 50; // Decrease player's health by 10
         gp.keyH.enterPressed = false; // Reset the enter key press
         canTouchEvent = false; // Prevent further event triggering until the player moves
-    }
-
-    public void useFountain(int gameState) {
-        gp.gameState = gameState;
-        if (gp.keyH.enterPressed == true) {
-            gp.gameState = gp.dialogueState;
-            gp.ui.currentDialogue = "You feel refreshed!";
-            gp.player.health = gp.player.maxHealth; // Heal the player to max health
-            gp.player.mana = gp.player.maxMana; // Restore mana to max
-            gp.keyH.enterPressed = false; // Reset the enter key press
-            canTouchEvent = false; // Prevent further event triggering until the player moves
-            System.out.println("Fountain used");
-        }
-        
-        gp.keyH.enterPressed = false;
     }
 
     public void teleport(int map, int col, int row) {

@@ -15,6 +15,7 @@ import item.ITEM_Better_Armor;
 import item.ITEM_Door_Key;
 import monster.MON_rSlime;
 import object.OBJ_Chest;
+import object.OBJ_Fountain;
 // import object.OBJ_Chest;
 // import object.OBJ_Chest_Locked;
 // import object.OBJ_Door_Closed;
@@ -118,6 +119,11 @@ public class AssetSetter {
 		gp.obj[map][i] = new ITEM_Better_Armor(gp);
 		gp.obj[map][i].worldX = gp.tileSize * 50;
 		gp.obj[map][i].worldY = gp.tileSize * 68;
+		i++;
+
+		gp.obj[map][i] = new OBJ_Fountain(gp);
+		gp.obj[map][i].worldX = gp.tileSize * 50;
+		gp.obj[map][i].worldY = gp.tileSize * 47;
 		i++;
 
 	}
