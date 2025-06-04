@@ -432,11 +432,14 @@ public class Player extends Entity{
 					projectile.PROJECTILE_Fire_Ball fireball = new projectile.PROJECTILE_Fire_Ball(gp);
 					int px = this.worldX;
 					int py = this.worldY;
+					switch (direction) {
+						case "up":    py -= gp.tileSize; break;
+						case "down":  py += gp.tileSize; break;
+						case "left":  px -= gp.tileSize; break;
+						case "right": px += gp.tileSize; break;
+					}
 					fireball.set(px, py, direction, true, this);
-					System.out.println("Creating fireball at: " + px + "," + py + " dir=" + direction);
-					System.out.println("projectileList size before: " + gp.projectileList.size());
 					gp.projectileList.add(fireball);
-					System.out.println("projectileList size after: " + gp.projectileList.size());
 					attacking = true;
 					attackCooldown = ATTACK_COOLDOWN_MAX;
 				} else {
@@ -484,14 +487,16 @@ public class Player extends Entity{
 			int npcIndex = gp.cChecker.checkEntity(this, gp.npc);
 
 			if (keyH.enterPressed == true) {
-				if (objIndex != 999) {
-					if (gp.obj[gp.currentMap][objIndex] != null && gp.obj[gp.currentMap][objIndex].name.equals("Chest")) {
+				objIndex = gp.cChecker.checkObject(this, true);
+				if (objIndex != 999 && gp.obj[gp.currentMap][objIndex] != null) {
+					Entity obj = gp.obj[gp.currentMap][objIndex];
+					if (obj instanceof object.OBJ_Fountain) {
+						((object.OBJ_Fountain)obj).interact();
+					} else if (obj.name.equals("Chest")) {
 						interactChest(objIndex);
 					} else {
 						pickUpObject(objIndex);
 					}
-				} else if (npcIndex != 999) {
-					interactNPC(npcIndex);
 				}
 				keyH.enterPressed = false;
 			}
@@ -615,19 +620,18 @@ public class Player extends Entity{
 		}
 
 		if (keyH.enterPressed) {
-			for (int i = 0; i < gp.obj[gp.currentMap].length; i++) {
-				Entity obj = gp.obj[gp.currentMap][i];
-				if (obj != null && obj instanceof object.OBJ_Fountain && this.alive) {
-					// Check if player is adjacent or overlapping
-					Rectangle playerArea = new Rectangle(worldX + solidArea.x, worldY + solidArea.y, solidArea.width, solidArea.height);
-					Rectangle objArea = new Rectangle(obj.worldX + obj.solidArea.x, obj.worldY + obj.solidArea.y, obj.solidArea.width, obj.solidArea.height);
-					if (playerArea.intersects(objArea)) {
-						((object.OBJ_Fountain)obj).interact();
-						break;
-					}
+			int objIndex = gp.cChecker.checkObject(this, true);
+			if (objIndex != 999 && gp.obj[gp.currentMap][objIndex] != null) {
+				Entity obj = gp.obj[gp.currentMap][objIndex];
+				if (obj instanceof object.OBJ_Fountain) {
+					((object.OBJ_Fountain)obj).interact();
+				} else if (obj.name.equals("Chest")) {
+					interactChest(objIndex);
+				} else {
+					pickUpObject(objIndex);
 				}
 			}
-			keyH.enterPressed = false; // Prevent repeat
+			keyH.enterPressed = false;
 		}
 	}
 	
@@ -641,7 +645,7 @@ public class Player extends Entity{
 		if (spriteCounter > 5 && spriteCounter <= 25){
 			spriteNum = 2;
 
-			int range = 1;
+			int range = 4;
 			int hitboxType = 0;
 			if (currentWeapon != null) {
 				range = currentWeapon.attackRange;

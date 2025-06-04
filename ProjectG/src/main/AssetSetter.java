@@ -155,7 +155,7 @@ public class AssetSetter {
 	public void setMonster() {
 		int map = 1;
 		int i = 0;
-		spawnRandomMonstersInArea(map, 45, 45, 55, 55, 2);
+		spawnRandomMonstersInArea(map, 45, 45, 55, 55, 5);
 	}
 
 	public void spawnRandomMonstersInArea(int map, int startCol, int startRow, int endCol, int endRow, int monsterCount) {

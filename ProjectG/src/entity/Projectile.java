@@ -1,5 +1,7 @@
 package entity;
 
+import java.awt.Graphics2D;
+
 import main.GamePanel;
 
 public class Projectile extends Entity {
@@ -61,6 +63,14 @@ public class Projectile extends Entity {
         }
     }
 
+    @Override
+    public void draw(Graphics2D g2) {
+        int screenX = worldX - gp.player.worldX + gp.player.screenX;
+        int screenY = worldY - gp.player.worldY + gp.player.screenY;
+        System.out.println("Drawing projectile at screen: " + screenX + "," + screenY + " alive=" + alive);
 
+        g2.setColor(java.awt.Color.RED);
+        g2.fillRect(screenX, screenY, gp.tileSize, gp.tileSize);
+    }
 
 }

@@ -13,6 +13,7 @@ public class ITEM_Staff_Normal extends Entity {
         itemType = 0;
         level = 1;
         down1 = setup("/items/normal_staff");
+        attackRange = 4; //attack range in tiles
 
         //Attack animation
         attackUp1 = setup("/player/attack_staff_up_1");

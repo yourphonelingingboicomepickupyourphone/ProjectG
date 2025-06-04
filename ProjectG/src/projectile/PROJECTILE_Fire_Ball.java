@@ -36,6 +36,9 @@ public class PROJECTILE_Fire_Ball extends Projectile {
         int screenY = worldY - gp.player.worldY + gp.player.screenY;
         System.out.println("Drawing projectile at screen: " + screenX + "," + screenY + " alive=" + alive);
 
+        g2.setColor(java.awt.Color.RED);
+        g2.fillRect(screenX, screenY, gp.tileSize, gp.tileSize);
+
         // Debug: Draw a red square if image is null
         if (up1 == null) {
             g2.setColor(java.awt.Color.RED);
