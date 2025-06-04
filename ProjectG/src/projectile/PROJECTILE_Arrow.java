@@ -14,6 +14,7 @@ public class PROJECTILE_Arrow extends Projectile{
         this.gp = gp;
 
         name = "Fire Ball";
+        alive = true;
         speed = 8;
         attackBonus = 50;
         manaCost = 50;
@@ -36,20 +37,27 @@ public class PROJECTILE_Arrow extends Projectile{
     public void draw(Graphics2D g2) {
         int screenX = worldX - gp.player.worldX + gp.player.screenX;
         int screenY = worldY - gp.player.worldY + gp.player.screenY;
-        System.out.println("Drawing projectile at screen: " + screenX + "," + screenY + " alive=" + alive);
 
-        // Debug: Draw a red square if image is null
-        if (up1 == null) {
+        BufferedImage image = null;
+        switch (direction) {
+            case "up":
+                image = (spriteNum == 1) ? up1 : up2;
+                break;
+            case "down":
+                image = (spriteNum == 1) ? down1 : down2;
+                break;
+            case "left":
+                image = (spriteNum == 1) ? left1 : left2;
+                break;
+            case "right":
+                image = (spriteNum == 1) ? right1 : right2;
+                break;
+        }
+
+        if (image == null) {
             g2.setColor(java.awt.Color.RED);
             g2.fillRect(screenX, screenY, gp.tileSize, gp.tileSize);
         } else {
-            BufferedImage image = null;
-            switch (direction) {
-                case "up": image = up1; break;
-                case "down": image = down1; break;
-                case "left": image = left1; break;
-                case "right": image = right1; break;
-            }
             g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
         }
     }

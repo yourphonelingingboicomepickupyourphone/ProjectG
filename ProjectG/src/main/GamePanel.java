@@ -192,6 +192,7 @@ public class GamePanel extends JPanel implements Runnable{
 					}
 					if (projectileList.get(i).alive == false) {
 						projectileList.remove(i);
+						i--;
 					}
 				}
 			}	//Projectile update

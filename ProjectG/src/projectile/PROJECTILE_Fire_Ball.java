@@ -12,6 +12,7 @@ public class PROJECTILE_Fire_Ball extends Projectile {
         this.gp = gp;
 
         name = "Fire Ball";
+        alive = true;
         speed = 8;
         attackBonus = 50;
         manaCost = 50;
