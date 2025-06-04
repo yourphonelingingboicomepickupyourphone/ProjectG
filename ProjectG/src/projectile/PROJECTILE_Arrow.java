@@ -3,11 +3,13 @@ package projectile;
 import entity.Projectile;
 import main.GamePanel;
 
+
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-public class PROJECTILE_Fire_Ball extends Projectile {
-    public PROJECTILE_Fire_Ball(GamePanel gp) {
+public class PROJECTILE_Arrow extends Projectile{
+
+        public PROJECTILE_Arrow(GamePanel gp) {
         super(gp);
         this.gp = gp;
 
@@ -21,14 +23,14 @@ public class PROJECTILE_Fire_Ball extends Projectile {
     }
 
     public void getImage() {
-        up1 = setup("/projectiles/fireball_up_1");
-        up2 = setup("/projectiles/fireball_up_2");
-        down1 = setup("/projectiles/fireball_down_1");
-        down2 = setup("/projectiles/fireball_down_2");
-        left1 = setup("/projectiles/fireball_left_1");
-        left2 = setup("/projectiles/fireball_left_2");
-        right1 = setup("/projectiles/fireball_right_1");
-        right2 = setup("/projectiles/fireball_right_2");
+        up1 = setup("/projectiles/arrow");
+        up2 = setup("/projectiles/arrow");
+        down1 = setup("/projectiles/arrow");
+        down2 = setup("/projectiles/arrow");
+        left1 = setup("/projectiles/arrow");
+        left2 = setup("/projectiles/arrow");
+        right1 = setup("/projectiles/arrow");
+        right2 = setup("/projectiles/arrow");
     }
 
     @Override
