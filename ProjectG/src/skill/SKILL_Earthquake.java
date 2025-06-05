@@ -13,9 +13,9 @@ public class SKILL_Earthquake implements Skill {
     private BufferedImage icon;
     
     private int manaCost = 100;
-    private int cooldownMax = 600; // 10 seconds at 60 FPS
+    private int cooldownMax = 4800; // 180 seconds at 60 FPS
     private int cooldown = 0;
-    private int levelRequirement = 5;
+    private int levelRequirement = 1;
 
     public String getName(GamePanel gp) { return gp.ui.tr("skill.earthquake.name"); }
     public String getDescription(GamePanel gp) { return gp.ui.tr("skill.earthquake.description"); }
@@ -54,6 +54,25 @@ public class SKILL_Earthquake implements Skill {
     }
 
     public void applyEffect(GamePanel gp, Player player) {
-        // No-op for dash, effect is handled in use() and tickDash()
+        player.skillAnimating = true;
+        player.skillAnimCounter = 0;
+        player.skillAnimFrame = 0;
+
+        int waveCount = 4;
+        int baseRadius = gp.tileSize;
+        int damage = 100;
+        int delayBetweenWaves = 10; // 20 frames between waves
+
+        // Calculate player center
+        int centerX = player.worldX + player.solidArea.x + player.solidArea.width / 2;
+        int centerY = player.worldY + player.solidArea.y + player.solidArea.height / 2;
+
+        for (int i = 1; i <= waveCount; i++) {
+            int radius = baseRadius * i;
+            int delay = 60 + delayBetweenWaves * (i - 1); // 60 frames for first wave
+            player.pendingEarthquakeWaves.add(new Player.PendingWave(delay, radius, damage));
+        }
+        player.earthquakeWaveCenterX = centerX;
+        player.earthquakeWaveCenterY = centerY;
     }
 }

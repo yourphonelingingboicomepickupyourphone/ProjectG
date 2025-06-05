@@ -120,7 +120,7 @@ public class Entity implements Serializable{
 	//Monster attributes
 	public int expReward;
 	public int timeSinceLastHit = 0; // in frames
-	public int healDelay = 300; // 5 seconds at 60fps
+	public int healDelay = 600; // 10 seconds at 60fps
 
 
 	public Entity(GamePanel gp) {

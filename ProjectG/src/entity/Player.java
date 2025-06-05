@@ -8,6 +8,10 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
+
+import javax.imageio.ImageIO;
 
 import data.DataStorage;
 import data.EntitySaveData;
@@ -55,6 +59,16 @@ public class Player extends Entity{
 	public ArrayList<Skill> unlockedSkills = new ArrayList<>();
 	public Skill[] assignedSkills = new Skill[4];
 	public int selectedSkillIndex = 0;
+
+	public boolean skillAnimating = false;
+	public int skillAnimCounter = 0;
+	public int skillAnimFrame = 0;
+	public BufferedImage[] earthquakeAnimFrames; // For Earthquake animation
+
+	public Queue<PendingWave> pendingEarthquakeWaves = new LinkedList<>();
+
+	public int earthquakeWaveCenterX = 0;
+	public int earthquakeWaveCenterY = 0;
 
 	public Player(GamePanel gp, KeyHandler kH) {
 
@@ -638,6 +652,37 @@ public class Player extends Entity{
 			}
 			keyH.enterPressed = false;
 		}
+		
+		//Check skill animation
+		if (skillAnimating) {
+			skillAnimCounter++;
+			if (skillAnimCounter < 60) {
+				// Show the 1st frame for the first 60 ticks (1 second)
+				skillAnimFrame = 0;
+			} else {
+				// After 60 ticks, keep showing the 2nd frame
+				skillAnimFrame = 1;
+			}
+			// End animation when all pending waves are done
+			if (pendingEarthquakeWaves.isEmpty()) {
+				skillAnimating = false;
+				skillAnimFrame = 0;
+			}
+		}
+
+		if (!pendingEarthquakeWaves.isEmpty()) {
+            Player.PendingWave wave = pendingEarthquakeWaves.peek();
+            wave.delay--;
+            if (wave.delay <= 0) {
+                effect.EFFECT_EarthquakeWave newWave = new effect.EFFECT_EarthquakeWave(
+                    gp, earthquakeWaveCenterX, earthquakeWaveCenterY, wave.radius, wave.damage
+                );
+                gp.projectileList.add(newWave);
+                pendingEarthquakeWaves.poll(); // Remove this wave from the queue
+            }
+        }
+
+		return;
 	}
 	
 	public void attacking(){
@@ -1053,6 +1098,11 @@ public class Player extends Entity{
 		if (invincible == true){
 			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.6f));	
 		}
+
+		if (skillAnimating && earthquakeAnimFrames != null && earthquakeAnimFrames[skillAnimFrame] != null) {
+			g2.drawImage(earthquakeAnimFrames[skillAnimFrame], x, y, gp.tileSize * 2, gp.tileSize * 2, null);
+			return; // Skip drawing normal sprite if animating
+		}
 		// Draw image with scaling
     	g2.drawImage(image, x, y, gp.tileSize * 2, gp.tileSize * 2, null); // 160x160 final size
 
@@ -1355,7 +1405,7 @@ public class Player extends Entity{
 	    unlockedSkills.add(new skill.SKILL_Fireball(this.gp));
 	    unlockedSkills.add(new skill.SKILL_Fireball(this.gp));
 	    unlockedSkills.add(new skill.SKILL_Dash(this.gp));
-	    unlockedSkills.add(new skill.SKILL_Fireball(this.gp));
+	    unlockedSkills.add(new skill.SKILL_Earthquake(this.gp));
 	    // ...add more as needed
 
 	    // Assign default skills to Q/W/E/R (indices 0-3)
@@ -1363,6 +1413,15 @@ public class Player extends Entity{
 	    assignedSkills[1] = unlockedSkills.get(1); // W
 	    assignedSkills[2] = unlockedSkills.get(2); // E
 	    assignedSkills[3] = unlockedSkills.get(3); // R
+
+		try {
+			earthquakeAnimFrames = new BufferedImage[2]; // Adjust the number to your frame count
+			for (int i = 0; i < 2; i++) {
+				earthquakeAnimFrames[i] = ImageIO.read(getClass().getResourceAsStream("/player/earthquake_anim_" + (i+1) + ".png"));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	// Use the skill assigned to a specific key (Q/W/E/R)
@@ -1393,5 +1452,16 @@ public class Player extends Entity{
 				assignedSkills[keyIndex] = skill;
 			}
 		}
+	}
+
+	public static class PendingWave {
+	    public int delay;
+	    public int radius;
+	    public int damage;
+	    public PendingWave(int delay, int radius, int damage) {
+	        this.delay = delay;
+	        this.radius = radius;
+	        this.damage = damage;
+	    }
 	}
 }

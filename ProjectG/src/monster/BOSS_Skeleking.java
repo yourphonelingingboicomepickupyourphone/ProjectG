@@ -11,6 +11,12 @@ public class BOSS_Skeleking extends Entity {
 
     private BufferedImage down3, down4, down5, down6;
 
+    private boolean slapWarningActive = false;
+    private int slapWarningTimer = 0;
+    private int slapWarningDuration = 40; // frames to show warning
+    private int slapDamage = 100;
+    private int slapTargetX, slapTargetY;
+
     public BOSS_Skeleking(GamePanel gp) {
         super(gp);
 
@@ -55,8 +61,27 @@ public class BOSS_Skeleking extends Entity {
                 
             }
         } else if (phase == 2) {
-            // Second phase actions
-            
+            // --- Boss Slap Logic with Warning (only in phase 2) ---
+            if (!slapWarningActive && Math.random() < 0.01) { // 1% chance per frame to start slap
+                slapWarningActive = true;
+                slapWarningTimer = slapWarningDuration;
+                // Target the player's current position
+                slapTargetX = gp.player.worldX + gp.player.solidArea.x;
+                slapTargetY = gp.player.worldY + gp.player.solidArea.y;
+                // Add warning effect
+                effect.EFFECT_BossSlapWarning warning = new effect.EFFECT_BossSlapWarning(gp, slapTargetX, slapTargetY, slapWarningDuration);
+                gp.projectileList.add(warning);
+            }
+
+            if (slapWarningActive) {
+                slapWarningTimer--;
+                if (slapWarningTimer <= 0) {
+                    // Do the slap at the warned position
+                    effect.EFFECT_BossSlap slap = new effect.EFFECT_BossSlap(gp, slapTargetX, slapTargetY, slapDamage);
+                    gp.projectileList.add(slap);
+                    slapWarningActive = false;
+                }
+            }
         }
 
         if (phase == 1 && health <= maxHealth / 2) {
@@ -79,16 +104,6 @@ public class BOSS_Skeleking extends Entity {
 
             solidAreaDefaultX = solidArea.x;
             solidAreaDefaultY = solidArea.y;
-
-            // hitbox.x = ...;
-            // hitbox.y = ...;
-            // hitbox.width = ...;
-            // hitbox.height = ...;
-        }
-
-        // Example: Fire a projectile toward the player every N frames
-        if (attackCooldown == 0) {
-        
         }
     }
 
