@@ -30,10 +30,12 @@ public class BOSS_Skeleking extends Entity {
 
         down1 = setup("/monsters/skeleton_down_1");
         down2 = setup("/monsters/skeleton_down_2");
-        down3 = setup("/monsters/skeleton_down_3");
-        down4 = setup("/monsters/skeleton_down_4");
-        down5 = setup("/monsters/skeleton_down_5");
-        down6 = setup("/monsters/skeleton_down_6");
+        left1 = setup("/monsters/skeleton_left_1");
+        left2 = setup("/monsters/skeleton_left_2");
+        right1 = setup("/monsters/skeleton_right_1");
+        right2 = setup("/monsters/skeleton_right_2");
+        up1 = setup("/monsters/skeleton_up_1");
+        up2 = setup("/monsters/skeleton_up_2");
 
         //attack animation
         
@@ -53,14 +55,17 @@ public class BOSS_Skeleking extends Entity {
     @Override
     public void setAction() {
         if (phase == 1) {
-            super.update();
-
-            // First phase actions
-            if (Math.random() < 0.1) { // 10% chance to change direction
+            if (Math.random() < 0.1) {
                 int randomDirection = (int)(Math.random() * 4);
-                
+                switch (randomDirection) {
+                    case 0: direction = "up"; break;
+                    case 1: direction = "down"; break;
+                    case 2: direction = "left"; break;
+                    case 3: direction = "right"; break;
+                }
             }
         } else if (phase == 2) {
+            // Boss phase 2 logic (special attacks, etc.)
             // --- Boss Slap Logic with Warning (only in phase 2) ---
             if (!slapWarningActive && Math.random() < 0.01) { // 1% chance per frame to start slap
                 slapWarningActive = true;
@@ -91,11 +96,11 @@ public class BOSS_Skeleking extends Entity {
             attack += 50;
             // Change appearance
             down1 = setup("/monsters/boss_skeleking_down_1");
-            down2 = setup("/monsters/boss_skeleking_down_2");
-            down3 = setup("/monsters/boss_skeleking_down_3");
-            down4 = setup("/monsters/boss_skeleking_down_4");
-            down5 = setup("/monsters/boss_skeleking_down_5");
-            down6 = setup("/monsters/boss_skeleking_down_6");
+            down2 = setup("/monsters/boss_skeleking_down_1");
+            down3 = setup("/monsters/boss_skeleking_down_1");
+            down4 = setup("/monsters/boss_skeleking_down_1");
+            down5 = setup("/monsters/boss_skeleking_down_1");
+            down6 = setup("/monsters/boss_skeleking_down_1");
 
             solidArea.x = 5;
             solidArea.y = 10;

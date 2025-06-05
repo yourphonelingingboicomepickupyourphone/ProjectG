@@ -15,6 +15,7 @@ import item.ITEM_Axe_Normal;
 import item.ITEM_Better_Armor;
 import item.ITEM_Bow_Normal;
 import item.ITEM_Door_Key;
+import monster.BOSS_Skeleking;
 import monster.MON_rSlime;
 import object.OBJ_Chest;
 import object.OBJ_Fountain;
@@ -166,6 +167,13 @@ public class AssetSetter {
 		int map = 1;
 		int i = 0;
 		spawnRandomMonstersInArea(map, 45, 45, 55, 55, 5);
+
+		i+=5;
+
+		gp.monster[map][i] = new BOSS_Skeleking(gp);
+		gp.monster[map][i].worldX = gp.tileSize * 50;
+		gp.monster[map][i].worldY = gp.tileSize * 30;
+		i++;
 	}
 
 	public void spawnRandomMonstersInArea(int map, int startCol, int startRow, int endCol, int endRow, int monsterCount) {
@@ -208,4 +216,7 @@ public class AssetSetter {
 	        }
 	    }
 	}
+	
 }
+
+
