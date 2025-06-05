@@ -10,7 +10,7 @@ import main.GamePanel;
 public class SKILL_Dash implements Skill{
 
     private int manaCost = 50;
-    private int cooldownMax = 3000;
+    private int cooldownMax = 1800;
     private int cooldown = 0;
     private int levelRequirement = 1;
 
@@ -81,7 +81,6 @@ public class SKILL_Dash implements Skill{
         // No-op for dash, effect is handled in use() and tickDash()
     }
 
-    @Override
     public BufferedImage getIcon() {
         return icon;
     }
