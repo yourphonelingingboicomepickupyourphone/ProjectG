@@ -36,7 +36,7 @@ public class ITEM_Mini_Mana_Potion extends Entity{
                 user.mana = user.maxMana;
             }
             gp.ui.addMessage(gp.ui.tr("message.use_item", name));
-            gp.ui.addMessage(gp.ui.tr("message.restore_mana", healthHeal));
+            gp.ui.addMessage(gp.ui.tr("message.restore_mana", manaHeal));
         } else {
             gp.ui.addMessage(gp.ui.tr("message.full_mana"));
         }
