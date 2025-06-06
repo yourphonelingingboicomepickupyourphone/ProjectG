@@ -799,12 +799,13 @@ public class KeyHandler implements KeyListener{
 
 	private String generateRandomName() {
 	    String[] names = {
-			"Alex", "Riley", "Morgan", "Casey", "Jordan", "Taylor", "Skyler", "Jamie", "Avery", "Quinn", "TrungTT",
-        "Harper", "Rowan", "Dakota", "Emerson", "Finley", "Oner", "Peyton", "Reese", "Sawyer", "Sage",
-        "Charlie", "Elliot", "Jules", "Kai", "Logan", "Milan", "Noel", "Phoenix", "River", "Shiloh",
-        "Blake", "Cameron", "Drew", "Frankie", "Jesse", "Kendall", "Lane", "Doran", "Parker", "Remy",
-        "Sam", "Tatum", "Val", "Wren", "Zion", "Aspen", "Briar", "Cory", "Devon", "Keria", "Gray",
-        "Indigo", "Jaden", "Kieran", "Faker", "Micah", "Oakley", "Perry", "Quincy", "Robin", "Sasha"
+		// 	"Alex", "Riley", "Morgan", "Casey", "Jordan", "Taylor", "Skyler", "Jamie", "Avery", "Quinn", "TrungTT",
+        // "Harper", "Rowan", "Dakota", "Emerson", "Finley", "Oner", "Peyton", "Reese", "Sawyer", "Sage",
+        // "Charlie", "Elliot", "Jules", "Kai", "Logan", "Milan", "Noel", "Phoenix", "River", "Shiloh",
+        // "Blake", "Cameron", "Drew", "Frankie", "Jesse", "Kendall", "Lane", "Doran", "Parker", "Remy",
+        // "Sam", "Tatum", "Val", "Wren", "Zion", "Aspen", "Briar", "Cory", "Devon", "Keria", "Gray",
+        // "Indigo", "Jaden", "Kieran", "Faker", "Micah", "Oakley", "Perry", "Quincy", "Robin", "Sasha"
+		"TrungTT"
 		};
 	    return names[(int)(Math.random() * names.length)];
 	}

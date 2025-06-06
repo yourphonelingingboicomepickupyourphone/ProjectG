@@ -998,8 +998,6 @@ public class UI {
 	}
 
 
-
-
 	public int chestCol = 0;
 	public int chestRow = 0;
 	public final int maxChestCol = 6; // Example: 6 columns

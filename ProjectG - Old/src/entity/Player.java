@@ -173,11 +173,48 @@ public class Player extends Entity{
 	}
 
 	public void interactNPC(int i) {
-		if(i != 999) {
+		if (gp.keyH.enterPressed) {
+			double talkRange = gp.tileSize * 0.3; // 0.3 tiles
 
-			if (gp.keyH.enterPressed == true) {
+			int closestNpcIndex = -1;
+			double closestDistance = Double.MAX_VALUE;
+
+			for (int j = 0; j < gp.npc[gp.currentMap].length; j++) {
+				if (gp.npc[gp.currentMap][j] != null) {
+					// Expand NPC's solid area by talkRange in all directions
+					Rectangle npcArea = new Rectangle(
+						gp.npc[gp.currentMap][j].worldX + gp.npc[gp.currentMap][j].solidArea.x - (int)talkRange,
+						gp.npc[gp.currentMap][j].worldY + gp.npc[gp.currentMap][j].solidArea.y - (int)talkRange,
+						gp.npc[gp.currentMap][j].solidArea.width + (int)(talkRange * 2),
+						gp.npc[gp.currentMap][j].solidArea.height + (int)(talkRange * 2)
+					);
+					Rectangle playerArea = new Rectangle(
+						worldX + solidArea.x,
+						worldY + solidArea.y,
+						solidArea.width,
+						solidArea.height
+					);
+
+					if (npcArea.intersects(playerArea)) {
+						// Calculate center-to-center distance for closest NPC
+						int npcCenterX = gp.npc[gp.currentMap][j].worldX + gp.npc[gp.currentMap][j].solidArea.x + gp.npc[gp.currentMap][j].solidArea.width / 2;
+						int npcCenterY = gp.npc[gp.currentMap][j].worldY + gp.npc[gp.currentMap][j].solidArea.y + gp.npc[gp.currentMap][j].solidArea.height / 2;
+						int playerCenterX = worldX + solidArea.x + solidArea.width / 2;
+						int playerCenterY = worldY + solidArea.y + solidArea.height / 2;
+						double distance = Math.hypot(npcCenterX - playerCenterX, npcCenterY - playerCenterY);
+
+						if (distance < closestDistance) {
+							closestNpcIndex = j;
+							closestDistance = distance;
+						}
+					}
+				}
+			}
+
+			if (closestNpcIndex != -1) {
+				attackCancel = true;
 				gp.gameState = gp.dialogueState;
-				gp.npc[i].speak();
+				gp.npc[gp.currentMap][closestNpcIndex].speak();
 			}
 		}
 	}

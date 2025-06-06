@@ -8,6 +8,8 @@ public class BOSS_Skeleking extends Entity {
 
     private int phase = 1; // 1 = boss, 2 = enraged boss
     private int attackCooldown = 60; // Cooldown for attacks in frames
+    public int invincibleCounter = 0;
+    public int invincibleTime = 20; // frames (adjust as needed)
 
     // Boss frames
     private BufferedImage down1, down2, down3, down4, down5, down6;
@@ -36,6 +38,8 @@ public class BOSS_Skeleking extends Entity {
         renderLayer = 3;
         speed = 0; // Boss will not move
 
+
+
         // Load boss frames (replace with unique frames if you have them)
         down1 = setup("/monsters/boss_skeleking_down_1");
         down2 = setup("/monsters/boss_skeleking_down_1");
@@ -60,9 +64,7 @@ public class BOSS_Skeleking extends Entity {
         int dy = (gp.player.worldY + gp.player.solidArea.y) - (this.worldY + this.solidArea.y);
         double distance = Math.sqrt(dx * dx + dy * dy);
 
-        int attackRange = gp.tileSize * 4; // Attack if player is within 4 tiles
-
-        if (distance <= attackRange) {
+        if (gp.player.bossArenaActive) {
             // Attack logic (slap attack)
             if (!slapWarningActive && Math.random() < 0.01) {
                 slapWarningActive = true;
@@ -100,6 +102,13 @@ public class BOSS_Skeleking extends Entity {
         if (health <= 0) {
             alive = false;
             dying = true;
+
+            // Remove boss arena when boss is dead
+            gp.player.bossArenaActive = false;
+
+            // Optionally, remove boss from the monster array if needed:
+            // gp.monster[gp.currentMap][bossIndex] = null;
+
             return;
         }
 
@@ -111,6 +120,15 @@ public class BOSS_Skeleking extends Entity {
             spriteNum++;
             if (spriteNum > 6) spriteNum = 1;
             spriteCounter = 0;
+        }
+
+        // --- Reset invincibility after cooldown ---
+        if (invincible) {
+            invincibleCounter++;
+            if (invincibleCounter > invincibleTime) {
+                invincible = false;
+                invincibleCounter = 0;
+            }
         }
     }
 

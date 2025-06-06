@@ -43,10 +43,10 @@ public class NPC_Wizard extends Entity {
     }
 
     public void setDialogue() {
-        dialogues[0] = "Wassup nigga?";
-        dialogues[1] = "You looking for a job?";
-        dialogues[2] = "Hah you useless blyat";
-        dialogues[3] = "Lucky I have something for you to do";
+        dialogues[0] = "Ho, ho, ho";
+        dialogues[1] = "Why you still here?";
+        dialogues[2] = "You should be out there fighting";
+        dialogues[3] = "Pick one of those weapons and go!";
     }
 
     public void setAction() {

@@ -51,23 +51,23 @@ public class AssetSetter {
 		i++;
 		gp.obj[map][i] = new ITEM_Sword_Normal(gp);
 		gp.obj[map][i].worldX = gp.tileSize * 50;
-		gp.obj[map][i].worldY = gp.tileSize * 47;
+		gp.obj[map][i].worldY = gp.tileSize * 45;
 		i++;
 		gp.obj[map][i] = new ITEM_Spear_Normal(gp);
 		gp.obj[map][i].worldX = gp.tileSize * 48;
-		gp.obj[map][i].worldY = gp.tileSize * 47;
+		gp.obj[map][i].worldY = gp.tileSize * 45;
 		i++;
 		gp.obj[map][i] = new ITEM_Staff_Normal(gp);
 		gp.obj[map][i].worldX = gp.tileSize * 46;
-		gp.obj[map][i].worldY = gp.tileSize * 47;
+		gp.obj[map][i].worldY = gp.tileSize * 45;
 		i++;
 		gp.obj[map][i] = new ITEM_Axe_Normal(gp);
-		gp.obj[map][i].worldX = gp.tileSize * 45;
-		gp.obj[map][i].worldY = gp.tileSize * 47;
+		gp.obj[map][i].worldX = gp.tileSize * 52;
+		gp.obj[map][i].worldY = gp.tileSize * 45;
 		i++;
 		gp.obj[map][i] = new ITEM_Bow_Normal(gp);
-		gp.obj[map][i].worldX = gp.tileSize * 45;
-		gp.obj[map][i].worldY = gp.tileSize * 48;
+		gp.obj[map][i].worldX = gp.tileSize * 54;
+		gp.obj[map][i].worldY = gp.tileSize * 45;
 		i++;
 
 		map = 1;
@@ -146,7 +146,7 @@ public class AssetSetter {
 
 		gp.npc[map][i] = new NPC_Wizard(gp);
 		gp.npc[map][i].worldX = gp.tileSize * 50;
-		gp.npc[map][i].worldY = gp.tileSize * 46;
+		gp.npc[map][i].worldY = gp.tileSize * 48;
 		i++;
 
 		map = 1;

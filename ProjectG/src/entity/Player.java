@@ -516,6 +516,7 @@ public class Player extends Entity{
 			//Check object collision
 			int objIndex = gp.cChecker.checkObject(this, true);
 			int npcIndex = gp.cChecker.checkEntity(this, gp.npc);
+			interactNPC(npcIndex);
 
 			if (keyH.enterPressed == true) {
 				objIndex = gp.cChecker.checkObject(this, true);
