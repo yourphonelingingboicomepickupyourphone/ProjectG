@@ -70,6 +70,9 @@ public class Player extends Entity{
 	public int earthquakeWaveCenterX = 0;
 	public int earthquakeWaveCenterY = 0;
 
+	public boolean bossArenaActive = false;
+	public int bossArenaCenterX, bossArenaCenterY, bossArenaRadius;
+
 	public Player(GamePanel gp, KeyHandler kH) {
 
 		super(gp);
@@ -557,6 +560,23 @@ public class Player extends Entity{
 				}
 			} else {
 				collisionRecoilCounter = RECOIL_DURATION;
+			}
+
+			// Clamp player inside boss arena circle if active
+			if (bossArenaActive) {
+				int px = worldX + solidArea.x + solidArea.width / 2;
+				int py = worldY + solidArea.y + solidArea.height / 2;
+				int dx = px - bossArenaCenterX;
+				int dy = py - bossArenaCenterY;
+				double dist = Math.sqrt(dx * dx + dy * dy);
+				int allowed = bossArenaRadius - Math.max(solidArea.width, solidArea.height) / 2;
+				if (dist > allowed) {
+					double angle = Math.atan2(dy, dx);
+					int newPx = bossArenaCenterX + (int)(allowed * Math.cos(angle));
+					int newPy = bossArenaCenterY + (int)(allowed * Math.sin(angle));
+					worldX = newPx - solidArea.x - solidArea.width / 2;
+					worldY = newPy - solidArea.y - solidArea.height / 2;
+				}
 			}
 
 			attackCancel = false;
@@ -1336,7 +1356,7 @@ public class Player extends Entity{
 				inventory.set(inventory.indexOf(item), previousBoots);
 			}
 	    } else {
-	        // Show message: "You need to be level " + item.levelRequirement + " to equip this item."
+	        // Show message:
 	    	gp.ui.addMessage("You need to be level " + item.levelRequirement + " to equip this item.");
 	    }
 	}

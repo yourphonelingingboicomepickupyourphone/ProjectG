@@ -24,6 +24,18 @@ public class KeyHandler implements KeyListener{
 	public void keyPressed(KeyEvent e) {
     	int code = e.getKeyCode();
 
+		// Block menu keys in boss arena
+		if (gp.player != null && gp.player.bossArenaActive) {
+			if (code == gp.keyConfig.getKey(KeyConfig.INVENTORY) ||
+				code == gp.keyConfig.getKey(KeyConfig.PAUSE) ||
+				code == gp.keyConfig.getKey(KeyConfig.CHARACTER) ||
+				code == gp.keyConfig.getKey(KeyConfig.SKILLS) ||
+				code == gp.keyConfig.getKey(KeyConfig.ESCAPE)) {
+				gp.ui.addMessage("You can't open menus in the boss arena!");
+				return;
+			}
+		}
+
 		if (gp.gameState == gp.titleState) {
 			// Handle all title screen substates here!
 			titleState(code);
@@ -366,7 +378,7 @@ public class KeyHandler implements KeyListener{
 
 
 	public void pauseState(int code){
-			
+		if (blockMenusInBossArena(code)) return;
 		if (code == gp.keyConfig.getKey(KeyConfig.ESCAPE)) {
 			gp.gameState = gp.playState;
 		}
@@ -407,6 +419,7 @@ public class KeyHandler implements KeyListener{
 	}
 	
 	public void characterState(int code){
+		if (blockMenusInBossArena(code)) return;
 		if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
 			UI.progressionSelectIndex--;
 			if (UI.progressionSelectIndex < 0) UI.progressionSelectIndex = 3;
@@ -499,18 +512,6 @@ public class KeyHandler implements KeyListener{
 					if (gp.ui.languageIndex < 0) gp.ui.languageIndex = gp.ui.languageCodes.length - 1;
 					gp.ui.language = gp.ui.languageCodes[gp.ui.languageIndex];
 					gp.ui.loadLanguage();
-					gp.config.saveConfig();
-				}
-				if (code == gp.keyConfig.getKey(KeyConfig.RIGHT)) {
-					gp.ui.languageIndex++;
-					if (gp.ui.languageIndex >= gp.ui.languageCodes.length) gp.ui.languageIndex = 0;
-					gp.ui.language = gp.ui.languageCodes[gp.ui.languageIndex];
-					gp.ui.loadLanguage();
-					gp.config.saveConfig();
-				}
-			}
-			if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
-				switch (gp.ui.commandNum) {
 					case 2: // Controls
 						gp.ui.subState = 1;
 						gp.ui.controlsCommandNum = 0;
@@ -626,6 +627,7 @@ public class KeyHandler implements KeyListener{
 	}
 
 	public void inventoryState(int code){
+		if (blockMenusInBossArena(code)) return;
 		if (code == gp.keyConfig.getKey(KeyConfig.INVENTORY)){
 			gp.gameState = gp.playState;
 		}
@@ -953,6 +955,7 @@ public class KeyHandler implements KeyListener{
 	}
 
 	public void skillsState(int code) {
+		if (blockMenusInBossArena(code)) return;
 		int unlockedCount = gp.player.unlockedSkills.size();
 
 		if (!gp.ui.assigningSkill) {
@@ -1015,4 +1018,20 @@ public class KeyHandler implements KeyListener{
 			}
 		}
 	}
+
+	private boolean blockMenusInBossArena(int code) {
+        if (gp.player != null && gp.player.bossArenaActive) {
+            // Block inventory, character, pause, escape, skills, etc.
+            if (
+                code == gp.keyConfig.getKey(KeyConfig.INVENTORY) ||
+                code == gp.keyConfig.getKey(KeyConfig.CHARACTER) ||
+                code == gp.keyConfig.getKey(KeyConfig.ESCAPE) ||
+                code == gp.keyConfig.getKey(KeyConfig.SKILLS)
+            ) {
+                gp.ui.addMessage("You can't open menus in the boss arena!");
+                return true;
+            }
+        }
+        return false;
+    }
 }

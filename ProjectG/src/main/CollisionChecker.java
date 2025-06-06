@@ -64,6 +64,33 @@ public class CollisionChecker {
                 }
                 break;
         }
+
+        // Boss arena border collision (circle)
+        if (gp.player.bossArenaActive) {
+            int entityCenterX = entity.worldX + entity.solidArea.x + entity.solidArea.width / 2;
+            int entityCenterY = entity.worldY + entity.solidArea.y + entity.solidArea.height / 2;
+            int dx = entityCenterX - gp.player.bossArenaCenterX;
+            int dy = entityCenterY - gp.player.bossArenaCenterY;
+            double dist = Math.sqrt(dx * dx + dy * dy);
+            int allowed = gp.player.bossArenaRadius - Math.max(entity.solidArea.width, entity.solidArea.height) / 2;
+            // If entity is outside and would move inside, block it
+            if (dist > allowed) {
+                // Predict next position based on direction
+                int nextX = entityCenterX, nextY = entityCenterY;
+                switch(entity.direction) {
+                    case "up":    nextY -= entity.speed; break;
+                    case "down":  nextY += entity.speed; break;
+                    case "left":  nextX -= entity.speed; break;
+                    case "right": nextX += entity.speed; break;
+                }
+                int ndx = nextX - gp.player.bossArenaCenterX;
+                int ndy = nextY - gp.player.bossArenaCenterY;
+                double nextDist = Math.sqrt(ndx * ndx + ndy * ndy);
+                if (nextDist < allowed) {
+                    entity.collisionOn = true;
+                }
+            }
+        }
     }
 
     public int checkObject(Entity entity, boolean player) {

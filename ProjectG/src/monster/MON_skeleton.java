@@ -78,8 +78,22 @@ public class MON_skeleton extends Entity{
 
     }
 
+    @Override
     public void setAction() {
-    
+        // Prevent entering boss arena
+        if (gp.player.bossArenaActive) {
+            int mx = this.worldX + this.solidArea.x + this.solidArea.width / 2;
+            int my = this.worldY + this.solidArea.y + this.solidArea.height / 2;
+            int dx = mx - gp.player.bossArenaCenterX;
+            int dy = my - gp.player.bossArenaCenterY;
+            double dist = Math.sqrt(dx * dx + dy * dy);
+            int allowed = gp.player.bossArenaRadius - Math.max(this.solidArea.width, this.solidArea.height) / 2;
+            if (dist < allowed) {
+                // Stop movement or pick a new direction
+                return;
+            }
+        }
+
         if (onPath == true){
             int goalCol = (gp.player.worldX + gp.player.solidArea.x) / gp.tileSize;
             int goalRow = (gp.player.worldY + gp.player.solidArea.y) / gp.tileSize;

@@ -271,7 +271,19 @@ public class GamePanel extends JPanel implements Runnable{
 
 			entityList.clear(); //clear the entity list for next time
 			
-			ui.draw(g2);	//ui
+			//Draw boss arena border BEFORE UI
+			if (player.bossArenaActive) {
+		        int sx = player.bossArenaCenterX - player.worldX + player.screenX;
+		        int sy = player.bossArenaCenterY - player.worldY + player.screenY;
+		        int r = player.bossArenaRadius;
+		        g2.setColor(java.awt.Color.YELLOW);
+		        g2.setStroke(new java.awt.BasicStroke(4));
+		        g2.drawOval(sx - r, sy - r, r * 2, r * 2);
+		        g2.setStroke(new java.awt.BasicStroke(1));
+		    }
+
+			//Draw UI (HP bar, mana bar, minimap, etc.)
+			ui.draw(g2);
 		}
 
 		if (debugMode) {
@@ -345,5 +357,5 @@ public class GamePanel extends JPanel implements Runnable{
 	    }
 	}
 
-
+	
 }

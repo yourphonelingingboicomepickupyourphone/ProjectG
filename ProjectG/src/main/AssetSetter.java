@@ -172,7 +172,7 @@ public class AssetSetter {
 
 		gp.monster[map][i] = new BOSS_Skeleking(gp);
 		gp.monster[map][i].worldX = gp.tileSize * 50;
-		gp.monster[map][i].worldY = gp.tileSize * 30;
+		gp.monster[map][i].worldY = gp.tileSize * 28;
 		i++;
 	}
 

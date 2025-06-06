@@ -29,7 +29,7 @@ public class MON_rSlime extends Entity{
         type = 1;
         
         level = lv; // Set the level of the monster
-        speed = 1;
+        speed = 1;  
         maxHealth = baseHeath * level;  // Base health + scaling with level
         health = maxHealth;
         attack = baseAttack + (level * 20); // Base attack + scaling with level
@@ -65,7 +65,8 @@ public class MON_rSlime extends Entity{
         right2 = setup("/monsters/slime_right_2");
     }
 
-    public void update(){
+    @Override
+    public void update() {
         super.update();
 
         int xDistance = Math.abs(worldX - gp.player.worldX);
@@ -76,11 +77,49 @@ public class MON_rSlime extends Entity{
             onPath = true; // Start pathfinding if within range
         }
 
+        // Prevent entering boss arena at movement step
+        if (gp.player.bossArenaActive && pathList != null && !pathList.isEmpty()) {
+            // Calculate intended next position
+            int nextX = pathList.get(0).col * gp.tileSize;
+            int nextY = pathList.get(0).row * gp.tileSize;
+            int slimeCenterX = nextX + solidArea.x + solidArea.width / 2;
+            int slimeCenterY = nextY + solidArea.y + solidArea.height / 2;
+            int dx = slimeCenterX - gp.player.bossArenaCenterX;
+            int dy = slimeCenterY - gp.player.bossArenaCenterY;
+            double dist = Math.sqrt(dx * dx + dy * dy);
+            int allowed = gp.player.bossArenaRadius - Math.max(solidArea.width, solidArea.height) / 2;
+            if (dist < allowed) {
+                // Block movement: clear path so slime can't move in
+                pathList.clear();
+                onPath = false;
+                return;
+            }
+        }
+
     }
 
     public void setAction() {
-    
+
         if (onPath == true){
+            // Prevent pathfinding into boss arena
+            if (gp.player.bossArenaActive) {
+                int slimeCenterX = worldX + solidArea.x + solidArea.width / 2;
+                int slimeCenterY = worldY + solidArea.y + solidArea.height / 2;
+                int dx = slimeCenterX - gp.player.bossArenaCenterX;
+                int dy = slimeCenterY - gp.player.bossArenaCenterY;
+                double dist = Math.sqrt(dx * dx + dy * dy);
+                int allowed = gp.player.bossArenaRadius - Math.max(solidArea.width, solidArea.height) / 2;
+                // If already outside, block pathfinding if target is inside arena
+                int playerDx = (gp.player.worldX + gp.player.solidArea.x + gp.player.solidArea.width / 2) - gp.player.bossArenaCenterX;
+                int playerDy = (gp.player.worldY + gp.player.solidArea.y + gp.player.solidArea.height / 2) - gp.player.bossArenaCenterY;
+                double playerDist = Math.sqrt(playerDx * playerDx + playerDy * playerDy);
+                if (dist > allowed && playerDist < allowed) {
+                    // Don't pathfind into the boss arena
+                    onPath = false;
+                    return;
+                }
+            }
+
             int goalCol = (gp.player.worldX + gp.player.solidArea.x) / gp.tileSize;
             int goalRow = (gp.player.worldY + gp.player.solidArea.y) / gp.tileSize;
 

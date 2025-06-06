@@ -24,7 +24,8 @@ public class UI {
 	BufferedImage flash;
 	GamePanel gp;
 	Graphics2D g2;
-	Font currentFont, currentFontBold;
+	public Font currentFont; 
+	public Font currentFontBold;
 	public boolean messageOn = false;
 	// public String message = "";
 	// int messageCounter = 0;
@@ -132,8 +133,8 @@ public class UI {
 			//drawFlashCooldown();
 			//Draw messages
 			drawMessages();
-			drawMiniMap(g2);
 			drawSkillBar();
+			// drawMiniMap(g2);
 		}
 
 		//Pause State
