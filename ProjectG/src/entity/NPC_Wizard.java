@@ -43,10 +43,10 @@ public class NPC_Wizard extends Entity {
     }
 
     public void setDialogue() {
-        dialogues[0] = "Ho, ho, ho";
-        dialogues[1] = "Why you still here?";
-        dialogues[2] = "You should be out there fighting";
-        dialogues[3] = "Pick one of those weapons and go!";
+        dialogues[0][0] = "Ho, ho, ho";
+        dialogues[0][1] = "Why you still here?";
+        dialogues[0][2] = "You should be out there fighting";
+        dialogues[0][3] = "Pick one of those weapons and go!";
     }
 
     public void setAction() {

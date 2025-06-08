@@ -355,7 +355,14 @@ public class GamePanel extends JPanel implements Runnable{
 	        player.worldX = player.defaultWorldX;
 	        player.worldY = player.defaultWorldY;
 	    }
+		resetNpcDialogIndex();
 	}
-
+	public void resetNpcDialogIndex() {
+	    for (int i = 0; i < npc[currentMap].length; i++) {
+	        if (npc[currentMap][i] != null) {
+	            npc[currentMap][i].dialogIndex = 0;
+	        }
+	    }
+	}
 	
 }

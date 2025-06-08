@@ -106,8 +106,13 @@ public class BOSS_Skeleking extends Entity {
             // Remove boss arena when boss is dead
             gp.player.bossArenaActive = false;
 
-            // Optionally, remove boss from the monster array if needed:
-            // gp.monster[gp.currentMap][bossIndex] = null;
+            // Remove boss from the monster array
+            for (int i = 0; i < gp.monster[gp.currentMap].length; i++) {
+                if (gp.monster[gp.currentMap][i] == this) {
+                    gp.monster[gp.currentMap][i] = null;
+                    break;
+                }
+            }
 
             return;
         }
@@ -224,7 +229,7 @@ public class BOSS_Skeleking extends Entity {
 
         attackRange = gp.tileSize * 4;
 
-        if (!gp.player.bossArenaActive && distance <= attackRange) {
+        if (alive && !gp.player.bossArenaActive && distance <= attackRange) {
             gp.player.bossArenaActive = true;
             gp.player.bossArenaCenterX = bossCenterX;
             gp.player.bossArenaCenterY = bossCenterY;

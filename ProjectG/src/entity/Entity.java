@@ -48,8 +48,8 @@ public class Entity implements Serializable{
 	public int actionLockCounter = 0; //to control the action of the entity
 	public boolean invincible = false; //to check if the entity is invincible
 	public int invincibleCounter = 0; //to check the invincibility counter
-	String dialogues[] = new String[40]; //to store the dialogues of the entity
-	int dialogIndex = 0; //to store the index of the dialogues
+	public String dialogues[][] = new String[10][40]; //to store the dialogues of the entity
+	public int dialogIndex = 0; //to store the index of the dialogues
 
 	public boolean showHpBar = false;
 	public int hpBarDisplayCounter = 0;
@@ -153,12 +153,14 @@ public class Entity implements Serializable{
 
 	public void speak() {
 		
-		if (dialogues[dialogIndex] == null) {
-			dialogIndex = 0;
+		int map = gp.currentMap;
+		if (dialogues[map][dialogIndex] == null) {
+			gp.gameState = gp.playState;
+			dialogIndex = 0; // Reset dialog index if no more dialogues
+			return;
 		}
-		gp.ui.currentDialogue = dialogues[dialogIndex];
+		gp.ui.currentDialogue = dialogues[map][dialogIndex];
 		dialogIndex++;
-
 		facePlayer();
 	}
 

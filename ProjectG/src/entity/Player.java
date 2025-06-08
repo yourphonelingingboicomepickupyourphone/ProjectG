@@ -15,6 +15,7 @@ import javax.imageio.ImageIO;
 
 import data.DataStorage;
 import data.EntitySaveData;
+import main.EventHandler;
 import main.GamePanel;
 import main.KeyHandler;
 import object.OBJ_Chest;
@@ -72,6 +73,12 @@ public class Player extends Entity{
 
 	public boolean bossArenaActive = false;
 	public int bossArenaCenterX, bossArenaCenterY, bossArenaRadius;
+
+	private int failedWeaponPickupCount = 0;
+	public boolean pendingTeleport = false;
+	public int pendingTeleportMap = 0;
+	public int pendingTeleportX = 0;
+	public int pendingTeleportY = 0;
 
 	public Player(GamePanel gp, KeyHandler kH) {
 
@@ -894,7 +901,52 @@ public class Player extends Entity{
 	}
 
 	public void pickUpObject(int i) {
-	    if (i != 999 && gp.obj[gp.currentMap][i].pickable) {
+		if (i != 999 && gp.obj[gp.currentMap][i].pickable) {
+			// Only restrict on the first map (map 0)
+			if (gp.currentMap == 0) {
+				Entity picked = gp.obj[gp.currentMap][i];
+				// Check if the item is a weapon (itemType == 0)
+				if (picked.itemType == 0) {
+					// Check if player already has a weapon in inventory or equipped
+					boolean hasWeapon = false;
+					if (currentWeapon != null) hasWeapon = true;
+					for (Entity item : inventory) {
+						if (item != null && item.itemType == 0) {
+							hasWeapon = true;
+							break;
+						}
+					}
+					if (hasWeapon) {
+						// Add a counter to track failed weapon pickup attempts
+						failedWeaponPickupCount++;
+
+						// Show a special dialogue from the first available NPC
+						for (Entity npc : gp.npc[gp.currentMap]) {
+							if (npc != null) {
+								int map = gp.currentMap;
+								if (failedWeaponPickupCount < 3) {
+									npc.dialogues[map][10] = "You may only choose one weapon here. Make it count!";
+								} else if (failedWeaponPickupCount < 6) {
+									npc.dialogues[map][10] = "Seriously, just pick one weapon and go!";
+								} else if (failedWeaponPickupCount < 9) {
+									npc.dialogues[map][10] = "Stop trying! You can't take more than one weapon!";
+								} else {
+									npc.dialogues[map][10] = "Enough! You have taken one. No more!";
+									pendingTeleport = true;
+									pendingTeleportMap = 1;
+									pendingTeleportX = 50;
+									pendingTeleportY = 50;
+								}
+								npc.dialogIndex = 10;
+								gp.gameState = gp.dialogueState;
+								npc.speak();
+								break;
+							}
+						}
+						return;
+					}
+				}
+			}
 			if (inventory.size() <= maxInventorySize) {
 				Entity picked = gp.obj[gp.currentMap][i];
 				boolean stacked = false;
@@ -912,8 +964,8 @@ public class Player extends Entity{
 				}
 				gp.obj[gp.currentMap][i] = null; // Remove from world
 			}
-	    }
-	    stackInventory(); // <-- Add this line
+		}
+		stackInventory();
 	}
 
 
@@ -1267,6 +1319,10 @@ public class Player extends Entity{
 		spriteNum = 1;
 		spriteCounter = 0;
 		direction = "down";
+		bossArenaActive = false;
+		bossArenaCenterX = 0;
+		bossArenaCenterY = 0;
+		bossArenaRadius = 0;
 		// Delete old save file
 		java.io.File saveFile = new java.io.File("save.dat");
 		if (saveFile.exists()) {

@@ -28,7 +28,7 @@ public class OBJ_Fountain extends Entity{
 	public void interact() {
     	System.out.println("Fountain interact called!");
 		gp.ui.addMessage(gp.ui.tr("useFountain"));
-		gp.player.health = gp.player.maxHealth;
-		gp.player.mana = gp.player.maxMana;
+		gp.player.health = gp.player.getTotalMaxHealth();
+		gp.player.mana = gp.player.getTotalMaxMana();
 	}
 }

@@ -411,9 +411,24 @@ public class KeyHandler implements KeyListener{
 		}
 	}
 
-	public void dialogueState(int code){
+	public void dialogueState(int code) {
 		if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
-			gp.gameState = gp.playState;
+			// Find the current NPC being talked to
+			for (Entity npc : gp.npc[gp.currentMap]) {
+				if (npc != null && npc.dialogues != null && npc.dialogues.length > 0) {
+					if (npc.dialogues[gp.currentMap][npc.dialogIndex] != null) {
+						npc.speak();
+					} else {
+						gp.gameState = gp.playState;
+						npc.dialogIndex = 0; // Reset for next time
+						if (gp.player.pendingTeleport) {
+							gp.eHandler.teleport(gp.player.pendingTeleportMap, gp.player.pendingTeleportX, gp.player.pendingTeleportY);
+							gp.player.pendingTeleport = false;
+						}
+					}
+					break;
+				}
+			}
 		}
 	}
 	
