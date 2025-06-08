@@ -129,7 +129,7 @@ public class Player extends Entity{
 		this.defense = 10;
 		this.exp = 0;
 		this.speed = 5;
-		this.nextLevelExp = (int)(100 * (1 - ((4 - level * 30) / (0.1 * level + 4))));
+		this.nextLevelExp = calculateNextLevelExp(this.level);
 		this.totalProgressionPoints = 0;
 		this.progressionPoints = 0;
 		this.progressionHealthUpgrades = 0;
@@ -1087,24 +1087,22 @@ public class Player extends Entity{
 	}
 
 	public void checkLevelUp() {
-		if (exp >= nextLevelExp) {
+		while (exp >= nextLevelExp && level < MAX_LEVEL) {
 			level++;
 			exp -= nextLevelExp;
-			if (level < MAX_LEVEL){
-				totalProgressionPoints += 10;
-				progressionPoints += 10;
-			} else {
-				if (exp > 17500){
-					totalProgressionPoints += 10;
-					progressionPoints += 10;
-					exp -= 17500; 
-				}
-			}
-			
+			// Update nextLevelExp for the new level
+			nextLevelExp = calculateNextLevelExp(level); // Make sure you have this method!
+			totalProgressionPoints += 10;
+			progressionPoints += 10;
 			gp.ui.addMessage(gp.ui.tr("message.level_up", level));
 		}
+		// Optionally, handle max level overflow
+		if (level >= MAX_LEVEL && exp > 17500) {
+			totalProgressionPoints += 10;
+			progressionPoints += 10;
+			exp -= 17500;
+		}
 	}
-
 	public void draw(Graphics2D g2) {
 		
 		g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
@@ -1315,6 +1313,9 @@ public class Player extends Entity{
 		attacking = false;
 		attackCancel = false;
 		collisionRecoilCounter = 0;
+		knockbackCounter = 0;    
+		knockbackDX = 0;            
+		knockbackDY = 0;              
 		standCounter = 0;
 		spriteNum = 1;
 		spriteCounter = 0;
@@ -1440,7 +1441,7 @@ public class Player extends Entity{
 		}
 	}
 
-	public void flash(){
+	public void flash() {
 		int dx = 0;
 		int dy = 0;
 		switch (direction) {
@@ -1449,31 +1450,78 @@ public class Player extends Entity{
 			case "left": dx = -1; break;
 			case "right": dx = 1; break;
 		}
-		for (int i = 1; i <= FLASH_RANGE; i++) {
-			int targetX = worldX + dx * gp.tileSize * i;
-			int targetY = worldY + dy * gp.tileSize * i;
 
-			// Check collision at target position
-			Rectangle testArea = new Rectangle(targetX + solidArea.x, targetY + solidArea.y, solidArea.width, solidArea.height);
+		int lastFreeX = worldX;
+		int lastFreeY = worldY;
+
+		for (int i = 1; i <= FLASH_RANGE; i++) {
+			int testX = worldX + dx * gp.tileSize * i;
+			int testY = worldY + dy * gp.tileSize * i;
+			Rectangle testArea = new Rectangle(testX + solidArea.x, testY + solidArea.y, solidArea.width, solidArea.height);
 			boolean blocked = false;
-			// Temporarily move player for collision check
-			int oldX = worldX, oldY = worldY;
-			worldX = targetX; worldY = targetY;
-			collisionOn = false;
-			gp.cChecker.checkTile(this);
-			blocked = collisionOn;
-			worldX = oldX; worldY = oldY;
+
+			// Check monsters
+			for (Entity monster : gp.monster[gp.currentMap]) {
+				if (monster != null && monster.alive && !monster.dying) {
+					Rectangle monsterArea = new Rectangle(
+						monster.worldX + monster.solidArea.x,
+						monster.worldY + monster.solidArea.y,
+						monster.solidArea.width,
+						monster.solidArea.height
+					);
+					if (testArea.intersects(monsterArea)) {
+						blocked = true;
+						break;
+					}
+				}
+			}
+			// Check NPCs
+			if (!blocked) {
+				for (Entity npc : gp.npc[gp.currentMap]) {
+					if (npc != null) {
+						Rectangle npcArea = new Rectangle(
+							npc.worldX + npc.solidArea.x,
+							npc.worldY + npc.solidArea.y,
+							npc.solidArea.width,
+							npc.solidArea.height
+						);
+						if (testArea.intersects(npcArea)) {
+							blocked = true;
+							break;
+						}
+					}
+				}
+			}
+			// Check objects (items/chests/etc)
+			if (!blocked) {
+				for (Entity obj : gp.obj[gp.currentMap]) {
+					if (obj != null && obj.collision) {
+						Rectangle objArea = new Rectangle(
+							obj.worldX + obj.solidArea.x,
+							obj.worldY + obj.solidArea.y,
+							obj.solidArea.width,
+							obj.solidArea.height
+						);
+						if (testArea.intersects(objArea)) {
+							blocked = true;
+							break;
+						}
+					}
+				}
+			}
 
 			if (blocked) {
-				// Stop at previous position
-				worldX += dx * gp.tileSize * (i - 1);
-				worldY += dy * gp.tileSize * (i - 1);
-				return;
+				// Stop at the last free position before the block
+				break;
+			} else {
+				lastFreeX = testX;
+				lastFreeY = testY;
 			}
 		}
 
-		worldX += dx * gp.tileSize * FLASH_RANGE;
-		worldY += dy * gp.tileSize * FLASH_RANGE;
+		// Move player to the furthest free spot
+		worldX = lastFreeX;
+		worldY = lastFreeY;
 	}
 
 	public void initializeSkills() {
@@ -1540,5 +1588,9 @@ public class Player extends Entity{
 	        this.radius = radius;
 	        this.damage = damage;
 	    }
+	}
+
+	public int calculateNextLevelExp(int level){
+		return (int)(100 * (1 - ((4 - level * 30) / (0.1 * level + 4))));
 	}
 }

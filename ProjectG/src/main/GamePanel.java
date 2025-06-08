@@ -109,9 +109,13 @@ public class GamePanel extends JPanel implements Runnable{
 				npc[i][j] = null;
 			}
 		}
-		for (int i = 0; i < monster.length; i++) {
-			for (int j = 0; j < monster[i].length; j++) {
-				monster[i][j] = null;
+		for (int i = 0; i < monster[currentMap].length; i++) {
+			Entity m = monster[currentMap][i];
+			if (m != null) {
+				m.update();
+				if (!m.alive) {
+					monster[currentMap][i] = null;
+				}
 			}
 		}
 		for (int i = 0; i < obj.length; i++) {
@@ -264,6 +268,8 @@ public class GamePanel extends JPanel implements Runnable{
 				}
 			});
 
+			entityList.removeIf(e -> e instanceof monster.BOSS_Skeleking && !e.alive);
+			
 			//Draw entities (including projectiles)
 			for(int i = 0; i < entityList.size(); i++) {
 				entityList.get(i).draw(g2);
@@ -272,7 +278,14 @@ public class GamePanel extends JPanel implements Runnable{
 			entityList.clear(); //clear the entity list for next time
 			
 			//Draw boss arena border BEFORE UI
-			if (player.bossArenaActive) {
+			boolean bossAlive = false;
+			for (Entity e : monster[currentMap]) {
+				if (e instanceof monster.BOSS_Skeleking && e.alive) {
+					bossAlive = true;
+					break;
+				}
+			}
+			if (player.bossArenaActive && bossAlive) {
 		        int sx = player.bossArenaCenterX - player.worldX + player.screenX;
 		        int sy = player.bossArenaCenterY - player.worldY + player.screenY;
 		        int r = player.bossArenaRadius;
@@ -280,6 +293,8 @@ public class GamePanel extends JPanel implements Runnable{
 		        g2.setStroke(new java.awt.BasicStroke(4));
 		        g2.drawOval(sx - r, sy - r, r * 2, r * 2);
 		        g2.setStroke(new java.awt.BasicStroke(1));
+		    } else {
+		        player.bossArenaActive = false; // Defensive: turn off if boss is gone
 		    }
 
 			//Draw UI (HP bar, mana bar, minimap, etc.)

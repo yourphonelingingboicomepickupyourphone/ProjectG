@@ -143,18 +143,20 @@ public class KeyHandler implements KeyListener{
 					gp.ui.kbRow = 0; // Reset cursor position
 					// Proceed to next screen or save name
 				} else if (key.equals("OK")) {
-					if (gp.player.name.isEmpty()) {
+					// Only accept if name is not null and not just spaces
+					if (gp.player.name == null || gp.player.name.trim().isEmpty()) {
 						gp.player.name = generateRandomName();
-						// Stay on the name input screen so the player can see and edit the name
-					} else {
-						gp.ui.typingName = false;
-						gp.gameState = gp.playState;
-						gp.player.name = gp.player.name.trim();
-						// Proceed to next screen or save name
+						return;
 					}
-				} else if (gp.player.name.length() < 12) // Limit name length
-					gp.player.name += key;
-			} else if (code == gp.keyConfig.getKey(KeyConfig.ESCAPE)) {
+					gp.player.name = gp.player.name.trim();
+					gp.ui.typingName = false;
+					gp.gameState = gp.playState;
+					gp.ui.kbCol = 0; // Reset cursor position
+					gp.ui.kbRow = 0; // Reset cursor position
+				}
+			}
+			// Handle ESC key to go back to main menu
+			if (code == gp.keyConfig.getKey(KeyConfig.ESCAPE)) {
 				gp.ui.typingName = false;
 				gp.ui.titleScreenState = 0; // Go back to main menu
 				gp.ui.commandNum = 0; // Reset command number

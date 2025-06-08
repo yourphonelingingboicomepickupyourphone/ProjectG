@@ -100,6 +100,7 @@ public class BOSS_Skeleking extends Entity {
     @Override
     public void update() {
         if (health <= 0) {
+            health = 0;
             alive = false;
             dying = true;
 
@@ -108,11 +109,14 @@ public class BOSS_Skeleking extends Entity {
 
             // Remove boss from the monster array
             for (int i = 0; i < gp.monster[gp.currentMap].length; i++) {
-                if (gp.monster[gp.currentMap][i] == this) {
+                Entity m = gp.monster[gp.currentMap][i];
+                if (m instanceof monster.BOSS_Skeleking) {
                     gp.monster[gp.currentMap][i] = null;
-                    break;
                 }
             }
+
+            gp.entityList.removeIf(e -> e instanceof monster.BOSS_Skeleking);
+            System.out.println("Boss removed from monster array and entityList!");
 
             return;
         }
