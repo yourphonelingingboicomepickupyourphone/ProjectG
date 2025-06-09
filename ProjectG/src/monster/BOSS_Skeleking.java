@@ -99,8 +99,9 @@ public class BOSS_Skeleking extends Entity {
 
     @Override
     public void update() {
-        if (health <= 0) {
-            health = 0;
+        if (health < 0) health = 0;
+
+        if (health == 0 && alive) {
             alive = false;
             dying = true;
 
@@ -109,15 +110,16 @@ public class BOSS_Skeleking extends Entity {
 
             // Remove boss from the monster array
             for (int i = 0; i < gp.monster[gp.currentMap].length; i++) {
-                Entity m = gp.monster[gp.currentMap][i];
-                if (m instanceof monster.BOSS_Skeleking) {
+                if (gp.monster[gp.currentMap][i] == this) {
                     gp.monster[gp.currentMap][i] = null;
+                    break;
                 }
             }
 
-            gp.entityList.removeIf(e -> e instanceof monster.BOSS_Skeleking);
-            System.out.println("Boss removed from monster array and entityList!");
+            // Remove from entityList if present
+            gp.entityList.removeIf(e -> e == this);
 
+            System.out.println("Boss removed from monster array and entityList!");
             return;
         }
 
@@ -175,14 +177,31 @@ public class BOSS_Skeleking extends Entity {
             g2.drawRect(screenX + solidArea.x, screenY + solidArea.y, solidArea.width, solidArea.height);
         }
 
-        // Only show boss bar if player is in attack range
-        int dx = (gp.player.worldX + gp.player.solidArea.x) - (this.worldX + this.solidArea.x);
-        int dy = (gp.player.worldY + gp.player.solidArea.y) - (this.worldY + this.solidArea.y);
+        // Calculate boss center
+        int bossCenterX = this.worldX + renderSize / 2;
+        int bossCenterY = this.worldY + renderSize / 2;
+
+        // Calculate player center
+        int playerCenterX = gp.player.worldX + gp.player.solidArea.x + gp.player.solidArea.width / 2;
+        int playerCenterY = gp.player.worldY + gp.player.solidArea.y + gp.player.solidArea.height / 2;
+
+        // Use center-to-center distance
+        int dx = playerCenterX - bossCenterX;
+        int dy = playerCenterY - bossCenterY;
         double distance = Math.sqrt(dx * dx + dy * dy);
+
         int attackRange = gp.tileSize * 4;
 
-        if (gp.player.bossArenaActive) {
-            // --- BOSS HEALTH BAR AND NAME AT BOTTOM OF SCREEN ---
+        // Only activate arena if boss is alive
+        if (alive && !gp.player.bossArenaActive && distance <= attackRange) {
+            gp.player.bossArenaActive = true;
+            gp.player.bossArenaCenterX = bossCenterX;
+            gp.player.bossArenaCenterY = bossCenterY;
+            gp.player.bossArenaRadius = gp.tileSize * 8; // Adjust as needed
+        }
+
+        // Only show boss bar if boss is alive and arena is active
+        if (alive && gp.player.bossArenaActive) {
             int barWidth = gp.screenWidth - gp.tileSize * 4;
             int barHeight = gp.tileSize / 5;
             int barX = gp.tileSize * 2;
@@ -203,41 +222,34 @@ public class BOSS_Skeleking extends Entity {
             g2.setFont(gp.ui.currentFont.deriveFont(java.awt.Font.BOLD, 24f));
             java.awt.FontMetrics fm = g2.getFontMetrics();
             String bossName = name;
-            int nameWidth = fm.stringWidth(bossName);
-            int nameX = barX + 10; // Slightly offset from the left edge
-            int nameY = barY + barHeight - 10; // Slightly above the bottom of the bar
+            int nameX = barX + 10;
+            int nameY = barY + barHeight - 10;
             g2.drawString(bossName, nameX, nameY);
 
             // Draw boss health numbers (centered in the bar)
             String healthText = health + " / " + maxHealth;
-            int healthTextWidth = fm.stringWidth(healthText);
             int healthTextX = gp.ui.getXForCenteredText(healthText);
-            int healthTextY = barY + barHeight; // Slightly above the bottom of the bar
+            int healthTextY = barY + barHeight;
             g2.setColor(java.awt.Color.WHITE);
             g2.setFont(gp.ui.currentFont.deriveFont(java.awt.Font.BOLD, 16f));
             g2.drawString(healthText, healthTextX, healthTextY);
         }
+    }
 
-        // Calculate boss center
-        int bossCenterX = this.worldX + renderSize / 2;
-        int bossCenterY = this.worldY + renderSize / 2;
-
-        // Calculate player center
-        int playerCenterX = gp.player.worldX + gp.player.solidArea.x + gp.player.solidArea.width / 2;
-        int playerCenterY = gp.player.worldY + gp.player.solidArea.y + gp.player.solidArea.height / 2;
-
-        // Use center-to-center distance
-        dx = playerCenterX - bossCenterX;
-        dy = playerCenterY - bossCenterY;
-        distance = Math.sqrt(dx * dx + dy * dy);
-
-        attackRange = gp.tileSize * 4;
-
-        if (alive && !gp.player.bossArenaActive && distance <= attackRange) {
-            gp.player.bossArenaActive = true;
-            gp.player.bossArenaCenterX = bossCenterX;
-            gp.player.bossArenaCenterY = bossCenterY;
-            gp.player.bossArenaRadius = gp.tileSize * 8; // Adjust as needed
+    public void takeDamage(int amount) {
+        if (!invincible && alive) {
+            int damage = Math.max(0, amount - defense);
+            if (damage > maxHealth / 2) {
+                // Heal and increase max health
+                maxHealth = 20000;
+                health = maxHealth;
+                gp.ui.addMessage("The Skeleking roars and becomes stronger!");
+            } else {
+                health -= damage;
+                if (health < 0) health = 0;
+            }
+            invincible = true;
+            invincibleCounter = 0;
         }
     }
 }

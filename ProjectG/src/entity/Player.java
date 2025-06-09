@@ -1062,7 +1062,12 @@ public class Player extends Entity{
 					dmg = 0;
 				}
 				
-				gp.monster[gp.currentMap][i].health -= dmg;
+				if (gp.monster[gp.currentMap][i] instanceof monster.BOSS_Skeleking) {
+					((monster.BOSS_Skeleking)gp.monster[gp.currentMap][i]).takeDamage(dmg);
+				} else {
+					gp.monster[gp.currentMap][i].health -= dmg;
+				}
+
 				gp.monster[gp.currentMap][i].invincible = true;
 
 				gp.monster[gp.currentMap][i].timeSinceLastHit = 0;
