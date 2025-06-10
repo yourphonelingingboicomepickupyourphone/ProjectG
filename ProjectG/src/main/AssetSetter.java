@@ -49,27 +49,10 @@ public class AssetSetter {
 		chest.chestInventory.add(new ITEM_Mini_Health_Potion(gp));
 		chest.chestInventory.add(new ITEM_Mini_Mana_Potion(gp));
 		i++;
-		gp.obj[map][i] = new ITEM_Sword_Normal(gp);
-		gp.obj[map][i].worldX = gp.tileSize * 50;
-		gp.obj[map][i].worldY = gp.tileSize * 45;
-		i++;
-		gp.obj[map][i] = new ITEM_Spear_Normal(gp);
-		gp.obj[map][i].worldX = gp.tileSize * 48;
-		gp.obj[map][i].worldY = gp.tileSize * 45;
-		i++;
-		gp.obj[map][i] = new ITEM_Staff_Normal(gp);
-		gp.obj[map][i].worldX = gp.tileSize * 46;
-		gp.obj[map][i].worldY = gp.tileSize * 45;
-		i++;
-		gp.obj[map][i] = new ITEM_Axe_Normal(gp);
-		gp.obj[map][i].worldX = gp.tileSize * 52;
-		gp.obj[map][i].worldY = gp.tileSize * 45;
-		i++;
-		gp.obj[map][i] = new ITEM_Bow_Normal(gp);
-		gp.obj[map][i].worldX = gp.tileSize * 54;
-		gp.obj[map][i].worldY = gp.tileSize * 45;
-		i++;
 
+
+
+		
 		map = 1;
 		i = 0;
 		gp.obj[map][i] = new OBJ_SpawnPoint(gp);
@@ -217,6 +200,41 @@ public class AssetSetter {
 	    }
 	}
 	
+	public void spawnStartingWeapons() {
+	    int map = 0;
+	    int i = 0;
+	    // Find first empty slots in gp.obj[map]
+	    while (i < gp.obj[map].length && gp.obj[map][i] != null) i++;
+	    if (i < gp.obj[map].length) {
+	        gp.obj[map][i] = new item.ITEM_Sword_Normal(gp);
+	        gp.obj[map][i].worldX = gp.tileSize * 50;
+	        gp.obj[map][i].worldY = gp.tileSize * 45;
+	        i++;
+	    }
+	    if (i < gp.obj[map].length) {
+	        gp.obj[map][i] = new item.ITEM_Spear_Normal(gp);
+	        gp.obj[map][i].worldX = gp.tileSize * 48;
+	        gp.obj[map][i].worldY = gp.tileSize * 45;
+	        i++;
+	    }
+	    if (i < gp.obj[map].length) {
+	        gp.obj[map][i] = new item.ITEM_Staff_Normal(gp);
+	        gp.obj[map][i].worldX = gp.tileSize * 46;
+	        gp.obj[map][i].worldY = gp.tileSize * 45;
+	        i++;
+	    }
+	    if (i < gp.obj[map].length) {
+	        gp.obj[map][i] = new item.ITEM_Axe_Normal(gp);
+	        gp.obj[map][i].worldX = gp.tileSize * 52;
+	        gp.obj[map][i].worldY = gp.tileSize * 45;
+	        i++;
+	    }
+	    if (i < gp.obj[map].length) {
+	        gp.obj[map][i] = new item.ITEM_Bow_Normal(gp);
+	        gp.obj[map][i].worldX = gp.tileSize * 54;
+	        gp.obj[map][i].worldY = gp.tileSize * 45;
+	    }
+	}
 }
 
 

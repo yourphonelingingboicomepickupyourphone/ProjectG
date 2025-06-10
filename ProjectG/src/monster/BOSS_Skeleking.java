@@ -20,6 +20,18 @@ public class BOSS_Skeleking extends Entity {
     private int slapDamage = 100;
     private int slapTargetX, slapTargetY;
 
+    // Add these fields to BOSS_Skeleking:
+    private int displayedHealth;
+    private boolean refillingHealth = false;
+    private int refillSpeed = 180; // Amount to refill per frame (adjust for smoothness)
+
+    private boolean phaseChanging = false;
+    private int phaseChangeTimer = 0;
+    private final int PHASE_CHANGE_DURATION = 180; // 3 seconds at 60 FPS
+
+    private boolean pendingPhase2 = false;
+    private int pendingMaxHealth = 0;
+
     public BOSS_Skeleking(GamePanel gp) {
         super(gp);
 
@@ -38,8 +50,6 @@ public class BOSS_Skeleking extends Entity {
         renderLayer = 3;
         speed = 0; // Boss will not move
 
-
-
         // Load boss frames (replace with unique frames if you have them)
         down1 = setup("/monsters/boss_skeleking_down_1");
         down2 = setup("/monsters/boss_skeleking_down_1");
@@ -55,6 +65,8 @@ public class BOSS_Skeleking extends Entity {
         solidArea.height = gp.tileSize * 5; // Boss is 5 tiles tall
         solidAreaDefaultX = solidArea.x;
         solidAreaDefaultY = solidArea.y;
+
+        displayedHealth = (int)health;
     }
 
     @Override
@@ -65,20 +77,24 @@ public class BOSS_Skeleking extends Entity {
         double distance = Math.sqrt(dx * dx + dy * dy);
 
         if (gp.player.bossArenaActive) {
-            // Attack logic (slap attack)
-            if (!slapWarningActive && Math.random() < 0.01) {
+            // --- PHASE-DEPENDENT ATTACK FREQUENCY ---
+            double attackChance = (phase == 2) ? 0.04 : 0.01; // 4% per frame in phase 2, 1% in phase 1
+
+            if (!slapWarningActive && Math.random() < attackChance) {
                 slapWarningActive = true;
                 slapWarningTimer = slapWarningDuration;
                 slapTargetX = gp.player.worldX + gp.player.solidArea.x;
                 slapTargetY = gp.player.worldY + gp.player.solidArea.y;
-                effect.EFFECT_BossSlapWarning warning = new effect.EFFECT_BossSlapWarning(gp, slapTargetX, slapTargetY, slapWarningDuration);
+                int warningSize = (phase == 2) ? gp.tileSize * 2 : gp.tileSize;
+                effect.EFFECT_BossSlapWarning warning = new effect.EFFECT_BossSlapWarning(gp, slapTargetX, slapTargetY, slapWarningDuration, warningSize);
                 gp.projectileList.add(warning);
             }
 
             if (slapWarningActive) {
                 slapWarningTimer--;
                 if (slapWarningTimer <= 0) {
-                    effect.EFFECT_BossSlap slap = new effect.EFFECT_BossSlap(gp, slapTargetX, slapTargetY, slapDamage);
+                    int slapSize = (phase == 2) ? gp.tileSize * 2 : gp.tileSize;
+                    effect.EFFECT_BossSlap slap = new effect.EFFECT_BossSlap(gp, slapTargetX, slapTargetY, slapDamage, slapSize);
                     gp.projectileList.add(slap);
                     slapWarningActive = false;
                 }
@@ -88,12 +104,9 @@ public class BOSS_Skeleking extends Entity {
         // Transition to enraged boss (phase 2)
         if (phase == 1 && health <= maxHealth / 2) {
             phase = 2;
-            attackCooldown = Math.max(20, attackCooldown - 30); // faster attacks
-            attack += 50; // more damage
-            speed = 0; // still does not move
-            slapDamage += 50; // slap does more damage
-            // Same hitbox
-            
+            attack += 50;
+            slapDamage += 50;
+            // You can also increase slapWarningDuration or other stats here if desired
         }
     }
 
@@ -104,23 +117,46 @@ public class BOSS_Skeleking extends Entity {
         if (health == 0 && alive) {
             alive = false;
             dying = true;
-
-            // Remove boss arena when boss is dead
             gp.player.bossArenaActive = false;
-
-            // Remove boss from the monster array
             for (int i = 0; i < gp.monster[gp.currentMap].length; i++) {
                 if (gp.monster[gp.currentMap][i] == this) {
                     gp.monster[gp.currentMap][i] = null;
                     break;
                 }
             }
-
-            // Remove from entityList if present
             gp.entityList.removeIf(e -> e == this);
-
             System.out.println("Boss removed from monster array and entityList!");
             return;
+        }
+
+        // --- PHASE CHANGING LOGIC ---
+        if (!phaseChanging && health <= maxHealth / 2 && phase == 1) {
+            phaseChanging = true;
+            phaseChangeTimer = PHASE_CHANGE_DURATION;
+            invincible = true;
+            refillingHealth = true;
+            // Optionally play animation/sound here
+            return; // Skip setAction() this frame
+        }
+
+        if (phaseChanging) {
+            phaseChangeTimer--;
+            // Animate health bar refill as before
+            if (refillingHealth && displayedHealth < pendingMaxHealth) {
+                displayedHealth += refillSpeed;
+                if (displayedHealth > pendingMaxHealth) displayedHealth = pendingMaxHealth;
+            }
+            // End phase change after timer and refill complete
+            if (phaseChangeTimer <= 0 && displayedHealth >= pendingMaxHealth && pendingPhase2) {
+                phaseChanging = false;
+                invincible = false;
+                phase = 2; // Enter phase 2 after animation
+                maxHealth = pendingMaxHealth;
+                health = maxHealth;
+                pendingPhase2 = false;
+                refillingHealth = false;
+            }
+            return; // Skip setAction() while phase changing
         }
 
         setAction();
@@ -140,6 +176,19 @@ public class BOSS_Skeleking extends Entity {
                 invincible = false;
                 invincibleCounter = 0;
             }
+        }
+
+        // Animate health bar refill
+        if (refillingHealth) {
+            if (displayedHealth < health) {
+                displayedHealth += refillSpeed;
+                if (displayedHealth > health) displayedHealth = (int)health;
+            } else {
+                refillingHealth = false;
+            }
+        } else {
+            // Keep displayedHealth in sync if not animating
+            displayedHealth = (int)health;
         }
     }
 
@@ -212,7 +261,7 @@ public class BOSS_Skeleking extends Entity {
             g2.fillRoundRect(barX, barY, barWidth, barHeight, 20, 20);
 
             // Health bar (red)
-            double healthPercent = (double)health / maxHealth;
+            double healthPercent = (double)displayedHealth / maxHealth;
             int healthBarWidth = (int)(barWidth * healthPercent);
             g2.setColor(new java.awt.Color(180, 40, 40));
             g2.fillRoundRect(barX, barY, healthBarWidth, barHeight, 20, 20);
@@ -239,10 +288,14 @@ public class BOSS_Skeleking extends Entity {
     public void takeDamage(int amount) {
         if (!invincible && alive) {
             int damage = Math.max(0, amount - defense);
-            if (damage > maxHealth / 2) {
-                // Heal and increase max health
-                maxHealth = 20000;
-                health = maxHealth;
+            if (damage > maxHealth / 2 && phase == 1 && !phaseChanging && !pendingPhase2) {
+                // Prepare for phase 2, but don't change health yet
+                pendingPhase2 = true;
+                pendingMaxHealth = 20000;
+                phaseChanging = true;
+                phaseChangeTimer = PHASE_CHANGE_DURATION;
+                invincible = true;
+                refillingHealth = true;
                 gp.ui.addMessage("The Skeleking roars and becomes stronger!");
             } else {
                 health -= damage;

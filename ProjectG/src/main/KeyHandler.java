@@ -415,14 +415,19 @@ public class KeyHandler implements KeyListener{
 
 	public void dialogueState(int code) {
 		if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
-			// Find the current NPC being talked to
 			for (Entity npc : gp.npc[gp.currentMap]) {
 				if (npc != null && npc.dialogues != null && npc.dialogues.length > 0) {
+					// If the next line is the last line, spawn weapons now
+					if (npc.dialogues[gp.currentMap][npc.dialogIndex + 1] == null
+						&& gp.currentMap == 0 && !gp.player.hasTalkedToWeaponNPC) {
+						gp.player.hasTalkedToWeaponNPC = true;
+						gp.aSetter.spawnStartingWeapons();
+					}
 					if (npc.dialogues[gp.currentMap][npc.dialogIndex] != null) {
 						npc.speak();
 					} else {
 						gp.gameState = gp.playState;
-						npc.dialogIndex = 0; // Reset for next time
+						npc.dialogIndex = 0;
 						if (gp.player.pendingTeleport) {
 							gp.eHandler.teleport(gp.player.pendingTeleportMap, gp.player.pendingTeleportX, gp.player.pendingTeleportY);
 							gp.player.pendingTeleport = false;

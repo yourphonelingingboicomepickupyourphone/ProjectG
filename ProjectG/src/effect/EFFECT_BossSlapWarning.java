@@ -6,12 +6,14 @@ import java.awt.*;
 
 public class EFFECT_BossSlapWarning extends Entity {
     private int duration; // frames to show warning
+    private int size;
 
-    public EFFECT_BossSlapWarning(GamePanel gp, int x, int y, int duration) {
+    public EFFECT_BossSlapWarning(GamePanel gp, int x, int y, int duration, int size) {
         super(gp);
         this.worldX = x;
         this.worldY = y;
         this.duration = duration;
+        this.size = size;
         this.alive = true;
     }
 
@@ -28,6 +30,6 @@ public class EFFECT_BossSlapWarning extends Entity {
         int screenX = worldX - gp.player.worldX + gp.player.screenX;
         int screenY = worldY - gp.player.worldY + gp.player.screenY;
         g2.setColor(new Color(255, 0, 0, 120));
-        g2.fillOval(screenX, screenY, gp.tileSize, gp.tileSize);
+        g2.fillOval(screenX, screenY, size, size);
     }
 }

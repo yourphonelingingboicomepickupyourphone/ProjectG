@@ -74,6 +74,7 @@ public class Player extends Entity{
 	public boolean bossArenaActive = false;
 	public int bossArenaCenterX, bossArenaCenterY, bossArenaRadius;
 
+	public boolean hasTalkedToWeaponNPC = false;
 	private int failedWeaponPickupCount = 0;
 	public boolean pendingTeleport = false;
 	public int pendingTeleportMap = 0;
@@ -960,7 +961,24 @@ public class Player extends Entity{
 				}
 				// If not stacked, add as new item
 				if (!stacked) {
-					inventory.add(picked);
+					// --- Auto-equip logic ---
+					boolean equipped = false;
+					if (picked.itemType == 0 && currentWeapon == null) { // Weapon
+						currentWeapon = picked;
+						equipped = true;
+					} else if (picked.itemType == 1 && currentHat == null) { // Hat
+						currentHat = picked;
+						equipped = true;
+					} else if (picked.itemType == 2 && currentArmor == null) { // Armor
+						currentArmor = picked;
+						equipped = true;
+					} else if (picked.itemType == 3 && currentBoots == null) { // Boots
+						currentBoots = picked;
+						equipped = true;
+					}
+					if (!equipped) {
+						inventory.add(picked);
+					}
 				}
 				gp.obj[gp.currentMap][i] = null; // Remove from world
 			}

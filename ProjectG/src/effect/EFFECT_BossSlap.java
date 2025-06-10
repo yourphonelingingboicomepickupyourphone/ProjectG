@@ -12,12 +12,14 @@ public class EFFECT_BossSlap extends Entity {
     private int damage = 100;
     private boolean hasDealtDamage = false;
     private BufferedImage slapImage;
+    private int size;
 
-    public EFFECT_BossSlap(GamePanel gp, int x, int y, int damage) {
+    public EFFECT_BossSlap(GamePanel gp, int x, int y, int damage, int size) {
         super(gp);
         this.worldX = x;
         this.worldY = y;
         this.damage = damage;
+        this.size = size;
         this.alive = true;
 
         try {
@@ -33,7 +35,7 @@ public class EFFECT_BossSlap extends Entity {
         duration--;
         if (!hasDealtDamage) {
             // Check if player is in the area
-            Rectangle slapArea = new Rectangle(worldX, worldY, gp.tileSize, gp.tileSize);
+            Rectangle slapArea = new Rectangle(worldX, worldY, size, size);
             Rectangle playerArea = new Rectangle(
                 gp.player.worldX + gp.player.solidArea.x,
                 gp.player.worldY + gp.player.solidArea.y,
@@ -57,10 +59,10 @@ public class EFFECT_BossSlap extends Entity {
         int screenX = worldX - gp.player.worldX + gp.player.screenX;
         int screenY = worldY - gp.player.worldY + gp.player.screenY;
         if (slapImage != null) {
-            g2.drawImage(slapImage, screenX, screenY, gp.tileSize, gp.tileSize, null);
+            g2.drawImage(slapImage, screenX, screenY, size, size, null);
         } else {
             g2.setColor(new Color(255, 80, 80, 180));
-            g2.fillOval(screenX, screenY, gp.tileSize, gp.tileSize);
+            g2.fillOval(screenX, screenY, size, size);
         }
     }
 }
