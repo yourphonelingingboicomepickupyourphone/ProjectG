@@ -421,7 +421,7 @@ public class KeyHandler implements KeyListener{
 					if (npc.dialogues[gp.currentMap][npc.dialogIndex + 1] == null
 						&& gp.currentMap == 0 && !gp.player.hasTalkedToWeaponNPC) {
 						gp.player.hasTalkedToWeaponNPC = true;
-						gp.aSetter.spawnStartingWeapons();
+						gp.aSetter.spawnStartingWeaponsAnimated();
 					}
 					if (npc.dialogues[gp.currentMap][npc.dialogIndex] != null) {
 						npc.speak();

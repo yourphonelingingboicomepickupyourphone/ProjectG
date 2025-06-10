@@ -211,6 +211,24 @@ public class GamePanel extends JPanel implements Runnable{
 
 		}
 		
+		if (aSetter.weaponSpawnAnimating) {
+            aSetter.weaponSpawnAnimTimer++;
+            if (aSetter.weaponSpawnAnimTimer >= aSetter.WEAPON_SPAWN_ANIM_DELAY) {
+                aSetter.weaponSpawnAnimTimer = 0;
+                if (aSetter.weaponSpawnAnimIndex < aSetter.pendingWeaponSpawns.size()) {
+                    // Find first empty slot
+                    int map = 0;
+                    int i = 0;
+                    while (i < obj[map].length && obj[map][i] != null) i++;
+                    if (i < obj[map].length) {
+                        obj[map][i] = aSetter.pendingWeaponSpawns.get(aSetter.weaponSpawnAnimIndex);
+                    }
+                    aSetter.weaponSpawnAnimIndex++;
+                } else {
+                    aSetter.weaponSpawnAnimating = false;
+                }
+            }
+        }
 	}
 	
 	public void paintComponent(Graphics g) {	//draw objects onscreen

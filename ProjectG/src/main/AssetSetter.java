@@ -33,6 +33,35 @@ public class AssetSetter {
 	
 	GamePanel gp;
 	
+	public java.util.List<Entity> pendingWeaponSpawns = new java.util.ArrayList<>();
+	public int weaponSpawnAnimIndex = 0;
+	int weaponSpawnAnimTimer = 0;
+	public final int WEAPON_SPAWN_ANIM_DELAY = 30; // frames between each weapon
+	public boolean weaponSpawnAnimating = false;
+
+	// Call this to start the animation:
+	public void spawnStartingWeaponsAnimated() {
+	    pendingWeaponSpawns.clear();
+	    weaponSpawnAnimIndex = 0;
+	    weaponSpawnAnimTimer = 0;
+	    weaponSpawnAnimating = true;
+
+	    int map = 0;
+	    // Prepare the weapons to be spawned
+	    pendingWeaponSpawns.add(new item.ITEM_Sword_Normal(gp));
+	    pendingWeaponSpawns.add(new item.ITEM_Spear_Normal(gp));
+	    pendingWeaponSpawns.add(new item.ITEM_Staff_Normal(gp));
+	    pendingWeaponSpawns.add(new item.ITEM_Axe_Normal(gp));
+	    pendingWeaponSpawns.add(new item.ITEM_Bow_Normal(gp));
+	    // Set their positions (adjust as needed)
+	    int[] xs = {50, 48, 46, 52, 54};
+	    int[] ys = {45, 45, 45, 45, 45};
+	    for (int i = 0; i < pendingWeaponSpawns.size(); i++) {
+	        pendingWeaponSpawns.get(i).worldX = gp.tileSize * xs[i];
+	        pendingWeaponSpawns.get(i).worldY = gp.tileSize * ys[i];
+	    }
+	}
+
 	public AssetSetter(GamePanel gp) {
 		this.gp = gp;
 	}
@@ -200,41 +229,6 @@ public class AssetSetter {
 	    }
 	}
 	
-	public void spawnStartingWeapons() {
-	    int map = 0;
-	    int i = 0;
-	    // Find first empty slots in gp.obj[map]
-	    while (i < gp.obj[map].length && gp.obj[map][i] != null) i++;
-	    if (i < gp.obj[map].length) {
-	        gp.obj[map][i] = new item.ITEM_Sword_Normal(gp);
-	        gp.obj[map][i].worldX = gp.tileSize * 50;
-	        gp.obj[map][i].worldY = gp.tileSize * 45;
-	        i++;
-	    }
-	    if (i < gp.obj[map].length) {
-	        gp.obj[map][i] = new item.ITEM_Spear_Normal(gp);
-	        gp.obj[map][i].worldX = gp.tileSize * 48;
-	        gp.obj[map][i].worldY = gp.tileSize * 45;
-	        i++;
-	    }
-	    if (i < gp.obj[map].length) {
-	        gp.obj[map][i] = new item.ITEM_Staff_Normal(gp);
-	        gp.obj[map][i].worldX = gp.tileSize * 46;
-	        gp.obj[map][i].worldY = gp.tileSize * 45;
-	        i++;
-	    }
-	    if (i < gp.obj[map].length) {
-	        gp.obj[map][i] = new item.ITEM_Axe_Normal(gp);
-	        gp.obj[map][i].worldX = gp.tileSize * 52;
-	        gp.obj[map][i].worldY = gp.tileSize * 45;
-	        i++;
-	    }
-	    if (i < gp.obj[map].length) {
-	        gp.obj[map][i] = new item.ITEM_Bow_Normal(gp);
-	        gp.obj[map][i].worldX = gp.tileSize * 54;
-	        gp.obj[map][i].worldY = gp.tileSize * 45;
-	    }
-	}
 }
 
 
