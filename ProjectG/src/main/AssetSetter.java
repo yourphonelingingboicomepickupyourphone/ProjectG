@@ -36,7 +36,7 @@ public class AssetSetter {
 	public java.util.List<Entity> pendingWeaponSpawns = new java.util.ArrayList<>();
 	public int weaponSpawnAnimIndex = 0;
 	int weaponSpawnAnimTimer = 0;
-	public final int WEAPON_SPAWN_ANIM_DELAY = 30; // frames between each weapon
+	public final int WEAPON_SPAWN_ANIM_DELAY = 20; // frames between each weapon
 	public boolean weaponSpawnAnimating = false;
 
 	// Call this to start the animation:
@@ -206,12 +206,32 @@ public class AssetSetter {
 	        int x = col * gp.tileSize;
 	        int y = row * gp.tileSize;
 
-	        // Only place if the spot is empty
+	        // Only place if the spot is empty (no monster or object collision)
 	        boolean spotTaken = false;
+
+	        // Check monsters
 	        for (Entity m : gp.monster[map]) {
 	            if (m != null && m.worldX == x && m.worldY == y) {
 	                spotTaken = true;
 	                break;
+	            }
+	        }
+
+	        // Check objects/items at this spot using collision rectangles
+	        if (!spotTaken) {
+	            java.awt.Rectangle spawnRect = new java.awt.Rectangle(x, y, gp.tileSize, gp.tileSize);
+	            for (Entity obj : gp.obj[map]) {
+	                if (obj != null) {
+	                    int objX = obj.worldX + obj.solidArea.x;
+	                    int objY = obj.worldY + obj.solidArea.y;
+	                    int objW = obj.solidArea.width;
+	                    int objH = obj.solidArea.height;
+	                    java.awt.Rectangle objRect = new java.awt.Rectangle(objX, objY, objW, objH);
+	                    if (objRect.intersects(spawnRect)) {
+	                        spotTaken = true;
+	                        break;
+	                    }
+	                }
 	            }
 	        }
 	        if (spotTaken) continue;

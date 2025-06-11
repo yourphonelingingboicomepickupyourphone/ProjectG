@@ -1,5 +1,7 @@
 package main;
 
+import entity.Entity;
+
 public class EventHandler {
 
     GamePanel gp;
@@ -58,7 +60,21 @@ public class EventHandler {
             // }
 
             if (hit(0, 50, 57, "any")) {
-                teleport(1, 50, 50); // Teleport to map 1 at coordinates (50, 50)
+                if (gp.player.hasBeginnerWeapon()) {
+                    teleport(1, 50, 50); // Teleport to map 1 at coordinates (50, 50)
+                }
+                else {
+                    for (Entity npc : gp.npc[gp.currentMap]) {
+							if (npc != null) {
+								int map = gp.currentMap;
+								npc.dialogues[map][10] = "You must take a weapon before leaving!";
+								npc.dialogIndex = 10;
+								gp.gameState = gp.dialogueState;
+								npc.speak();
+								break;
+							}
+						}
+                }
             }
         }
     }

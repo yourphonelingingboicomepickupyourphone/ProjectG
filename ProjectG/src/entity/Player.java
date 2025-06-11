@@ -1122,7 +1122,12 @@ public class Player extends Entity{
 					gp.ui.addMessage(gp.ui.tr("message.defeat_monster", gp.monster[gp.currentMap][i].name));
 					gp.player.exp += gp.monster[gp.currentMap][i].expReward;
 					gp.player.checkLevelUp();
+
+					if (gp.monster[gp.currentMap][i] instanceof monster.BOSS_Skeleking) {
+						gp.monster[gp.currentMap][i].alive = false;
+					}
 				}
+
 			}
 
 		}
@@ -1639,6 +1644,14 @@ public class Player extends Entity{
 					assignedSkills[keyIndex] = skill;
 				}
 			}
+	}
+
+	public boolean hasBeginnerWeapon() {
+		if (currentWeapon != null) return true;
+		for (Entity item : inventory) {
+			if (item != null && item.itemType == 0) return true;
+		}
+		return false;
 	}
 
 	public static class PendingWave {

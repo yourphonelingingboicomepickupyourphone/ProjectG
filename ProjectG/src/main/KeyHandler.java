@@ -436,7 +436,6 @@ public class KeyHandler implements KeyListener{
 						gp.player.hasTalkedToWeaponNPC = true;
 						gp.aSetter.spawnStartingWeaponsAnimated();
 					}
-					// If the next line is the last line, spawn weapons now	
 					if (npc.dialogues[gp.currentMap][npc.dialogIndex] != null) {
 						npc.speak();
 					} else {
@@ -1037,6 +1036,11 @@ public class KeyHandler implements KeyListener{
 			if (code == gp.keyConfig.getKey(KeyConfig.ESCAPE)) {
 				gp.gameState = gp.playState;
 			}
+			if (code == gp.keyConfig.getKey(KeyConfig.SKILLSTREE)){
+				gp.gameState = gp.skillTreeState;
+				gp.ui.assigningSkill = false; // Reset assigning state
+				gp.ui.skillsCommandNum = 0; // Reset command number
+			}
 		} else {
 			// Navigating unlocked skills
 			if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
@@ -1087,6 +1091,13 @@ public class KeyHandler implements KeyListener{
 	            gp.ui.addMessage("Unlocked: " + node.skill.getName(gp));
 	        }
 	    }
+		if (code == gp.keyConfig.getKey(KeyConfig.SKILLS)) {
+			gp.gameState = gp.skillsState; // Exit skill tree to skills menu
+			gp.ui.assigningSkill = false; // Reset assigning state
+			gp.ui.skillsCommandNum = 0; // Reset command number
+			gp.ui.skillListScroll = 0; // Reset scroll position
+			selectedSkillTreeLevel = 0; // Reset skill tree level
+		}
 		if (code == gp.keyConfig.getKey(KeyConfig.ESCAPE)) {
 	        gp.gameState = gp.playState; // Exit skill tree
 	    }	

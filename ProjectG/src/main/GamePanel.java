@@ -304,17 +304,18 @@ public class GamePanel extends JPanel implements Runnable{
 					break;
 				}
 			}
+			if (!bossAlive) {
+				player.bossArenaActive = false; // Defensive: always turn off if boss is gone
+			}
 			if (player.bossArenaActive && bossAlive) {
-		        int sx = player.bossArenaCenterX - player.worldX + player.screenX;
-		        int sy = player.bossArenaCenterY - player.worldY + player.screenY;
-		        int r = player.bossArenaRadius;
-		        g2.setColor(java.awt.Color.YELLOW);
-		        g2.setStroke(new java.awt.BasicStroke(4));
-		        g2.drawOval(sx - r, sy - r, r * 2, r * 2);
-		        g2.setStroke(new java.awt.BasicStroke(1));
-		    } else {
-		        player.bossArenaActive = false; // Defensive: turn off if boss is gone
-		    }
+			    int sx = player.bossArenaCenterX - player.worldX + player.screenX;
+			    int sy = player.bossArenaCenterY - player.worldY + player.screenY;
+			    int r = player.bossArenaRadius;
+			    g2.setColor(java.awt.Color.YELLOW);
+			    g2.setStroke(new java.awt.BasicStroke(4));
+			    g2.drawOval(sx - r, sy - r, r * 2, r * 2);
+			    g2.setStroke(new java.awt.BasicStroke(1));
+			}
 
 			//Draw UI (HP bar, mana bar, minimap, etc.)
 			ui.draw(g2);

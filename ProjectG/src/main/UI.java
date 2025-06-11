@@ -1522,7 +1522,7 @@ public class UI {
 		int buttonGap = gp.tileSize; // Space between buttons
 
 		int totalButtonsWidth = backWidth + resetWidth + buttonGap;
-		int buttonsStartX = (gp.baseWidth - totalButtonsWidth) / 2;
+		int buttonsStartX = (gp.baseWidth - totalButtonsWidth) /  2;
 
 		int backX = buttonsStartX;
 		int resetX = backX + backWidth + buttonGap;
@@ -1867,6 +1867,7 @@ public class UI {
 		g2.setFont(currentFontBold.deriveFont(Font.BOLD, 28F));
 		g2.setColor(Color.WHITE);
 		g2.drawString(tr("skills.unlocked"), listX, listY);
+		listY += gp.tileSize / 2;
 
 		g2.setFont(currentFont.deriveFont(Font.PLAIN, 22F));
 		ArrayList<skill.Skill> unlockedSkills = (ArrayList<Skill>) gp.player.getAllUnlockedSkills();
@@ -1965,7 +1966,7 @@ public class UI {
 
 				// Draw cooldown seconds
 				g2.setColor(Color.WHITE);
-				g2.setFont(currentFontBold.deriveFont(Font.BOLD, 22F));
+				g2.setFont(currentFontBold.deriveFont(Font.BOLD, 22f));
 				String cdText = String.format("%.1f", skill.getCooldown() / 60.0);
 				int textWidth = g2.getFontMetrics().stringWidth(cdText);
 				g2.drawString(cdText, slotX + (slotSize - textWidth) / 2, slotY + slotSize / 2 + 10);
@@ -2182,44 +2183,52 @@ public class UI {
 
 	// Helper to draw a skill node with highlight, icon, name, and lock
 	private void drawSkillNode(skill.SkillTreeNode node, int x, int y, int size, boolean selected) {
-	    if (selected) {
-	        g2.setColor(new Color(255, 255, 100, 200));
-	        g2.fillOval(x - size / 2 - 8, y - size / 2 - 8, size + 16, size + 16);
-	    }
-	    g2.setColor(node.unlocked ? new Color(100, 255, 100) : new Color(120, 120, 120));
-	    g2.fillOval(x - size / 2, y - size / 2, size, size);
-	    g2.setColor(Color.BLACK);
-	    g2.setStroke(new BasicStroke(3));
-	    g2.drawOval(x - size / 2, y - size / 2, size, size);
+		if (selected) {
+			g2.setColor(new Color(255, 255, 100, 200));
+			g2.fillOval(x - size / 2 - 8, y - size / 2 - 8, size + 16, size + 16);
+		}
+		g2.setColor(node.unlocked ? new Color(100, 255, 100) : new Color(120, 120, 120));
+		g2.fillOval(x - size / 2, y - size / 2, size, size);
+		g2.setColor(Color.BLACK);
+		g2.setStroke(new BasicStroke(1f));
+		g2.drawOval(x - size / 2, y - size / 2, size, size);
 
-	    // Icon
-	    if (node.skill != null && node.skill.getIcon() != null) {
-	        g2.drawImage(node.skill.getIcon(), x - size / 2 + 8, y - size / 2 + 8, size - 16, size - 16, null);
-	    }
+		// Draw icon as a circle
+		if (node.skill != null && node.skill.getIcon() != null) {
+			int iconMargin = Math.max(2, size / 20); // minimal margin
+			int iconSize = size - iconMargin * 2;
+			int iconX = x - iconSize / 2;
+			int iconY = y - iconSize / 2;
 
-	    // Name
-	    g2.setColor(Color.WHITE);
-	    g2.setFont(currentFontBold.deriveFont(Font.BOLD, 18f));
-	    String name = node.skill != null ? node.skill.getName(gp) : "???";
-	    int nameWidth = g2.getFontMetrics().stringWidth(name);
-	    g2.drawString(name, x - nameWidth / 2, y + size / 2 + 22);
+			java.awt.Shape oldClip = g2.getClip();
+			g2.setClip(new java.awt.geom.Ellipse2D.Float(iconX, iconY, iconSize, iconSize));
+			g2.drawImage(node.skill.getIcon(), iconX, iconY, iconSize, iconSize, null);
+			g2.setClip(oldClip);
+		}
 
-	    // Lock status
-	    if (!node.unlocked) {
-	        if (node.parent != null && !node.parent.unlocked) {
-	            g2.setColor(new Color(255, 80, 80, 180));
-	            g2.setFont(currentFontBold.deriveFont(Font.BOLD, 16f));
-	            String lock = "Locked";
-	            int lockWidth = g2.getFontMetrics().stringWidth(lock);
-	            g2.drawString(lock, x - lockWidth / 2, y + size / 2 + 40);
-	        } else {
-	            g2.setColor(Color.YELLOW);
-	            g2.setFont(currentFontBold.deriveFont(Font.BOLD, 16f));
-	            String unlock = "Unlockable";
-	            int unlockWidth = g2.getFontMetrics().stringWidth(unlock);
-	            g2.drawString(unlock, x - unlockWidth / 2, y + size / 2 + 40);
-	        }
-	    }
+		// Name
+		g2.setColor(Color.WHITE);
+		g2.setFont(currentFontBold.deriveFont(Font.BOLD, 18f));
+		String name = node.skill != null ? node.skill.getName(gp) : "???";
+		int nameWidth = g2.getFontMetrics().stringWidth(name);
+		g2.drawString(name, x - nameWidth / 2, y + size / 2 + 22);
+
+		// Lock status
+		if (!node.unlocked) {
+			if (node.parent != null && !node.parent.unlocked) {
+				g2.setColor(new Color(255, 80, 80, 180));
+				g2.setFont(currentFontBold.deriveFont(Font.BOLD, 16f));
+				String lock = "Locked";
+				int lockWidth = g2.getFontMetrics().stringWidth(lock);
+				g2.drawString(lock, x - lockWidth / 2, y + size / 2 + 40);
+			} else {
+				g2.setColor(Color.YELLOW);
+				g2.setFont(currentFontBold.deriveFont(Font.BOLD, 16f));
+				String unlock = "Unlockable";
+				int unlockWidth = g2.getFontMetrics().stringWidth(unlock);
+				g2.drawString(unlock, x - unlockWidth / 2, y + size / 2 + 40);
+			}
+		}
 	}
 
 	// Utility: get tree depth
