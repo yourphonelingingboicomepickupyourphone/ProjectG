@@ -74,7 +74,8 @@ public class GamePanel extends JPanel implements Runnable{
 	public final int gameOverState = 9;
 	public final int deathState = 10;
 	public final int transitionState = 11;	//Transition state for map change
-	public final int skillsState = 12;	//Skill tree state
+	public final int skillsState = 12;	
+	public final int skillTreeState = 13; //Skill tree state
 
 	public boolean debugMode = false;	//Debug mode, true to enable debug features
 

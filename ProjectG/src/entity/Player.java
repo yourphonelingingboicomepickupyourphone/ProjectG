@@ -9,6 +9,7 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 import javax.imageio.ImageIO;
@@ -81,6 +82,9 @@ public class Player extends Entity{
 	public int pendingTeleportX = 0;
 	public int pendingTeleportY = 0;
 
+	public skill.SkillTreeNode skillTreeRoot;
+	public int skillPoints = 0; // Points available to spend
+
 	public Player(GamePanel gp, KeyHandler kH) {
 
 		super(gp);
@@ -105,6 +109,7 @@ public class Player extends Entity{
 		}
 		setItems();
 		initializeSkills();
+		initializeSkillTree();
 	}
 	
 	public void setDefaultValues() {
@@ -364,6 +369,23 @@ public class Player extends Entity{
 			} else {
 				assignedSkills[i] = null;
 			}
+		}
+		// After restoring objects:
+		boolean weaponsPresent = false;
+		for (Entity obj : gp.obj[0]) {
+			if (obj != null && (
+				obj instanceof item.ITEM_Sword_Normal ||
+				obj instanceof item.ITEM_Axe_Normal ||
+				obj instanceof item.ITEM_Bow_Normal ||
+				obj instanceof item.ITEM_Staff_Normal ||
+				obj instanceof item.ITEM_Spear_Normal
+			)) {
+				weaponsPresent = true;
+				break;
+			}
+		}
+		if (!weaponsPresent) {
+			hasTalkedToWeaponNPC = false;
 		}
 	}
 
@@ -1117,6 +1139,7 @@ public class Player extends Entity{
 			nextLevelExp = calculateNextLevelExp(level); // Make sure you have this method!
 			totalProgressionPoints += 10;
 			progressionPoints += 10;
+			skillPoints++;
 			gp.ui.addMessage(gp.ui.tr("message.level_up", level));
 		}
 		// Optionally, handle max level overflow
@@ -1550,17 +1573,12 @@ public class Player extends Entity{
 	public void initializeSkills() {
 	    // Example: Add all unlocked skills here (could be loaded from save or progression)
 	    unlockedSkills.clear();
-	    unlockedSkills.add(new skill.SKILL_Fireball(this.gp));
-	    unlockedSkills.add(new skill.SKILL_Fireball(this.gp));
-	    unlockedSkills.add(new skill.SKILL_Dash(this.gp));
-	    unlockedSkills.add(new skill.SKILL_Earthquake(this.gp));
-	    // ...add more as needed
 
 	    // Assign default skills to Q/W/E/R (indices 0-3)
-	    assignedSkills[0] = unlockedSkills.get(0); // Q
-	    assignedSkills[1] = unlockedSkills.get(1); // W
-	    assignedSkills[2] = unlockedSkills.get(2); // E
-	    assignedSkills[3] = unlockedSkills.get(3); // R
+	    // assignedSkills[0] = unlockedSkills.get(0); // Q
+	    // assignedSkills[1] = unlockedSkills.get(1); // W
+	    // assignedSkills[2] = unlockedSkills.get(2); // E
+	    // assignedSkills[3] = unlockedSkills.get(3); // R
 
 		try {
 			earthquakeAnimFrames = new BufferedImage[2]; // Adjust the number to your frame count
@@ -1570,6 +1588,20 @@ public class Player extends Entity{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void initializeSkillTree() {
+	    // Example: create a simple skill tree
+	    skillTreeRoot = new skill.SkillTreeNode(new skill.SKILL_Dash(gp));
+	    skillTreeRoot.unlocked = true; // Root is always unlocked
+
+	    skill.SkillTreeNode dashNode = new skill.SkillTreeNode(new skill.SKILL_Earthquake(gp));
+	    skillTreeRoot.children.add(dashNode);
+	    dashNode.parent = skillTreeRoot;
+
+	    skill.SkillTreeNode earthquakeNode = new skill.SkillTreeNode(new skill.SKILL_Fireball(gp));
+	    dashNode.children.add(earthquakeNode);
+	    earthquakeNode.parent = dashNode;
 	}
 
 	// Use the skill assigned to a specific key (Q/W/E/R)
@@ -1590,16 +1622,23 @@ public class Player extends Entity{
 
 	// Optionally, add a method to assign a skill to a key (for use in a skill menu)
 	public void assignSkillToKey(int keyIndex, Skill skill) {
-		if (keyIndex >= 0 && keyIndex < assignedSkills.length && unlockedSkills.contains(skill)) {
-			try {
-				// Create a new instance of the skill for this slot
-				Skill newSkill = skill.getClass().getConstructor(main.GamePanel.class).newInstance(this.gp);
-				assignedSkills[keyIndex] = newSkill;
-			} catch (Exception e) {
-				// Fallback: assign the same instance if reflection fails
-				assignedSkills[keyIndex] = skill;
+		List<Skill> allUnlocked = getAllUnlockedSkills();
+			if (keyIndex >= 0 && keyIndex < assignedSkills.length && allUnlocked.contains(skill)) {
+				// Remove this skill from any other slot
+				for (int i = 0; i < assignedSkills.length; i++) {
+					if (assignedSkills[i] != null && assignedSkills[i].getClass() == skill.getClass()) {
+						assignedSkills[i] = null;
+					}
+				}
+				try {
+					// Create a new instance of the skill for this slot
+					Skill newSkill = skill.getClass().getConstructor(main.GamePanel.class).newInstance(this.gp);
+					assignedSkills[keyIndex] = newSkill;
+				} catch (Exception e) {
+					// Fallback: assign the same instance if reflection fails
+					assignedSkills[keyIndex] = skill;
+				}
 			}
-		}
 	}
 
 	public static class PendingWave {
@@ -1615,5 +1654,19 @@ public class Player extends Entity{
 
 	public int calculateNextLevelExp(int level){
 		return (int)(100 * (1 - ((4 - level * 30) / (0.1 * level + 4))));
+	}
+
+	public java.util.List<Skill> getAllUnlockedSkills() {
+		List<Skill> unlocked = new ArrayList<>();
+		collectUnlockedSkills(skillTreeRoot, unlocked);
+		return unlocked;
+	}
+
+	private void collectUnlockedSkills(skill.SkillTreeNode node, List<Skill> unlocked) {
+		if (node == null) return;
+		if (node.unlocked && node.skill != null) unlocked.add(node.skill);
+		for (skill.SkillTreeNode child : node.children) {
+			collectUnlockedSkills(child, unlocked);
+		}
 	}
 }

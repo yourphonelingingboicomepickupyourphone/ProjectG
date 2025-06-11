@@ -75,6 +75,9 @@ public class UI {
 
 	public int counter = 0; // Counter for various animations and effects
 
+	public int skillListScroll = 0;
+	public final int maxVisibleSkills = 7; // Number of skills visible at once
+
 	public UI(GamePanel gp) {
 		this.gp = gp;
 		
@@ -178,6 +181,10 @@ public class UI {
 		}
 		else if (gp.gameState == gp.skillsState){
 			drawSkillScreen();
+		}
+		else if (gp.gameState == gp.skillTreeState) {
+			drawSkillTreeScreen();
+			return;
 		}
 	}
 
@@ -1861,19 +1868,37 @@ public class UI {
 		g2.setColor(Color.WHITE);
 		g2.drawString(tr("skills.unlocked"), listX, listY);
 
-		int skillListY = listY + gp.tileSize / 2;
 		g2.setFont(currentFont.deriveFont(Font.PLAIN, 22F));
-		for (int i = 0; i < gp.player.unlockedSkills.size(); i++) {
-			Skill skill = gp.player.unlockedSkills.get(i);
+		ArrayList<skill.Skill> unlockedSkills = (ArrayList<Skill>) gp.player.getAllUnlockedSkills();
+		int unlockedCount = unlockedSkills.size();
+		int start = skillListScroll;
+		int end = Math.min(start + maxVisibleSkills, unlockedCount);
+
+		for (int i = start; i < end; i++) {
+			skill.Skill skill = unlockedSkills.get(i);
+			int y = listY + (i - start) * gp.tileSize;
 			// Highlight if assigning and this skill is selected
 			if (assigningSkill && skillsCommandNum == i + 4) {
 				g2.setColor(new Color(100, 200, 255, 180));
-				g2.fillRoundRect(listX - 8, skillListY - 24, width - 2 * gp.tileSize, gp.tileSize, 16, 16);
+				g2.fillRoundRect(listX - 8, y - 24, width - 2 * gp.tileSize, gp.tileSize, 16, 16);
 				g2.setColor(Color.WHITE);
 			}
 			String skillText = skill.getName(this.gp) + " - " + skill.getDescription(this.gp);
-			g2.drawString(skillText, listX, skillListY);
-			skillListY += gp.tileSize;
+			g2.drawString(skillText, listX, y);
+		}
+
+		// Draw scroll bar if needed
+		if (unlockedCount > maxVisibleSkills) {
+			int barHeight = gp.tileSize * maxVisibleSkills;
+			int barY = listY;
+			int barX = frameX + width - gp.tileSize / 2;
+			int scrollHeight = Math.max(gp.tileSize / 2, (int) ((float)maxVisibleSkills / unlockedCount * barHeight));
+			int scrollY = barY + (int) ((float)skillListScroll / unlockedCount * barHeight);
+
+			g2.setColor(new Color(180, 180, 180, 180));
+			g2.fillRoundRect(barX, barY, gp.tileSize / 6, barHeight, 8, 8);
+			g2.setColor(new Color(80, 80, 255, 220));
+			g2.fillRoundRect(barX, scrollY, gp.tileSize / 6, scrollHeight, 8, 8);
 		}
 
 		// Instructions
@@ -2079,5 +2104,150 @@ public class UI {
 		g2.setColor(Color.WHITE);
 		int keyTextWidth = g2.getFontMetrics().stringWidth(keyName);
 		g2.drawString(keyName, flashX + 4, flashY + slotSize - 4);
+	}
+
+	public void drawSkillTreeScreen() {
+	    // Background
+	    g2.setColor(new Color(0, 0, 0, 230));
+	    g2.fillRect(0, 0, gp.baseWidth, gp.baseHeight);
+
+	    int centerX = gp.baseWidth / 2;
+	    int startY = gp.tileSize * 2;
+	    int nodeSize = gp.tileSize * 2;
+	    int verticalGap = gp.tileSize * 3;
+	    int horizontalGap = gp.tileSize * 3;
+
+	    // Title
+	    g2.setFont(currentFontBold.deriveFont(Font.BOLD, 48f));
+	    String title = "Skill Tree";
+	    int titleWidth = g2.getFontMetrics().stringWidth(title);
+	    g2.setColor(Color.WHITE);
+	    g2.drawString(title, centerX - titleWidth / 2, startY);
+
+	    // Skill points
+	    g2.setFont(currentFontBold.deriveFont(Font.BOLD, 28f));
+	    String points = "Skill Points: " + gp.player.skillPoints;
+	    int pointsWidth = g2.getFontMetrics().stringWidth(points);
+	    g2.setColor(Color.YELLOW);
+	    g2.drawString(points, centerX - pointsWidth / 2, startY + gp.tileSize);
+
+	    // --- Draw the tree recursively ---
+	    skill.SkillTreeNode root = gp.player.skillTreeRoot;
+	    int treeDepth = getSkillTreeDepth(root);
+	    int[] maxWidths = new int[treeDepth];
+	    getMaxWidths(root, 0, maxWidths);
+
+	    int rootY = startY + gp.tileSize * 2;
+	    int rootX = centerX;
+
+	    // Find selected node
+	    int selectedLevel = gp.keyH.selectedSkillTreeLevel;
+	    int selectedIndex = gp.keyH.selectedSkillTreeIndex;
+	    skill.SkillTreeNode selected = getSelectedSkillTreeNode(root, selectedLevel, selectedIndex);
+
+	    // Draw recursively
+	    drawSkillTreeNodeRecursive(root, rootX, rootY, nodeSize, verticalGap, horizontalGap, 0, 0, selected);
+
+	    // Instructions
+	    g2.setFont(currentFont.deriveFont(Font.PLAIN, 24f));
+	    g2.setColor(Color.LIGHT_GRAY);
+	    String instr = "ARROWS: Move   ENTER: Unlock   ESC: Close";
+	    int instrWidth = g2.getFontMetrics().stringWidth(instr);
+	    g2.drawString(instr, centerX - instrWidth / 2, gp.baseHeight - gp.tileSize);
+	}
+
+	// Recursively draw the skill tree
+	private void drawSkillTreeNodeRecursive(skill.SkillTreeNode node, int x, int y, int size, int vGap, int hGap, int level, int index, skill.SkillTreeNode selected) {
+	    // Draw children first (so lines go under nodes)
+	    int numChildren = node.children.size();
+	    if (numChildren > 0) {
+	        int totalWidth = (numChildren - 1) * hGap;
+	        int childX = x - totalWidth / 2;
+	        int childY = y + vGap;
+	        for (int i = 0; i < numChildren; i++) {
+	            skill.SkillTreeNode child = node.children.get(i);
+	            // Draw line from parent to child
+	            g2.setColor(Color.WHITE);
+	            g2.setStroke(new BasicStroke(3));
+	            g2.drawLine(x, y + size / 2, childX, childY - size / 2);
+	            // Draw child recursively
+	            drawSkillTreeNodeRecursive(child, childX, childY, size, vGap, hGap, level + 1, i, selected);
+	            childX += hGap;
+	        }
+	    }
+	    // Draw this node
+	    boolean isSelected = (node == selected);
+	    drawSkillNode(node, x, y, size, isSelected);
+	}
+
+	// Helper to draw a skill node with highlight, icon, name, and lock
+	private void drawSkillNode(skill.SkillTreeNode node, int x, int y, int size, boolean selected) {
+	    if (selected) {
+	        g2.setColor(new Color(255, 255, 100, 200));
+	        g2.fillOval(x - size / 2 - 8, y - size / 2 - 8, size + 16, size + 16);
+	    }
+	    g2.setColor(node.unlocked ? new Color(100, 255, 100) : new Color(120, 120, 120));
+	    g2.fillOval(x - size / 2, y - size / 2, size, size);
+	    g2.setColor(Color.BLACK);
+	    g2.setStroke(new BasicStroke(3));
+	    g2.drawOval(x - size / 2, y - size / 2, size, size);
+
+	    // Icon
+	    if (node.skill != null && node.skill.getIcon() != null) {
+	        g2.drawImage(node.skill.getIcon(), x - size / 2 + 8, y - size / 2 + 8, size - 16, size - 16, null);
+	    }
+
+	    // Name
+	    g2.setColor(Color.WHITE);
+	    g2.setFont(currentFontBold.deriveFont(Font.BOLD, 18f));
+	    String name = node.skill != null ? node.skill.getName(gp) : "???";
+	    int nameWidth = g2.getFontMetrics().stringWidth(name);
+	    g2.drawString(name, x - nameWidth / 2, y + size / 2 + 22);
+
+	    // Lock status
+	    if (!node.unlocked) {
+	        if (node.parent != null && !node.parent.unlocked) {
+	            g2.setColor(new Color(255, 80, 80, 180));
+	            g2.setFont(currentFontBold.deriveFont(Font.BOLD, 16f));
+	            String lock = "Locked";
+	            int lockWidth = g2.getFontMetrics().stringWidth(lock);
+	            g2.drawString(lock, x - lockWidth / 2, y + size / 2 + 40);
+	        } else {
+	            g2.setColor(Color.YELLOW);
+	            g2.setFont(currentFontBold.deriveFont(Font.BOLD, 16f));
+	            String unlock = "Unlockable";
+	            int unlockWidth = g2.getFontMetrics().stringWidth(unlock);
+	            g2.drawString(unlock, x - unlockWidth / 2, y + size / 2 + 40);
+	        }
+	    }
+	}
+
+	// Utility: get tree depth
+	private int getSkillTreeDepth(skill.SkillTreeNode node) {
+	    if (node.children.isEmpty()) return 1;
+	    int max = 0;
+	    for (skill.SkillTreeNode child : node.children) {
+	        max = Math.max(max, getSkillTreeDepth(child));
+	    }
+	    return max + 1;
+	}
+
+	// Utility: get max width at each level (for future expansion)
+	private void getMaxWidths(skill.SkillTreeNode node, int level, int[] maxWidths) {
+	    if (maxWidths.length > level) maxWidths[level]++;
+	    for (skill.SkillTreeNode child : node.children) {
+	        getMaxWidths(child, level + 1, maxWidths);
+	    }
+	}
+
+	// Utility: get selected node by level/index
+	private skill.SkillTreeNode getSelectedSkillTreeNode(skill.SkillTreeNode root, int level, int index) {
+	    skill.SkillTreeNode node = root;
+	    for (int l = 0; l < level; l++) {
+	        if (node.children.size() > index) node = node.children.get(index);
+	        else if (!node.children.isEmpty()) node = node.children.get(0);
+	        else break;
+	    }
+	    return node;
 	}
 }

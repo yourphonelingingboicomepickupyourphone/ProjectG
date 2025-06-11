@@ -2,8 +2,11 @@ package main;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 import entity.Entity;
+import skill.Skill;
 
 public class KeyHandler implements KeyListener{
 	
@@ -14,6 +17,8 @@ public class KeyHandler implements KeyListener{
 	}
 	
 	public boolean upPressed, downPressed, leftPressed, rightPressed, enterPressed, spacePressed, escPressed, flashPressed;
+	public int selectedSkillTreeLevel = 0;
+	public int selectedSkillTreeIndex = 0;
 
 	@Override
 	public void keyTyped(KeyEvent e) {
@@ -70,6 +75,9 @@ public class KeyHandler implements KeyListener{
 		}
 		else if (gp.gameState == gp.skillsState) {
 			skillsState(code);
+		}
+		else if (gp.gameState == gp.skillTreeState) {
+			skillTreeState(code);
 		}
 		
 
@@ -374,6 +382,10 @@ public class KeyHandler implements KeyListener{
 			gp.gameState = gp.skillsState;
 			gp.ui.skillsCommandNum = 0;
 			gp.ui.assigningSkill = false;
+			gp.ui.skillListScroll = 0; 
+		}
+		if (code == KeyEvent.VK_T) {
+			gp.gameState = gp.skillTreeState;
 		}
 	}
 
@@ -419,10 +431,12 @@ public class KeyHandler implements KeyListener{
 				if (npc != null && npc.dialogues != null && npc.dialogues.length > 0) {
 					// If the next line is the last line, spawn weapons now
 					if (npc.dialogues[gp.currentMap][npc.dialogIndex + 1] == null
-						&& gp.currentMap == 0 && !gp.player.hasTalkedToWeaponNPC) {
+						&& gp.currentMap == 0
+						&& (!gp.player.hasTalkedToWeaponNPC || !areStartingWeaponsPresent())) {
 						gp.player.hasTalkedToWeaponNPC = true;
 						gp.aSetter.spawnStartingWeaponsAnimated();
 					}
+					// If the next line is the last line, spawn weapons now	
 					if (npc.dialogues[gp.currentMap][npc.dialogIndex] != null) {
 						npc.speak();
 					} else {
@@ -990,7 +1004,8 @@ public class KeyHandler implements KeyListener{
 
 	public void skillsState(int code) {
 		if (blockMenusInBossArena(code)) return;
-		int unlockedCount = gp.player.unlockedSkills.size();
+		ArrayList<skill.Skill> unlockedSkills = (ArrayList<Skill>) gp.player.getAllUnlockedSkills();
+		int unlockedCount = unlockedSkills.size();
 
 		if (!gp.ui.assigningSkill) {
 			// Navigating slots (Q/W/E/R)
@@ -1027,10 +1042,15 @@ public class KeyHandler implements KeyListener{
 			if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
 				gp.ui.skillsCommandNum--;
 				if (gp.ui.skillsCommandNum < 4) gp.ui.skillsCommandNum = 4 + unlockedCount - 1;
+				// Scroll up if needed
+				if (gp.ui.skillsCommandNum - 4 < gp.ui.skillListScroll) gp.ui.skillListScroll = gp.ui.skillsCommandNum - 4;
 			}
 			if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
 				gp.ui.skillsCommandNum++;
 				if (gp.ui.skillsCommandNum >= 4 + unlockedCount) gp.ui.skillsCommandNum = 4;
+				// Scroll down if needed
+				if (gp.ui.skillsCommandNum - 4 >= gp.ui.skillListScroll + gp.ui.maxVisibleSkills)
+					gp.ui.skillListScroll = gp.ui.skillsCommandNum - 4 - gp.ui.maxVisibleSkills + 1;
 			}
 			if (code == gp.keyConfig.getKey(KeyConfig.LEFT) || code == gp.keyConfig.getKey(KeyConfig.RIGHT)) {
 				gp.ui.assigningSkill = false;
@@ -1039,11 +1059,11 @@ public class KeyHandler implements KeyListener{
 			if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
 				int skillIndex = gp.ui.skillsCommandNum - 4;
 				if (skillIndex >= 0 && skillIndex < unlockedCount) {
-					int slotIndex = gp.ui.skillAssignSlotIndex; // Use the saved slot index!
-					gp.player.assignSkillToKey(slotIndex, gp.player.unlockedSkills.get(skillIndex));
+					int slotIndex = gp.ui.skillAssignSlotIndex;
+					gp.player.assignSkillToKey(slotIndex, unlockedSkills.get(skillIndex));
 					gp.ui.assigningSkill = false;
 					gp.ui.skillsCommandNum = slotIndex;
-					gp.ui.addMessage(gp.ui.tr("skills.assigned", gp.player.unlockedSkills.get(skillIndex).getName(this.gp), "1234".charAt(slotIndex) + ""));
+					gp.ui.addMessage(gp.ui.tr("skills.assigned", unlockedSkills.get(skillIndex).getName(this.gp), "1234".charAt(slotIndex) + ""));
 				}
 			}
 			if (code == gp.keyConfig.getKey(KeyConfig.ESCAPE)) {
@@ -1051,6 +1071,52 @@ public class KeyHandler implements KeyListener{
 				gp.ui.skillsCommandNum = gp.ui.skillAssignSlotIndex; // Restore slot selection
 			}
 		}
+	}
+
+	public void skillTreeState(int code) {
+	    // Example navigation: up/down to move, enter to unlock
+	    if (code == gp.keyConfig.getKey(KeyConfig.UP)) selectedSkillTreeLevel--;
+	    if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) selectedSkillTreeLevel++;
+	    if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
+	        // Find selected node and unlock if possible
+	        skill.SkillTreeNode node = getSelectedSkillTreeNode();
+	        if (node != null && !node.unlocked && node.parent != null && node.parent.unlocked && gp.player.skillPoints >= node.requiredPoints) {
+	            node.unlocked = true;
+	            gp.player.skillPoints -= node.requiredPoints;
+	            gp.player.unlockedSkills.add(node.skill);
+	            gp.ui.addMessage("Unlocked: " + node.skill.getName(gp));
+	        }
+	    }
+		if (code == gp.keyConfig.getKey(KeyConfig.ESCAPE)) {
+	        gp.gameState = gp.playState; // Exit skill tree
+	    }	
+	}
+
+	private skill.SkillTreeNode getSelectedSkillTreeNode() {
+	    // Traverse tree based on selectedSkillTreeLevel/Index (implement as needed)
+	    // For a simple vertical tree:
+	    skill.SkillTreeNode node = gp.player.skillTreeRoot;
+	    for (int i = 0; i < selectedSkillTreeLevel; i++) {
+	        if (node.children.size() > 0) node = node.children.get(0);
+	        else return null;
+	    }
+	    return node;
+	}
+
+	private boolean areStartingWeaponsPresent() {
+		int map = 0;
+		for (Entity obj : gp.obj[map]) {
+			if (obj != null && (
+				obj instanceof item.ITEM_Sword_Normal ||
+				obj instanceof item.ITEM_Axe_Normal ||
+				obj instanceof item.ITEM_Bow_Normal ||
+				obj instanceof item.ITEM_Staff_Normal ||
+				obj instanceof item.ITEM_Spear_Normal
+			)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private boolean blockMenusInBossArena(int code) {
