@@ -78,6 +78,10 @@ public class UI {
 	public int skillListScroll = 0;
 	public final int maxVisibleSkills = 7; // Number of skills visible at once
 
+	public int saveSlotIndex = 0; // 0-based, for slot 1, 2, 3...
+	public final int maxSaveSlots = 3;
+	public boolean isSaving = true; // Flag to indicate if currently saving
+
 	public UI(GamePanel gp) {
 		this.gp = gp;
 		
@@ -185,6 +189,9 @@ public class UI {
 		else if (gp.gameState == gp.skillTreeState) {
 			drawSkillTreeScreen();
 			return;
+		}
+		else if (gp.gameState == gp.saveLoadState) {
+			drawSaveLoadScreen(g2, isSaving);
 		}
 	}
 
@@ -2258,5 +2265,96 @@ public class UI {
 	        else break;
 	    }
 	    return node;
+	}
+
+	// Example: In your drawPauseScreen() or a new drawSaveLoadScreen()
+	public void drawSaveLoadScreen(Graphics2D g2, boolean isSaving) {
+	    int width = gp.tileSize * 8;
+	    int height = gp.tileSize * 7;
+	    int frameX = (gp.baseWidth - width) / 2;
+	    int frameY = (gp.baseHeight - height) / 2;
+
+	    drawSubWindow(frameX, frameY, width, height);
+
+	    // Title
+	    g2.setFont(currentFontBold.deriveFont(Font.BOLD, 48f));
+	    String title = isSaving ? "Save Game" : "Load Game";
+	    int titleX = getXForCenteredText(title);
+	    int titleY = frameY + gp.tileSize * 2 / 3;
+	    g2.setColor(Color.WHITE);
+	    g2.drawString(title, titleX, titleY);
+
+	    // Slot list
+	    g2.setFont(currentFontBold.deriveFont(Font.BOLD, 36f));
+	    int slotBoxW = width - gp.tileSize * 3;
+	    int slotBoxH = gp.tileSize * 3 / 2;
+	    int slotStartY = titleY + gp.tileSize * 2;
+	    int slotGap = gp.tileSize / 2;
+
+	    for (int i = 0; i < maxSaveSlots; i++) {
+	        int slotX = frameX + (width - slotBoxW) / 2;
+	        int slotY = slotStartY + i * (slotBoxH + slotGap);
+
+	        // Highlight selected slot
+	        if (saveSlotIndex == i) {
+	            g2.setColor(new Color(255, 255, 100, 180));
+	            g2.fillRoundRect(slotX - 6, slotY - 6, slotBoxW + 12, slotBoxH + 12, 32, 32);
+	            g2.setColor(Color.YELLOW);
+	            g2.setStroke(new BasicStroke(3f));
+	            g2.drawRoundRect(slotX - 6, slotY - 6, slotBoxW + 12, slotBoxH + 12, 32, 32);
+	            g2.setStroke(new BasicStroke(1f));
+	        }
+
+	        // Slot background
+	        g2.setColor(new Color(40, 40, 40, 220));
+	        g2.fillRoundRect(slotX, slotY, slotBoxW, slotBoxH, 24, 24);
+	        g2.setColor(Color.WHITE);
+	        g2.drawRoundRect(slotX, slotY, slotBoxW, slotBoxH, 24, 24);
+
+	        // Slot text
+	        String slotText = "Slot " + (i + 1);
+	        int slotTextX = slotX + (slotBoxW - g2.getFontMetrics().stringWidth(slotText)) / 2;
+	        int slotTextY = slotY + slotBoxH / 2 + g2.getFontMetrics().getAscent() / 2 - 6;
+	        g2.setColor(Color.WHITE);
+	        g2.drawString(slotText, slotTextX, slotTextY);
+
+	        // Save date/time
+	        String dateTime = getSaveSlotDateTime(i);
+	        g2.setFont(currentFont.deriveFont(Font.PLAIN, 20f));
+	        int dateTextX = slotX + (slotBoxW - g2.getFontMetrics().stringWidth(dateTime)) / 2;
+	        int dateTextY = slotY + slotBoxH - 10;
+	        g2.setColor(Color.LIGHT_GRAY);
+	        g2.drawString(dateTime, dateTextX, dateTextY);
+
+	        // Restore font for next slot
+	        g2.setFont(currentFontBold.deriveFont(Font.BOLD, 36f));
+	    }
+
+	    // Instructions
+	    g2.setFont(currentFont.deriveFont(Font.PLAIN, 22f));
+	    g2.setColor(Color.LIGHT_GRAY);
+	    String instr = "Use UP/DOWN to select, ENTER to " + (isSaving ? "save" : "load") + ", ESC to cancel";
+	    int instrX = getXForCenteredText(instr);
+	    int instrY = frameY + height - gp.tileSize;
+	    g2.drawString(instr, instrX, instrY);
+	}
+
+	public String getSaveSlotDateTime(int slot) {
+		java.io.File meta = new java.io.File("save_slot" + (slot + 1) + ".meta");
+		if (!meta.exists()) return "Empty";
+		try (java.io.BufferedReader br = new java.io.BufferedReader(new java.io.FileReader(meta))) {
+			String line = br.readLine();
+			if (line != null && !line.isEmpty()) {
+				// Format: 2025-06-11T15:23:45.123
+				String[] parts = line.split("T");
+				if (parts.length == 2) {
+					return parts[0] + " " + parts[1].substring(0, 8); // yyyy-MM-dd HH:mm:ss
+				}
+				return line;
+			}
+		} catch (Exception e) {
+			return "Corrupt";
+		}
+		return "Empty";
 	}
 }

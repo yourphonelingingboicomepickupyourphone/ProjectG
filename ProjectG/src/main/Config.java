@@ -60,18 +60,18 @@ public class Config {
         }
     }
 
-    public void savePlayer(Player player) {
-		DataStorage data = player.toDataStorage();
-		data.savePlayerData(data);
-	}
+    public void savePlayer(Player player, int slot) {
+        DataStorage data = player.toDataStorage();
+        data.savePlayerData(data, slot);
+    }
 
-    public void loadPlayer(Player player) {
-        File saveFile = new File("save.dat");
+    public void loadPlayer(Player player, int slot) {
+        File saveFile = new File("save_slot" + slot + ".dat");
         if (!saveFile.exists()) {
-            System.out.println("No save file found, skipping load.");
+            System.out.println("No save file found for slot " + slot + ", skipping load.");
             return;
         }
-        DataStorage data = new DataStorage().loadPlayerData();
+        DataStorage data = new DataStorage().loadPlayerData(slot);
         if (data != null) {
             player.fromDataStorage(data);
         }

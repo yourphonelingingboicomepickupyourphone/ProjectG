@@ -79,6 +79,9 @@ public class KeyHandler implements KeyListener{
 		else if (gp.gameState == gp.skillTreeState) {
 			skillTreeState(code);
 		}
+		else if (gp.gameState == gp.saveLoadState) {
+			saveLoadState(code);
+		}
 		
 
 	}
@@ -109,7 +112,7 @@ public class KeyHandler implements KeyListener{
 					gp.ui.titleScreenState = 1; 
 				}
 				if (gp.ui.commandNum == 1) {
-					gp.config.loadPlayer(gp.player);
+					gp.config.loadPlayer(gp.player, code);
 				}
 				if (gp.ui.commandNum == 2) {
 					gp.ui.commandNum = 0; // Reset cursor to first option
@@ -408,9 +411,9 @@ public class KeyHandler implements KeyListener{
 			switch (gp.ui.pauseCommandNum) {
 				case 0: gp.gameState = gp.playState; break; // Continue
 				case 1: 
-					gp.config.savePlayer(gp.player);
-					gp.gameState = gp.playState;
-					gp.ui.addMessage(gp.ui.tr("message.saved"));
+					gp.ui.isSaving = true;
+					gp.gameState = gp.saveLoadState;
+					gp.ui.saveSlotIndex = 0;
 					break; // Save
 				case 2: gp.gameState = gp.optionsState; break; // Settings
 				case 3: // Return to Main Menu
@@ -1145,4 +1148,26 @@ public class KeyHandler implements KeyListener{
         }
         return false;
     }
+
+	public void saveLoadState(int code) {
+	    if (code == KeyEvent.VK_UP) {
+	        gp.ui.saveSlotIndex = (gp.ui.saveSlotIndex + gp.ui.maxSaveSlots - 1) % gp.ui.maxSaveSlots;
+	    }
+	    if (code == KeyEvent.VK_DOWN) {
+	        gp.ui.saveSlotIndex = (gp.ui.saveSlotIndex + 1) % gp.ui.maxSaveSlots;
+	    }
+	    if (code == KeyEvent.VK_ENTER) {
+	        if (gp.ui.isSaving) {
+	            gp.config.savePlayer(gp.player, gp.ui.saveSlotIndex + 1);
+	            gp.ui.addMessage("Game saved to slot " + (gp.ui.saveSlotIndex + 1));
+	        } else {
+	            gp.config.loadPlayer(gp.player, gp.ui.saveSlotIndex + 1);
+	            gp.ui.addMessage("Game loaded from slot " + (gp.ui.saveSlotIndex + 1));
+	        }
+	        gp.gameState = gp.playState;
+	    }
+	    if (code == KeyEvent.VK_ESCAPE) {
+	        gp.gameState = gp.playState;
+	    }
+	}
 }

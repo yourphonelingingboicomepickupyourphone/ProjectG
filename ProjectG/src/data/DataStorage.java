@@ -57,17 +57,21 @@ public class DataStorage implements Serializable{
     public ArrayList<Integer> assignedSkillCooldowns = new ArrayList<>();
 
     
-    public void savePlayerData(DataStorage data) {
-        try (FileOutputStream fos = new FileOutputStream("save.dat");
-            ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+    public void savePlayerData(DataStorage data, int slot) {
+        try (FileOutputStream fos = new FileOutputStream("save_slot" + slot + ".dat");
+         ObjectOutputStream oos = new ObjectOutputStream(fos)) {
             oos.writeObject(data);
+            // Save date/time
+            try (java.io.FileWriter fw = new java.io.FileWriter("save_slot" + slot + ".meta")) {
+                fw.write(java.time.LocalDateTime.now().toString());
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public DataStorage loadPlayerData() {
-        try (FileInputStream fis = new FileInputStream("save.dat");
+    public DataStorage loadPlayerData(int slot) {
+        try (FileInputStream fis = new FileInputStream("save_slot" + slot + ".dat");
             ObjectInputStream ois = new ObjectInputStream(fis)) {
             return (DataStorage) ois.readObject();
         } catch (Exception e) {
