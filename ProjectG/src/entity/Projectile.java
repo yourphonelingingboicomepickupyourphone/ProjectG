@@ -28,7 +28,7 @@ public class Projectile extends Entity {
             int monsterIndex = gp.cChecker.checkEntity(this, gp.monster);
             if (monsterIndex != -999) {
                 gp.player.damageMonster(monsterIndex);
-                alive = false;
+                alive = true;
             }
         } else if (user != gp.player) {
 

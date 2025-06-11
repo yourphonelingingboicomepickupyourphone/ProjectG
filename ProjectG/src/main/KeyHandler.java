@@ -104,6 +104,13 @@ public class KeyHandler implements KeyListener{
 		
 			if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
 				if (gp.ui.commandNum == 0) {
+					// Reset all save slots
+				    for (int i = 1; i <= gp.ui.maxSaveSlots; i++) {
+				        java.io.File saveFile = new java.io.File("save_slot" + i + ".dat");
+				        if (saveFile.exists()) saveFile.delete();
+				        java.io.File metaFile = new java.io.File("save_slot" + i + ".meta");
+				        if (metaFile.exists()) metaFile.delete();
+				    }
 					gp.keyConfig.resetToDefault(); // Reset key bindings to default
 					gp.config.saveConfig(); // Load the config to apply changes
 					gp.ui.resetKeyboardCursor();
@@ -112,7 +119,9 @@ public class KeyHandler implements KeyListener{
 					gp.ui.titleScreenState = 1; 
 				}
 				if (gp.ui.commandNum == 1) {
-					gp.config.loadPlayer(gp.player, code);
+					gp.ui.isSaving = false;
+					gp.ui.saveSlotIndex = 0;
+					gp.gameState = gp.saveLoadState;
 				}
 				if (gp.ui.commandNum == 2) {
 					gp.ui.commandNum = 0; // Reset cursor to first option
