@@ -19,17 +19,51 @@ public class Projectile extends Entity {
         this.direction = direction;
         this.alive = alive;
         this.user = user;
-        this.attackRange = 4 * gp.tileSize; //attack range in tiles
+        this.attackRange = gp.tileSize / 2; //attack range in tiles
     }
 
     public void update(){
         System.out.println("Projectile update: " + this.getClass().getName() + " alive=" + alive + " pos=" + worldX + "," + worldY);
         if (user == gp.player){
             int monsterIndex = gp.cChecker.checkEntity(this, gp.monster);
-            if (monsterIndex != -999) {
-                gp.player.damageMonster(monsterIndex);
-                alive = true;
+            if (monsterIndex != 999) {
+                Entity target = gp.monster[gp.currentMap][monsterIndex];
+                int dmg = (this.attackBonus > 0 ? this.attackBonus : 1); // Use projectile's attackBonus or 1
+
+                // --- FIX: Call boss takeDamage() directly ---
+                if (target instanceof monster.BOSS_Skeleking) {
+                    ((monster.BOSS_Skeleking)target).takeDamage(dmg);
+                } else {
+                    gp.player.damageMonster(monsterIndex);
+                }
+
+                // Show HP bar on hit (for both melee and projectile)
+                target.showHpBar = true;
+                target.hpBarDisplayCounter = 150;
+                alive = false;
+                return;
             }
+            // Check collision with NPCs
+            int npcIndex = gp.cChecker.checkEntity(this, gp.npc);
+            if (npcIndex != 999) {
+                alive = false;
+                return;
+            }
+
+            // Check collision with collidable objects (like chests, pillars, etc)
+            int objIndex = gp.cChecker.checkObject(this, false);
+            if (objIndex != 999 && gp.obj[gp.currentMap][objIndex].collision) {
+                alive = false;
+                return;
+            }
+
+            // Check collision with tiles (walls, obstacles)
+            gp.cChecker.checkTile(this);
+            if (collisionOn) {
+                alive = false;
+                return;
+            }
+
         } else if (user != gp.player) {
 
         }

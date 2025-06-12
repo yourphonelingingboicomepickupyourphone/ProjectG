@@ -472,36 +472,72 @@ public class Player extends Entity{
 		if (keyH.spacePressed == true && attackCooldown == 0 && this.currentWeapon != null && 
 				!attackCancel) {
 			int hitboxType = currentWeapon.weaponType;
-			if (hitboxType == 4) { // Staff
-				int manaCost = 20;
+			if (hitboxType == 4) { // Staff (Fireball)
+				int manaCost = 10;
 				if (mana >= manaCost) {
 					mana -= manaCost;
 					projectile.PROJECTILE_Fire_Ball fireball = new projectile.PROJECTILE_Fire_Ball(gp);
-					int px = this.worldX;
-					int py = this.worldY;
+
+					// Calculate the center of the player
+					int centerX = this.worldX + this.solidArea.x + this.solidArea.width / 2;
+					int centerY = this.worldY + this.solidArea.y + this.solidArea.height / 2;
+					int px = centerX;
+					int py = centerY;
+
 					switch (direction) {
-						case "up":    py -= gp.tileSize; break;
-						case "down":  py += gp.tileSize; break;
-						case "left":  px -= gp.tileSize; break;
-						case "right": px += gp.tileSize; break;
+						case "up":
+							px = centerX;
+							py = this.worldY + this.solidArea.y - gp.tileSize / 2;
+							break;
+						case "down":
+							px = centerX - this.solidArea.width;
+							py = this.worldY + this.solidArea.y + this.solidArea.height / 2;
+							break;
+						case "left":
+							px = this.worldX + this.solidArea.x - gp.tileSize / 2;
+							py = centerY - this.solidArea.height / 2;
+							break;
+						case "right":
+							px = this.worldX + this.solidArea.x + this.solidArea.width + gp.tileSize / 2;
+							py = centerY - this.solidArea.height / 2;
+							break;
 					}
 					fireball.set(px, py, direction, true, this);
-					gp.projectileList.add(fireball);
-					System.out.println("Creating fireball at: " + px + "," + py + " dir=" + direction);
-					System.out.println("projectileList size before: " + gp.projectileList.size());
 					gp.projectileList.add(fireball);
 					attacking = true;
 					attackCooldown = ATTACK_COOLDOWN_MAX;
 				} else {
 					gp.ui.addMessage(gp.ui.tr("message.not_enough_mana"));
 				}
-				keyH.spacePressed = false;
-				return;
-			} else if (hitboxType == 3) { // Bow
-				// Shoot arrow
+					keyH.spacePressed = false;
+					return;
+			} else if (hitboxType == 3) { // Bow (Arrow)
 				projectile.PROJECTILE_Arrow arrow = new projectile.PROJECTILE_Arrow(gp);
-				int px = this.worldX;
-				int py = this.worldY;
+
+				// Calculate the center of the player
+				int centerX = this.worldX + this.solidArea.x + this.solidArea.width / 2;
+				int centerY = this.worldY + this.solidArea.y + this.solidArea.height / 2;
+				int px = centerX;
+				int py = centerY;
+
+				switch (direction) {
+					case "up":
+						px = centerX;
+						py = this.worldY + this.solidArea.y - gp.tileSize / 2;
+						break;
+					case "down":
+						px = centerX;
+						py = this.worldY + this.solidArea.y + this.solidArea.height + gp.tileSize / 2;
+						break;
+					case "left":
+						px = this.worldX + this.solidArea.x - gp.tileSize / 2;
+						py = centerY;
+						break;
+					case "right":
+						px = this.worldX + this.solidArea.x + this.solidArea.width + gp.tileSize / 2;
+						py = centerY;
+						break;
+				}
 				arrow.set(px, py, direction, true, this);
 				gp.projectileList.add(arrow);
 				attacking = true;

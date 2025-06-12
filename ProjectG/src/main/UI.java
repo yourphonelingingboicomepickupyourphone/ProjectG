@@ -2269,8 +2269,9 @@ public class UI {
 
 	// Example: In your drawPauseScreen() or a new drawSaveLoadScreen()
 	public void drawSaveLoadScreen(Graphics2D g2, boolean isSaving) {
-	    int width = gp.tileSize * 8;
-	    int height = gp.tileSize * 7;
+		
+	    int width = gp.tileSize * 15;
+	    int height = gp.tileSize * 10;
 	    int frameX = (gp.baseWidth - width) / 2;
 	    int frameY = (gp.baseHeight - height) / 2;
 

@@ -14,8 +14,7 @@ public class PROJECTILE_Fire_Ball extends Projectile {
         name = "Fire Ball";
         alive = true;
         speed = 8;
-        attackBonus = 50;
-        manaCost = 50;
+        attackBonus = 100;
         getImage();
      
     }

@@ -16,27 +16,26 @@ public class PROJECTILE_Arrow extends Projectile{
         name = "Fire Ball";
         alive = true;
         speed = 8;
-        attackBonus = 50;
-        manaCost = 50;
+        attackBonus = 70;
         getImage();
      
     }
 
     public void getImage() {
-        up1 = setup("/projectiles/arrow");
-        up2 = setup("/projectiles/arrow");
-        down1 = setup("/projectiles/arrow");
-        down2 = setup("/projectiles/arrow");
-        left1 = setup("/projectiles/arrow");
-        left2 = setup("/projectiles/arrow");
-        right1 = setup("/projectiles/arrow");
-        right2 = setup("/projectiles/arrow");
+        up1 = setup("/projectiles/arrow_up_1");
+        up2 = setup("/projectiles/arrow_up_2");
+        down1 = setup("/projectiles/arrow_down_1");
+        down2 = setup("/projectiles/arrow_down_2");
+        left1 = setup("/projectiles/arrow_left_1");
+        left2 = setup("/projectiles/arrow_left_2");
+        right1 = setup("/projectiles/arrow_right_1");
+        right2 = setup("/projectiles/arrow_right_2");
     }
 
     @Override
     public void draw(Graphics2D g2) {
-        int screenX = worldX - gp.player.worldX + gp.player.screenX;
-        int screenY = worldY - gp.player.worldY + gp.player.screenY;
+        int screenX = worldX - gp.player.worldX + gp.player.screenX + gp.tileSize / 2;
+        int screenY = worldY - gp.player.worldY + gp.player.screenY + gp.tileSize / 2;
 
         BufferedImage image = null;
         switch (direction) {
