@@ -2281,9 +2281,9 @@ public class UI {
 	    g2.setFont(currentFontBold.deriveFont(Font.BOLD, 48f));
 	    String title = isSaving ? "Save Game" : "Load Game";
 	    int titleX = getXForCenteredText(title);
-	    int titleY = frameY + gp.tileSize * 2 / 3;
+	    int titleY = frameY + gp.tileSize * 4 / 5;
 	    g2.setColor(Color.WHITE);
-	    g2.drawString(title, titleX, titleY);
+	    g2.drawString(title, titleX, titleY + gp.tileSize / 2);
 
 	    // Slot list
 	    g2.setFont(currentFontBold.deriveFont(Font.BOLD, 36f));
