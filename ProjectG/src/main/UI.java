@@ -193,6 +193,9 @@ public class UI {
 		else if (gp.gameState == gp.saveLoadState) {
 			drawSaveLoadScreen(g2, isSaving);
 		}
+		else if (gp.gameState == gp.bossDeadState) {
+			drawBossDeadScreen();
+		}
 	}
 
 
@@ -2357,5 +2360,30 @@ public class UI {
 			return "Corrupt";
 		}
 		return "Empty";
+	}
+
+	public void drawBossDeadScreen() {
+		g2.setColor(new java.awt.Color(0, 0, 0, 180));
+		g2.fillRect(0, 0, gp.baseWidth, gp.baseHeight);
+
+		g2.setFont(currentFontBold.deriveFont(java.awt.Font.BOLD, 64f));
+		String text = "Congratulations!";
+		int x = getXForCenteredText(text);
+		int y = gp.baseHeight / 2 - gp.tileSize;
+		g2.setColor(java.awt.Color.YELLOW);
+		g2.drawString(text, x, y);
+
+		g2.setFont(currentFont.deriveFont(java.awt.Font.PLAIN, 36f));
+		String sub = "You have defeated the Skeleking!";
+		x = getXForCenteredText(sub);
+		y += gp.tileSize * 2;
+		g2.setColor(java.awt.Color.WHITE);
+		g2.drawString(sub, x, y);
+
+		String instr = "Press ENTER to return to main menu";
+		x = getXForCenteredText(instr);
+		y += gp.tileSize * 2;
+		g2.setColor(java.awt.Color.LIGHT_GRAY);
+		g2.drawString(instr, x, y);
 	}
 }

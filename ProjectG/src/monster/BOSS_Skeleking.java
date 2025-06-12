@@ -126,6 +126,7 @@ public class BOSS_Skeleking extends Entity {
             }
             gp.entityList.removeIf(e -> e == this);
             System.out.println("Boss removed from monster array and entityList!");
+            gp.gameState = gp.bossDeadState; 
             return;
         }
 

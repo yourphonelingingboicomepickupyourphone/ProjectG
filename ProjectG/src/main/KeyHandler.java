@@ -1179,4 +1179,21 @@ public class KeyHandler implements KeyListener{
 	        gp.gameState = gp.playState;
 	    }
 	}
+	
+	public void bossDeadState(int code) {
+	    if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE) || code == KeyEvent.VK_ENTER) {
+	        // Reset player state
+	        gp.player.reset();
+	        // Reset all entities (monsters, NPCs, objects, etc.)
+	        gp.resetEntities();
+	        // Reset save/load slot selection and menu state
+	        gp.ui.saveSlotIndex = 0;
+	        gp.ui.commandNum = 0;
+	        gp.ui.titleScreenState = 0;
+	        // Optionally reset other game variables here
+
+	        // Return to main menu
+	        gp.gameState = gp.titleState;
+	    }
+	}
 }

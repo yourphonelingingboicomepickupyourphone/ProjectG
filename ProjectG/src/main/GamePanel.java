@@ -77,6 +77,7 @@ public class GamePanel extends JPanel implements Runnable{
 	public final int skillsState = 12;	
 	public final int skillTreeState = 13; //Skill tree state
 	public final int saveLoadState = 14; // Save/load state
+	public final int bossDeadState = 99; // Pick a unique unused number
 
 	public boolean debugMode = false;	//Debug mode, true to enable debug features
 
