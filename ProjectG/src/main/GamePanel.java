@@ -187,7 +187,10 @@ public class GamePanel extends JPanel implements Runnable{
 						monster[currentMap][i].update();
 					}
 					if (monster[currentMap][i].alive == false) {
-						monster[currentMap][i] = null;
+						if (monster[currentMap][i] instanceof monster.BOSS_Skeleking) {
+							gameState = bossDeadState; // Switch to boss dead state if the boss is defeated
+						}
+					monster[currentMap][i] = null;
 					}
 				}
 			}	//Monster update

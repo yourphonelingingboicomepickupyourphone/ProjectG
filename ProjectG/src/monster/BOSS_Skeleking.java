@@ -113,7 +113,7 @@ public class BOSS_Skeleking extends Entity {
     @Override
     public void update() {
         if (health < 0) health = 0;
-
+        
         if (health == 0 && alive) {
             alive = false;
             dying = true;
@@ -126,10 +126,10 @@ public class BOSS_Skeleking extends Entity {
             }
             gp.entityList.removeIf(e -> e == this);
             System.out.println("Boss removed from monster array and entityList!");
-            gp.gameState = gp.bossDeadState; 
+            // gp.gameState = gp.bossDeadState; 
             return;
         }
-
+        
         // --- PHASE CHANGING LOGIC ---
         if (!phaseChanging && health <= maxHealth / 2 && phase == 1) {
             phaseChanging = true;
