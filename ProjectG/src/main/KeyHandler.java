@@ -82,6 +82,9 @@ public class KeyHandler implements KeyListener{
 		else if (gp.gameState == gp.saveLoadState) {
 			saveLoadState(code);
 		}
+		else if (gp.gameState == gp.bossDeadState){
+			bossDeadState(code);
+		}
 		
 
 	}
