@@ -89,25 +89,30 @@ public class AssetSetter {
 		gp.obj[map][i].worldY = gp.tileSize * 49;
 		i++;
 
-		gp.obj[map][i] = new OBJ_Pillar(gp);
-		gp.obj[map][i].worldX = gp.tileSize * 46;
-		gp.obj[map][i].worldY = gp.tileSize * 43;
+		gp.obj[0][i] = new object.OBJ_Portal(gp, 1, 50, 50); // Teleport to map 1, col 50, row 50
+		gp.obj[0][i].worldX = gp.tileSize * 50;
+		gp.obj[0][i].worldY = gp.tileSize * 57;
 		i++;
 
-		gp.obj[map][i] = new OBJ_Pillar(gp);
-		gp.obj[map][i].worldX = gp.tileSize * 53;
-		gp.obj[map][i].worldY = gp.tileSize * 43;
-		i++;
+		// gp.obj[map][i] = new OBJ_Pillar(gp);
+		// gp.obj[map][i].worldX = gp.tileSize * 46;
+		// gp.obj[map][i].worldY = gp.tileSize * 43;
+		// i++;
 
-		gp.obj[map][i] = new OBJ_Pillar(gp);
-		gp.obj[map][i].worldX = gp.tileSize * 46;
-		gp.obj[map][i].worldY = gp.tileSize * 49;
-		i++;
+		// gp.obj[map][i] = new OBJ_Pillar(gp);
+		// gp.obj[map][i].worldX = gp.tileSize * 53;
+		// gp.obj[map][i].worldY = gp.tileSize * 43;
+		// i++;
 
-		gp.obj[map][i] = new OBJ_Pillar(gp);
-		gp.obj[map][i].worldX = gp.tileSize * 53;
-		gp.obj[map][i].worldY = gp.tileSize * 49;
-		i++;
+		// gp.obj[map][i] = new OBJ_Pillar(gp);
+		// gp.obj[map][i].worldX = gp.tileSize * 46;
+		// gp.obj[map][i].worldY = gp.tileSize * 49;
+		// i++;
+
+		// gp.obj[map][i] = new OBJ_Pillar(gp);
+		// gp.obj[map][i].worldX = gp.tileSize * 53;
+		// gp.obj[map][i].worldY = gp.tileSize * 49;
+		// i++;
 
 		gp.obj[map][i] = new ITEM_Door_Key(gp);
 		gp.obj[map][i].worldX = gp.tileSize * 50;
@@ -178,7 +183,7 @@ public class AssetSetter {
 	public void setMonster() {
 		int map = 1;
 		int i = 0;
-		spawnRandomMonstersInArea(map, 45, 45, 55, 55, 5);
+		spawnRandomMonstersInArea(map, 45, 45, 55, 55, 20);
 
 		i+=5;
 

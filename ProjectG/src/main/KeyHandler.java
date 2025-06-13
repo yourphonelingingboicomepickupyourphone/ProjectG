@@ -1090,11 +1090,28 @@ public class KeyHandler implements KeyListener{
 	}
 
 	public void skillTreeState(int code) {
-	    // Example navigation: up/down to move, enter to unlock
-	    if (code == gp.keyConfig.getKey(KeyConfig.UP)) selectedSkillTreeLevel--;
-	    if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) selectedSkillTreeLevel++;
+	    int treeDepth = gp.ui.getSkillTreeDepth(gp.player.skillTreeRoot);
+
+	    // Up/Down navigation
+	    if (code == gp.keyConfig.getKey(KeyConfig.UP)) {
+	        selectedSkillTreeLevel--;
+	        if (selectedSkillTreeLevel < 0) selectedSkillTreeLevel = 0;
+	        // Scroll up if needed
+	        if (selectedSkillTreeLevel < gp.ui.skillTreeScroll) {
+	            gp.ui.skillTreeScroll = selectedSkillTreeLevel;
+	        }
+	    }
+	    if (code == gp.keyConfig.getKey(KeyConfig.DOWN)) {
+	        selectedSkillTreeLevel++;
+	        if (selectedSkillTreeLevel > treeDepth - 1) selectedSkillTreeLevel = treeDepth - 1;
+	        // Scroll down if needed
+	        if (selectedSkillTreeLevel >= gp.ui.skillTreeScroll + gp.ui.maxVisibleSkillTreeNodes) {
+	            gp.ui.skillTreeScroll = selectedSkillTreeLevel - gp.ui.maxVisibleSkillTreeNodes + 1;
+	        }
+	    }
+
+	    // Unlock skill
 	    if (code == gp.keyConfig.getKey(KeyConfig.CHOOSE)) {
-	        // Find selected node and unlock if possible
 	        skill.SkillTreeNode node = getSelectedSkillTreeNode();
 	        if (node != null && !node.unlocked && node.parent != null && node.parent.unlocked && gp.player.skillPoints >= node.requiredPoints) {
 	            node.unlocked = true;
@@ -1103,15 +1120,20 @@ public class KeyHandler implements KeyListener{
 	            gp.ui.addMessage("Unlocked: " + node.skill.getName(gp));
 	        }
 	    }
-		if (code == gp.keyConfig.getKey(KeyConfig.SKILLS)) {
-			gp.gameState = gp.skillsState; // Exit skill tree to skills menu
-			gp.ui.assigningSkill = false; // Reset assigning state
-			gp.ui.skillsCommandNum = 0; // Reset command number
-			gp.ui.skillListScroll = 0; // Reset scroll position
-			selectedSkillTreeLevel = 0; // Reset skill tree level
-		}
-		if (code == gp.keyConfig.getKey(KeyConfig.ESCAPE)) {
-	        gp.gameState = gp.playState; // Exit skill tree
+
+	    // Exit to skills menu
+	    if (code == gp.keyConfig.getKey(KeyConfig.SKILLS)) {
+	        gp.gameState = gp.skillsState;
+	        gp.ui.assigningSkill = false;
+	        gp.ui.skillsCommandNum = 0;
+	        gp.ui.skillListScroll = 0;
+	        selectedSkillTreeLevel = 0;
+	        gp.ui.skillTreeScroll = 0;
+	    }
+
+	    // Exit to play state
+	    if (code == gp.keyConfig.getKey(KeyConfig.ESCAPE)) {
+	        gp.gameState = gp.playState;
 	    }	
 	}
 

@@ -82,6 +82,9 @@ public class UI {
 	public final int maxSaveSlots = 3;
 	public boolean isSaving = true; // Flag to indicate if currently saving
 
+	public int skillTreeScroll = 0; // 0 = top of tree
+	public final int maxVisibleSkillTreeNodes = 3;
+
 	public UI(GamePanel gp) {
 		this.gp = gp;
 		
@@ -2140,15 +2143,33 @@ public class UI {
 	    String points = "Skill Points: " + gp.player.skillPoints;
 	    int pointsWidth = g2.getFontMetrics().stringWidth(points);
 	    g2.setColor(Color.YELLOW);
-	    g2.drawString(points, centerX - pointsWidth / 2, startY + gp.tileSize);
+	    int pointsY = startY + gp.tileSize;
+	    g2.drawString(points, centerX - pointsWidth / 2, pointsY);
+
+	    // --- Define tree area ---
+	    int areaTop = pointsY + gp.tileSize / 2;
+	    int areaBottom = gp.baseHeight - gp.tileSize * 2 - gp.tileSize / 2; // leave space for instructions
+	    int areaHeight = areaBottom - areaTop;
 
 	    // --- Draw the tree recursively ---
 	    skill.SkillTreeNode root = gp.player.skillTreeRoot;
 	    int treeDepth = getSkillTreeDepth(root);
-	    int[] maxWidths = new int[treeDepth];
-	    getMaxWidths(root, 0, maxWidths);
 
-	    int rootY = startY + gp.tileSize * 2;
+	    // Clamp scroll
+	    if (skillTreeScroll > treeDepth - maxVisibleSkillTreeNodes) {
+	        skillTreeScroll = Math.max(0, treeDepth - maxVisibleSkillTreeNodes);
+	    }
+	    if (skillTreeScroll < 0) skillTreeScroll = 0;
+
+	    // Calculate verticalGap to fit exactly maxVisibleSkillTreeNodes in areaHeight
+	    int visibleNodes = Math.min(maxVisibleSkillTreeNodes, treeDepth);
+	    if (visibleNodes > 1) {
+	        verticalGap = (areaHeight - nodeSize) / (visibleNodes - 1);
+	    } else {
+	        verticalGap = areaHeight - nodeSize;
+	    }
+
+	    int rootY = areaTop + nodeSize / 2 - skillTreeScroll * verticalGap;
 	    int rootX = centerX;
 
 	    // Find selected node
@@ -2156,8 +2177,22 @@ public class UI {
 	    int selectedIndex = gp.keyH.selectedSkillTreeIndex;
 	    skill.SkillTreeNode selected = getSelectedSkillTreeNode(root, selectedLevel, selectedIndex);
 
-	    // Draw recursively
-	    drawSkillTreeNodeRecursive(root, rootX, rootY, nodeSize, verticalGap, horizontalGap, 0, 0, selected);
+	    // Draw recursively (pass areaTop and areaBottom for clamping)
+	    drawSkillTreeNodeRecursive(root, rootX, rootY, nodeSize, verticalGap, horizontalGap, 0, 0, selected, areaTop, areaBottom);
+
+	    // Draw scrollbar if needed
+	    if (treeDepth > maxVisibleSkillTreeNodes) {
+	        int barHeight = areaHeight;
+	        int barY = areaTop;
+	        int barX = gp.baseWidth - gp.tileSize * 2;
+	        int scrollHeight = Math.max(gp.tileSize / 2, (int) ((float)maxVisibleSkillTreeNodes / treeDepth * barHeight));
+	        int scrollY = barY + (int) ((float)skillTreeScroll / treeDepth * barHeight);
+
+	        g2.setColor(new Color(180, 180, 180, 180));
+	        g2.fillRoundRect(barX, barY, gp.tileSize / 6, barHeight, 8, 8);
+	        g2.setColor(new Color(80, 80, 255, 220));
+	        g2.fillRoundRect(barX, scrollY, gp.tileSize / 6, scrollHeight, 8, 8);
+	    }
 
 	    // Instructions
 	    g2.setFont(currentFont.deriveFont(Font.PLAIN, 24f));
@@ -2167,28 +2202,33 @@ public class UI {
 	    g2.drawString(instr, centerX - instrWidth / 2, gp.baseHeight - gp.tileSize);
 	}
 
-	// Recursively draw the skill tree
-	private void drawSkillTreeNodeRecursive(skill.SkillTreeNode node, int x, int y, int size, int vGap, int hGap, int level, int index, skill.SkillTreeNode selected) {
-	    // Draw children first (so lines go under nodes)
-	    int numChildren = node.children.size();
-	    if (numChildren > 0) {
-	        int totalWidth = (numChildren - 1) * hGap;
-	        int childX = x - totalWidth / 2;
-	        int childY = y + vGap;
-	        for (int i = 0; i < numChildren; i++) {
-	            skill.SkillTreeNode child = node.children.get(i);
-	            // Draw line from parent to child
-	            g2.setColor(Color.WHITE);
-	            g2.setStroke(new BasicStroke(3));
-	            g2.drawLine(x, y + size / 2, childX, childY - size / 2);
-	            // Draw child recursively
-	            drawSkillTreeNodeRecursive(child, childX, childY, size, vGap, hGap, level + 1, i, selected);
-	            childX += hGap;
-	        }
-	    }
-	    // Draw this node
-	    boolean isSelected = (node == selected);
-	    drawSkillNode(node, x, y, size, isSelected);
+	// Recursively draw the skill tree, clamped to areaTop/areaBottom
+	private void drawSkillTreeNodeRecursive(skill.SkillTreeNode node, int x, int y, int size, int vGap, int hGap, int level, int index, skill.SkillTreeNode selected, int areaTop, int areaBottom) {
+		// Only draw if y is in visible range
+		int minY = areaTop;
+		int maxY = areaBottom;
+		if (y + size / 2 >= minY && y - size / 2 <= maxY) {
+			boolean isSelected = (node == selected);
+			drawSkillNode(node, x, y, size, isSelected);
+		}
+		// Draw children
+		int numChildren = node.children.size();
+		if (numChildren > 0) {
+			int totalWidth = (numChildren - 1) * hGap;
+			int childX = x - totalWidth / 2;
+			int childY = y + vGap;
+			for (int i = 0; i < numChildren; i++) {
+				skill.SkillTreeNode child = node.children.get(i);
+				// Draw line from parent to child if in visible range
+				if (y + size / 2 >= minY && y - size / 2 <= maxY) {
+					g2.setColor(Color.WHITE);
+					g2.setStroke(new BasicStroke(3));
+					g2.drawLine(x, y + size / 2, childX, childY - size / 2);
+				}
+				drawSkillTreeNodeRecursive(child, childX, childY, size, vGap, hGap, level + 1, i, selected, areaTop, areaBottom);
+				childX += hGap;
+			}
+		}
 	}
 
 	// Helper to draw a skill node with highlight, icon, name, and lock
@@ -2242,7 +2282,7 @@ public class UI {
 	}
 
 	// Utility: get tree depth
-	private int getSkillTreeDepth(skill.SkillTreeNode node) {
+	public int getSkillTreeDepth(skill.SkillTreeNode node) {
 	    if (node.children.isEmpty()) return 1;
 	    int max = 0;
 	    for (skill.SkillTreeNode child : node.children) {

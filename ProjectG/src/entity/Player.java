@@ -594,6 +594,8 @@ public class Player extends Entity{
 					Entity obj = gp.obj[gp.currentMap][objIndex];
 					if (obj instanceof object.OBJ_Fountain) {
 						((object.OBJ_Fountain)obj).interact();
+					} else if (obj instanceof object.OBJ_Portal) {
+						((object.OBJ_Portal)obj).interact();
 					} else if (obj.name.equals("Chest")) {
 						interactChest(objIndex);
 					} else {
@@ -735,6 +737,8 @@ public class Player extends Entity{
 				Entity obj = gp.obj[gp.currentMap][objIndex];
 				if (obj instanceof object.OBJ_Fountain) {
 					((object.OBJ_Fountain)obj).interact();
+				} else if (obj instanceof object.OBJ_Portal) {
+					((object.OBJ_Portal)obj).interact();
 				} else if (obj.name.equals("Chest")) {
 					interactChest(objIndex);
 				} else {
