@@ -25,7 +25,7 @@ public class ITEM_Staff_Normal extends Entity {
         attackRight1 = setup("/player/attack_staff_right_1");
         attackRight2 = setup("/player/attack_staff_right_2");
 
-        attackBonus = 10;
+        attackBonus = 1000;
         cooldownBonus = 10; //time in ms to wait before the next attack
         rarity = 0; //0 = common, 1 = rare, 2 = epic, 3 = legendary
         levelRequirement = 1; //level requirement to use the item

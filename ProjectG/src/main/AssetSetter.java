@@ -114,40 +114,40 @@ public class AssetSetter {
 		// gp.obj[map][i].worldY = gp.tileSize * 49;
 		// i++;
 
-		gp.obj[map][i] = new ITEM_Door_Key(gp);
-		gp.obj[map][i].worldX = gp.tileSize * 50;
-		gp.obj[map][i].worldY = gp.tileSize * 59;
-		i++;
+		// gp.obj[map][i] = new ITEM_Door_Key(gp);
+		// gp.obj[map][i].worldX = gp.tileSize * 50;
+		// gp.obj[map][i].worldY = gp.tileSize * 59;
+		// i++;
 
-		gp.obj[map][i] = new ITEM_Door_Key(gp);
-		gp.obj[map][i].worldX = gp.tileSize * 54;
-		gp.obj[map][i].worldY = gp.tileSize * 59;
-		i++;
+		// gp.obj[map][i] = new ITEM_Door_Key(gp);
+		// gp.obj[map][i].worldX = gp.tileSize * 54;
+		// gp.obj[map][i].worldY = gp.tileSize * 59;
+		// i++;
 
-		gp.obj[map][i]= new ITEM_Dual_Blade_Axe(gp);
-		gp.obj[map][i].worldX = gp.tileSize * 50;
-		gp.obj[map][i].worldY = gp.tileSize * 62;
-		i++;
+		// gp.obj[map][i]= new ITEM_Dual_Blade_Axe(gp);
+		// gp.obj[map][i].worldX = gp.tileSize * 50;
+		// gp.obj[map][i].worldY = gp.tileSize * 62;
+		// i++;
 
-		gp.obj[map][i] = new ITEM_Mini_Health_Potion(gp);
-		gp.obj[map][i].worldX = gp.tileSize * 54;
-		gp.obj[map][i].worldY = gp.tileSize * 62;
-		i++;
+		// gp.obj[map][i] = new ITEM_Mini_Health_Potion(gp);
+		// gp.obj[map][i].worldX = gp.tileSize * 54;
+		// gp.obj[map][i].worldY = gp.tileSize * 62;
+		// i++;
 
-		gp.obj[map][i] = new ITEM_Mini_Mana_Potion(gp);
-		gp.obj[map][i].worldX = gp.tileSize * 54;
-		gp.obj[map][i].worldY = gp.tileSize * 65;
-		i++;
+		// gp.obj[map][i] = new ITEM_Mini_Mana_Potion(gp);
+		// gp.obj[map][i].worldX = gp.tileSize * 54;
+		// gp.obj[map][i].worldY = gp.tileSize * 65;
+		// i++;
 
-		gp.obj[map][i] = new ITEM_Armor_Normal(gp);
-		gp.obj[map][i].worldX = gp.tileSize * 50;
-		gp.obj[map][i].worldY = gp.tileSize * 65;
-		i++;
+		// gp.obj[map][i] = new ITEM_Armor_Normal(gp);
+		// gp.obj[map][i].worldX = gp.tileSize * 50;
+		// gp.obj[map][i].worldY = gp.tileSize * 65;
+		// i++;
 
-		gp.obj[map][i] = new ITEM_Better_Armor(gp);
-		gp.obj[map][i].worldX = gp.tileSize * 50;
-		gp.obj[map][i].worldY = gp.tileSize * 68;
-		i++;
+		// gp.obj[map][i] = new ITEM_Better_Armor(gp);
+		// gp.obj[map][i].worldX = gp.tileSize * 50;
+		// gp.obj[map][i].worldY = gp.tileSize * 68;
+		// i++;
 
 		gp.obj[map][i] = new OBJ_Fountain(gp);
 		gp.obj[map][i].worldX = gp.tileSize * 50;
@@ -183,7 +183,7 @@ public class AssetSetter {
 	public void setMonster() {
 		int map = 1;
 		int i = 0;
-		spawnRandomMonstersInArea(map, 45, 45, 55, 55, 20);
+		spawnRandomMonstersInArea(map, 45, 45, 55, 55, 10);
 
 		i+=5;
 

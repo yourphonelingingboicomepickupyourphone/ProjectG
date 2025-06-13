@@ -12,7 +12,7 @@ public class ITEM_Dual_Blade_Axe extends ITEM_Axe_Normal {
         down1 = setup("/items/dual_blade_axe");
         rarity = 0;
         cooldownBonus = 30;
-        attackBonus = 50;
+        attackBonus = 1000;
         defenseBonus = 10;
         levelRequirement = 2; //level requirement to use the item
 

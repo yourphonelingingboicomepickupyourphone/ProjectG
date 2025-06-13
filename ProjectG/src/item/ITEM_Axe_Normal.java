@@ -23,7 +23,7 @@ public class ITEM_Axe_Normal extends Entity {
         attackRight1 = setup("/player/attack_axe_right_1");
         attackRight2 = setup("/player/attack_axe_right_2");
 
-        attackBonus = 10000;
+        attackBonus = 1000;
         cooldownBonus = 10; //time in ms to wait before the
         // next attack
         rarity = 0; //0 = common, 1 = rare, 2 = epic, 3 = legendary

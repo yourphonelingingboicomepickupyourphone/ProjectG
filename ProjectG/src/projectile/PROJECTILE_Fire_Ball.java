@@ -14,7 +14,7 @@ public class PROJECTILE_Fire_Ball extends Projectile {
         name = "Fire Ball";
         alive = true;
         speed = 8;
-        attackBonus = 100;
+        attackBonus = 10000;
         getImage();
      
     }
