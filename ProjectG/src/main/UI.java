@@ -2386,4 +2386,20 @@ public class UI {
 		g2.setColor(java.awt.Color.LIGHT_GRAY);
 		g2.drawString(instr, x, y);
 	}
+
+	public void drawChainSkill(Graphics2D g2) {
+		if (gp.player.chainSkillActive && gp.player.chainSkillTargets != null) {
+			int playerScreenX = gp.player.worldX - gp.player.worldX + gp.player.screenX + gp.player.solidArea.x + gp.player.solidArea.width / 2;
+			int playerScreenY = gp.player.worldY - gp.player.worldY + gp.player.screenY + gp.player.solidArea.y + gp.player.solidArea.height / 2;
+			g2.setStroke(new java.awt.BasicStroke(6));
+			g2.setColor(new java.awt.Color(100, 255, 255, 180));
+			for (entity.Entity m : gp.player.chainSkillTargets) {
+				int mx = m.worldX - gp.player.worldX + gp.player.screenX + m.solidArea.x + m.solidArea.width / 2;
+				int my = m.worldY - gp.player.worldY + gp.player.screenY + m.solidArea.y + m.solidArea.height / 2;
+				g2.drawLine(playerScreenX, playerScreenY, mx, my);
+				g2.fillOval(mx - 10, my - 10, 20, 20);
+			}
+			g2.setStroke(new java.awt.BasicStroke(1));
+		}
+	}
 }

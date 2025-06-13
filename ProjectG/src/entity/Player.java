@@ -85,6 +85,10 @@ public class Player extends Entity{
 	public skill.SkillTreeNode skillTreeRoot;
 	public int skillPoints = 0; // Points available to spend
 
+	public java.util.List<Entity> chainSkillTargets = null;
+	public boolean chainSkillActive = false;
+	public int chainSkillAnimCounter = 0;
+
 	public Player(GamePanel gp, KeyHandler kH) {
 
 		super(gp);
@@ -766,6 +770,14 @@ public class Player extends Entity{
                 );
                 gp.projectileList.add(newWave);
                 pendingEarthquakeWaves.poll(); // Remove this wave from the queue
+            }
+        }
+
+		if (chainSkillActive) {
+            chainSkillAnimCounter--;
+            if (chainSkillAnimCounter <= 0) {
+                chainSkillActive = false;
+                chainSkillTargets = null;
             }
         }
 
@@ -1643,6 +1655,10 @@ public class Player extends Entity{
 	    skill.SkillTreeNode earthquakeNode = new skill.SkillTreeNode(new skill.SKILL_Fireball(gp));
 	    dashNode.children.add(earthquakeNode);
 	    earthquakeNode.parent = dashNode;
+
+		skill.SkillTreeNode chainNode = new skill.SkillTreeNode(new skill.SKILL_ChainLightning(gp));
+		earthquakeNode.children.add(chainNode);
+		chainNode.parent = earthquakeNode;
 	}
 
 	// Use the skill assigned to a specific key (Q/W/E/R)
